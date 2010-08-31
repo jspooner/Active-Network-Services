@@ -60,7 +60,7 @@ module Active
   end
 
 end  # module Active
-puts "FUCK SHIT 2"
+
 Active.require_all_libs_relative_to(__FILE__)
 Active.require_all_libs_relative_to(__FILE__, 'services')
 

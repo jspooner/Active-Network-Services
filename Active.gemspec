@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{Active}
-  s.version = "0.0.1"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jonathan Spooner, Brian Levine"]
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.email = %q{jspooner [at] gmail.com}
   s.executables = ["Active"]
   s.extra_rdoc_files = ["History.txt", "README.txt", "bin/Active", "version.txt"]
-  s.files = [".DS_Store", ".bnsignore", "Active.gemspec", "History.txt", "README.txt", "Rakefile", "bin/Active", "lib/Active.rb", "lib/services/activity.rb", "lib/services/search.rb", "spec/.DS_Store", "spec/Active_spec.rb", "spec/activity_spec.rb", "spec/search_spec.rb", "spec/spec_helper.rb", "test/test_Active.rb", "version.txt"]
+  s.files = [".bnsignore", "Active.gemspec", "History.txt", "README.txt", "Rakefile", "bin/Active", "lib/Active.rb", "lib/services/activity.rb", "lib/services/search.rb", "spec/.DS_Store", "spec/Active_spec.rb", "spec/activity_spec.rb", "spec/search_spec.rb", "spec/spec_helper.rb", "test/test_Active.rb", "version.txt"]
   s.homepage = %q{http://developer.active.com/docs/Activecom_Search_API_Reference}
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]
