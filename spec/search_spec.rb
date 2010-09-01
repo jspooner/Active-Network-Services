@@ -7,6 +7,12 @@ require File.join(File.dirname(__FILE__), %w[ .. lib services activity])
 # No need to type Britify:: before each call
 include Active::Services
 
+describe  "Set up" do
+  it "should set the api key"
+  it "should not all search.active.com by default"
+  it "should call search.active.com when told to"
+end
+
 describe  "Search URL Construction" do
 
   it "should construct a valid url with location" do
@@ -15,6 +21,11 @@ describe  "Search URL Construction" do
     uri.scheme.should eql("http")
     uri.host.should eql("search.active.com")
     uri.query.include?("l=#{CGI.escape("San Diego, CA, US")}").should be_true
+  end
+  
+  it "should construct a valid url from a zip code" do
+    uri = URI.parse(Search.construct_url( {:zip => "92121"} ))    
+    uri.query.include?("l=#{CGI.escape("92121")}").should be_true
   end
   
   it "should construct a valid url with CSV keywords" do
@@ -69,11 +80,10 @@ describe Search do
     FakeWeb.clean_registry
   end
   
-  # it "should be instantiated without any arguments" do
-  #   lambda { Search.new(  ) }.should raise_error(ArgumentError)
-  #   lambda { Search.new( "moo" ) }.should_not raise_error
-  # end
-
+  it "should have some channels" do
+    Search.CHANNELS.should_not be_nil
+  end
+  
   it "should raise and error during a 404" do
     FakeWeb.register_uri(:get, "http://search.active.com/search?api_key=&num=10&page=1&l=San+Diego%2C+CA%2C+US&f=activities&v=json&r=10&s=date_asc&k=&m=meta:startDate:daterange:today..+", 
                          :body => "Nothing to be found 'round here", :status => ["404", "Not Found"])
@@ -148,11 +158,27 @@ describe "Call Live Data" do
     results.each do |a|
       puts "-#{a.category}-"
       a.category.should satisfy { |d|
-        d == 'Running' 
+        d.include?('Running' )
       }
     end
     
     
   end
+  
+  it "should find activities that have been recently added" 
+  
+  it "should find upcoming events"
+  
+  it "should find popular events"
+  
+  it "should order by trending with params"
+  #   results = Search.search( {:channels => ['Running'], :sort => 'trending'} )
+  # end
+  
+  it "should order by RELEVANCE"
+  
+  it "should order by date DATE_ASC"
+
+  it "should order by date DATE_DESC"
   
 end

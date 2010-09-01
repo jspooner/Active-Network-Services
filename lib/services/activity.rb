@@ -1,34 +1,51 @@
 module Active
   module Services
     class Activity
-      attr_accessor :title, :address, :start_date, :start_time, :end_time, :end_date, :category, :desc
+      attr_accessor :title, :url, :category, :address, :start_date, :start_time, :end_time, :end_date, :category, :desc,
+                    :asset_id, :data
       def initialize data
-        data = HashWithIndifferentAccess.new(data)  
-        @title = data[:title]
-
-        unless data[:meta].nil?        
-          @start_date                  = Date.parse(data[:meta][:startDate])    
-          @end_date                    = Date.parse(data[:meta][:endDate])  if data[:meta][:endDate]
-          @category                    = data[:meta][:channel]      ||= ""
-          @desc                        = data[:meta][:description]  ||= ""
-          @start_time                  = data[:meta][:startTime]    ||= ""
-          @end_time                    = data[:meta][:endTime]      ||= ""
+        @data      = HashWithIndifferentAccess.new(data)  
+        self.title    = @data[:title]
+        @url      = @data[:url]
+  
+        unless @data[:meta].nil?  
+          self.asset_id                    = @data[:meta][:assetId]      
+          @start_date                  = Date.parse(@data[:meta][:startDate])    
+          @end_date                    = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
+          self.category                    = @data[:meta][:channel]      ||= ""
+          
+          @desc                        = @data[:meta][:description]  ||= ""
+          @start_time                  = @data[:meta][:startTime]    ||= ""
+          @end_time                    = @data[:meta][:endTime]      ||= ""
           @address = {
-            :name    => data[:meta][:location],
-            # # :address => data[:meta][''],          || ""   ,
-            :city    => data[:meta][:city],
-            :state   => data[:meta][:state],
-            :zip     => data[:meta][:zip],
-            :lat     => data[:meta][:latitude],
-            :lng     => data[:meta][:longitude],
-            :country => data[:meta][:country]
+            :name    => @data[:meta][:locationName],
+            :address    => @data[:meta][:location],
+            :city    => @data[:meta][:city],
+            :state   => @data[:meta][:state],
+            :zip     => @data[:meta][:zip],
+            :lat     => @data[:meta][:latitude],
+            :lng     => @data[:meta][:longitude],
+            :country => @data[:meta][:country]
+            
+            # dma?
+            
           }
         end
-        @onlineDonationAvailable     = data[:meta][:onlineDonationAvailable]
-        @onlineRegistrationAvailable = data[:meta][:onlineRegistrationAvailable]
-        @onlineMembershipAvailable   = data[:meta][:onlineMembershipAvailable]
+        @onlineDonationAvailable     = @data[:meta][:onlineDonationAvailable]
+        @onlineRegistrationAvailable = @data[:meta][:onlineRegistrationAvailable]
+        @onlineMembershipAvailable   = @data[:meta][:onlineMembershipAvailable]
 
       end
+      
+      # ahhh... just use the first channel if it's an array.
+      def category=(value)
+        @category = (value.class == Array) ? value[0] : value
+      end
+      
+      def asset_id=(value)        
+        @asset_id = (value.class==Array) ? value[0] : value
+      end
+      
     end
   end
 end

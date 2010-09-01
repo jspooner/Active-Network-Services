@@ -16,6 +16,7 @@ describe Activity do
         :trackbackurl                => "http://www.active.com/running/lake-buena-vista-fl/walt-disney-world-marathon-2011",
         :substitutionUrl             => "1820830",
         :assetId                     => ['3584C7D6-14FD-4FD1-BD07-C2A9B2925B6C','3584c7d6-14fd-4fd1-bd07-c2a9b2925b6c'],
+        :channel                     => ['action_sports','running'],  
         :city                        => "Lake Buena Vista",
         :latitude                    => "28.39494",
         :category                    => "Activities",
@@ -35,7 +36,6 @@ describe Activity do
         :contactPhone                => "407-938-3398",
         :startDate                   => "2011-01-09",
         :onlineDonationAvailable     => "true",
-        :channel                     => "Running",
         :assetTypeId                 => "3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6",
         :UpdateDateTime              => "8/18/2010 10:16:26 AM",
         :contactEmail                => 'wdw.sports.marathon.endurance@disneysports.com',
@@ -58,6 +58,10 @@ describe Activity do
   
   it "should be a valid activity" do
     a = Activity.new(@valid_attributes)
+    a.url.should eql("http://www.active.com/running/lake-buena-vista-fl/walt-disney-world-marathon-2011")
+    a.category.should eql("action_sports")
+    a.asset_id.should eql("3584C7D6-14FD-4FD1-BD07-C2A9B2925B6C")
+    
     a.title.should_not be_nil                      
     a.start_date.should_not be_nil                 
     a.end_date.should_not be_nil                   
@@ -85,17 +89,4 @@ describe Activity do
   end
   
   
-  
 end
-# :tag: 
-# :- event:10
-# :- Running:10
-# :splitMediaType: 
-# :- Event
-# :- Marathon
-# :assetName: 
-# :- "2011 Walt Disney World\xAE Marathon"
-# :- "2011 Walt Disney World\xAE Marathon"
-# mediaType: 
-# - Event
-# - Event\Marathon        
