@@ -8,6 +8,7 @@ require 'active_record'
 module Active
   module Services
     
+    # we should remove this class and just replace with symbols
     class Sort
       def self.DATE_ASC 
         "date_asc"
@@ -19,7 +20,8 @@ module Active
         "relevance"
       end
     end
-    
+
+    # we should remove this class and just replace with symbols    
     class Facet
       def self.ACTIVITIES
         "activities"
