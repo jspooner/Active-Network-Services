@@ -48,15 +48,30 @@ describe  "Search URL Construction" do
     uri.query.include?("num=10").should be_true    
     uri.query.include?("daterange:today..+").should be_true            
   end
+
+  it "should construct a valid url with channels array" do
+    uri = URI.parse( Search.construct_url( {:channels => [:running, :tri,:cycling, :yoga]} ) )
+    uri.query.include?("m=meta:channel=Running+OR+meta:channel=Cycling+OR+meta:channel=Mind%2520%2526%2520Mody%255CYoga").should be_true            
+  end
   
   it "should send valid channel info" do
-    uri = URI.parse( Search.construct_url({:channels => ['Running','Triathlon']}) )
-    uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true            
+    uri = URI.parse( Search.construct_url({:channels => [:running,:triathlon]}) )
+    uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true
+  end
+  
+  it "should send the correct channel value for everything in Search.CHANNELS" do
+    Search.CHANNELS.each do |key,value|
+      uri = URI.parse( Search.construct_url({:channels => [key]}) )
+      value = URI.escape(value, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      value = URI.escape(value, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+      value.gsub!(/\-/,"%252D")
+      uri.query.include?("meta:channel=#{value}").should be_true
+    end
   end
   
   it "should send a valid start and end date" do
-    uri = URI.parse( Search.construct_url() )    
-    uri.query.include?("daterange:today..+").should be_true            
+    uri = URI.parse( Search.construct_url() )
+    uri.query.include?("daterange:today..+").should be_true
   end
 
   it "should send a valid start and end date" do
@@ -65,11 +80,11 @@ describe  "Search URL Construction" do
   end
   
   it "should be valid with date range and channels" do
-    uri = URI.parse( Search.construct_url({:channels => ['Running','Triathlon'],
-                                           :start_date => Date.new(2010, 11, 1), 
+    uri = URI.parse( Search.construct_url({:channels => [:running, :triathlon],
+                                           :start_date => Date.new(2010, 11, 1),
                                            :end_date => Date.new(2010, 11, 15)}) )
-    uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true            
-    uri.query.include?("daterange:11%2F01%2F2010..11%2F15%2F2010").should be_true                    
+    uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true
+    uri.query.include?("daterange:11%2F01%2F2010..11%2F15%2F2010").should be_true
   end
   
   it "should pass the search radius" do
@@ -127,7 +142,7 @@ end
 
 describe "Call Live Data" do
   it "should find only events in the future" do
-    results = Search.search( {} )
+    results = Search.search( { :keywords => ["swim"]} )
     results.should have(10).items
     results.each do |a|
       a.start_date.should satisfy { |d|
@@ -157,7 +172,7 @@ describe "Call Live Data" do
   end
   
   it "should find only running activities" do
-    results = Search.search( {:channels => ['Running'],
+    results = Search.search( {:channels => [:running],
                               :start_date => Date.new(2010,1,1), :num_results => 20} )
     results.should have(20).items    
     results.each do |a|
@@ -167,6 +182,12 @@ describe "Call Live Data" do
       }
     end
   end
+  
+  it "should find yoga activities by channel" do
+    results = Search.search( {:channels => [:yoga]} )
+    results.should have(10).items        
+  end
+  
     
   it "should find activities that have been recently added" 
   
