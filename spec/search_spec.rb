@@ -72,6 +72,11 @@ describe  "Search URL Construction" do
     uri.query.include?("daterange:11%2F01%2F2010..11%2F15%2F2010").should be_true                    
   end
   
+  it "should pass the search radius" do
+    uri = URI.parse( Search.construct_url({:radius => '666'}) )
+    uri.query.include?("r=666").should be_true                
+  end
+  
 end
 
 
@@ -161,10 +166,8 @@ describe "Call Live Data" do
         d.include?('Running' )
       }
     end
-    
-    
   end
-  
+    
   it "should find activities that have been recently added" 
   
   it "should find upcoming events"
