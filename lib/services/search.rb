@@ -44,10 +44,10 @@ module Active
           :weight_lifting => 'Fitness\Weight Lifting',
           :gear => 'Gear',
           :lifestyle_vehicles => 'Lifestyle Vehicles',
-          :mind_mody => 'Mind & Mody',
-          :meditation => 'Mind & Mody\Meditation',
-          :pilates => 'Mind & Mody\Pilates',
-          :yoga => 'Mind & Mody\Yoga',
+          :mind_mody => 'Mind & Body',
+          :meditation => 'Mind & Body\Meditation',
+          :pilates => 'Mind & Body\Pilates',
+          :yoga => 'Mind & Body\Yoga',
           :nutrition => 'Nutrition',
           :travel => 'Travel',
           :women => 'Women',
@@ -239,13 +239,12 @@ module Active
         # end
         # 
         url = "#{SEARCH_URL}/search?api_key=#{options[:api_key]}&num=#{options[:num_results]}&page=#{options[:page]}&l=#{options[:location]}&f=#{options[:facet]}&v=#{options[:view]}&r=#{options[:radius]}&s=#{options[:sort]}&k=#{options[:keywords].join("+")}&m=#{meta_data}"
-        puts url
+        # puts url
         url
       end
       
       private
         def self.double_encode_channel str
-          # str = "Mind & Body\\Yoga"
           str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
           str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
           str.gsub!(/\-/,"%252D")

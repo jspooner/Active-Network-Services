@@ -171,6 +171,8 @@ describe "Call Live Data" do
     end
   end
   
+  # our model should be updated to handle multiple categories 
+  # I'm sure running is with in all of these events but we're only storing 1.
   it "should find only running activities" do
     results = Search.search( {:channels => [:running],
                               :start_date => Date.new(2010,1,1), :num_results => 20} )
