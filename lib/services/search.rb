@@ -200,6 +200,8 @@ module Active
           :end_date    => "+"
         }
         options.merge!(arg_options)
+
+        return arg_options[:url] if arg_options.keys.index(:url) #a search url was specified - bypass parsing the options (trending)
         
         options[:location] = CGI.escape(options[:location]) if options[:location]
         
