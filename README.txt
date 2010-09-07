@@ -14,6 +14,13 @@ Search api for Active Network
 
 	Search.search( {:location => "San Diego, CA, US"} )
 
+	List all categories
+	Active::Services::Search.CHANNELS.each do |key, value| 
+		puts key.to_s.humanize
+	end 
+	
+	
+
 == REQUIREMENTS:
 
 * none

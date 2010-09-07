@@ -9,7 +9,7 @@ include Active::Services
 describe Activity do
   before(:each) do 
     @valid_attributes = {
-      :title => "2011 Walt Disney World\xAE Marathon | Lake Buena Vista, Florida <b>...</b>",
+      :title => "<b>2011 Walt Disney World\xAE Marathon \u003cb\u003e...\u003c/b\u003e | Lake Buena Vista, Florida <b>...</b>",
       :url => "http://www.active.com/running/lake-buena-vista-fl/walt-disney-world-marathon-2011",
       :language => "en",
       :meta => {
@@ -54,6 +54,17 @@ describe Activity do
       :escapedUrl => 'http://www.active.com/running/lake-buena-vista-fl/walt-disney-world-marathon-2011',
       :summary => "This is the summary."
       }
+  end
+  
+  it "should strip out html from the title" do
+    a = Activity.new(@valid_attributes)
+    a.title.should eql("2011 Walt Disney World Marathon")
+  end
+  
+  it "should strip out unicode from the title"
+  
+  it "should use the first group if title contains pipes." do
+    
   end
   
   it "should be a valid activity" do

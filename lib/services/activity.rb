@@ -5,14 +5,14 @@ module Active
                     :asset_id, :data
       def initialize data
         @data      = HashWithIndifferentAccess.new(data)  
-        self.title    = @data[:title]
-        @url      = @data[:url]
+        self.title = @data[:title]
+        @url       = @data[:url]
   
         unless @data[:meta].nil?  
-          self.asset_id                    = @data[:meta][:assetId]      
-          @start_date                  = Date.parse(@data[:meta][:startDate])    
-          @end_date                    = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
-          self.category                    = @data[:meta][:channel]      ||= ""
+          self.asset_id = @data[:meta][:assetId]      
+          @start_date   = Date.parse(@data[:meta][:startDate])    
+          @end_date     = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
+          self.category = @data[:meta][:channel]      ||= ""
           
           @desc                        = @data[:meta][:description]  ||= ""
           @start_time                  = @data[:meta][:startTime]    ||= ""
@@ -37,7 +37,14 @@ module Active
 
       end
       
-      # ahhh... just use the first channel if it's an array.
+      def title=(value)
+        @title = value.gsub(/<\/?[^>]*>/, "") 
+        if value.include?("|")
+          @title = @title.split("|")[0].strip!
+        end
+      end
+      
+      # TODO add many channels
       def category=(value)
         @category = (value.class == Array) ? value[0] : value
       end
