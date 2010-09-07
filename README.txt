@@ -20,7 +20,7 @@ Search api for Active Network
 
 == INSTALL:
 
-* sudo gem install active
+* sudo gem install Active
 
 == LICENSE:
 

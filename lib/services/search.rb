@@ -239,7 +239,9 @@ module Active
         # end
         # 
         url = "#{SEARCH_URL}/search?api_key=#{options[:api_key]}&num=#{options[:num_results]}&page=#{options[:page]}&l=#{options[:location]}&f=#{options[:facet]}&v=#{options[:view]}&r=#{options[:radius]}&s=#{options[:sort]}&k=#{options[:keywords].join("+")}&m=#{meta_data}"
-        # puts url
+        puts "//////"
+        puts url
+        puts "//////"
         url
       end
       
