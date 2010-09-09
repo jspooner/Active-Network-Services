@@ -174,7 +174,8 @@ module Active
           http.get("#{searchurl.path}?#{searchurl.query}")
         }
         
-        if res.code == '200'
+        # if res.code == '200' or res.code == '307'
+        if (200..307).include?(res.code.to_i)
           parsed_json = JSON.parse(res.body)
           parsed_json['_results'].collect { |a| Activity.new(a) }          
         else
@@ -188,7 +189,7 @@ module Active
           :view        => "json",
           :facet       => Facet.ACTIVITIES,
           :sort        => Sort.DATE_ASC,
-          :radius      => "10",
+          :radius      => "50",
           :meta        => "",
           :num_results => "10",
           :page        => "1",
