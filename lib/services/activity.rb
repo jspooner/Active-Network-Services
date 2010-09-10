@@ -2,7 +2,7 @@ module Active
   module Services
     class Activity
       attr_accessor :title, :url, :category, :address, :start_date, :start_time, :end_time, :end_date, :category, :desc,
-                    :asset_id, :data
+                    :asset_id, :asset_type_id,  :data
       def initialize data
         @data      = HashWithIndifferentAccess.new(data)  
         self.title = @data[:title]
@@ -10,6 +10,7 @@ module Active
   
         unless @data[:meta].nil?  
           self.asset_id = @data[:meta][:assetId]      
+          self.asset_type_id = @data[:meta][:assetTypeId]      
           @start_date   = Date.parse(@data[:meta][:startDate])    
           @end_date     = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
           self.category = @data[:meta][:channel]      ||= ""
