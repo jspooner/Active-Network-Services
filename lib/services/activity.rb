@@ -2,11 +2,14 @@ module Active
   module Services
     class Activity
       attr_accessor :title, :url, :category, :address, :start_date, :start_time, :end_time, :end_date, :category, :desc,
-                    :asset_id, :asset_type_id,  :data
+                    :asset_id, :asset_type_id,  :data, :endIndex, :pageSize, :searchTime, :numberOfResults
       def initialize data
         @data      = HashWithIndifferentAccess.new(data)  
         self.title = @data[:title]
         @url       = @data[:url]
+        @pageSize = @data[:pageSize]
+        @searchTime = @data[:searchTime]
+        @numberOfResults = @data[:numberOfResults]
   
         unless @data[:meta].nil?  
           self.asset_id = @data[:meta][:assetId]      

@@ -178,7 +178,8 @@ module Active
         if (200..307).include?(res.code.to_i)
           parsed_json = JSON.parse(res.body)
           return parsed_json["numberOfResults"] if data.has_key?(:show_number_of_results)
-          parsed_json['_results'].collect { |a| Activity.new(a) }          
+          query_addl_info= {:endIndex=>parsed_json["endIndex"], :pageSize=>parsed_json["pageSize"], :searchTime=>parsed_json["searchTime"], :numberOfResults=>parsed_json["numberOfResults"]}
+          parsed_json['_results'].collect { |a| Activity.new(a.merge query_addl_info) }          
         else
           raise RuntimeError, "Active Search responded with a #{res.code} for your query."
         end
