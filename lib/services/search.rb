@@ -177,6 +177,7 @@ module Active
         # if res.code == '200' or res.code == '307'
         if (200..307).include?(res.code.to_i)
           parsed_json = JSON.parse(res.body)
+          return parsed_json["numberOfResults"] if data.has_key?(:show_number_of_results)
           parsed_json['_results'].collect { |a| Activity.new(a) }          
         else
           raise RuntimeError, "Active Search responded with a #{res.code} for your query."
