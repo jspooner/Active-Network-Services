@@ -29,11 +29,11 @@ module Active
     end
 
     class Search
-      attr_accessor :results, :endIndex, :pageSize, :searchTime, :num_results, :start_date, :end_date,
-                    :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset,
-                    :api_key, :view, :facet, :sort,
-                    :end_point, :meta
-      # 
+      attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset,
+                    :view, :facet, :sort, :num_results
+                    
+      attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
+       
       SEARCH_URL      = "http://search.active.com"
       DEFAULT_TIMEOUT = 5
       
@@ -117,8 +117,12 @@ module Active
         }
         
         if (200..307).include?(res.code.to_i)
-          parsed_json = JSON.parse(res.body)
-          # query_info  = {:endIndex=>parsed_json["endIndex"], :pageSize=>parsed_json["pageSize"], :searchTime=>parsed_json["searchTime"], :numberOfResults=>parsed_json["numberOfResults"]}
+          parsed_json      = JSON.parse(res.body)
+          @endIndex        = parsed_json["endIndex"]
+          @pageSize        = parsed_json["pageSize"]
+          @searchTime      = parsed_json["searchTime"]
+          @numberOfResults = parsed_json["numberOfResults"]
+
           @results    = parsed_json['_results'].collect { |a| Activity.new(a) }
         else
           raise RuntimeError, "Active Search responded with a #{res.code} for your query."
