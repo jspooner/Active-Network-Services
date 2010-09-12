@@ -122,8 +122,7 @@ module Active
           @pageSize        = parsed_json["pageSize"]
           @searchTime      = parsed_json["searchTime"]
           @numberOfResults = parsed_json["numberOfResults"]
-
-          @results    = parsed_json['_results'].collect { |a| Activity.new(a) }
+          @results         = parsed_json['_results'].collect { |a| Activity.new(a) }
         else
           raise RuntimeError, "Active Search responded with a #{res.code} for your query."
         end

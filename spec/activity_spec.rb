@@ -63,8 +63,12 @@ describe Activity do
   
   it "should strip out unicode from the title"
   
-  it "should use the first group if title contains pipes." do
-    
+  it "should use the first group if title contains pipes." 
+  
+  it "should have 2 channels" do
+    a = Activity.new(@valid_attributes)
+    a.categories.should be_an_instance_of(Array)
+    a.should have(2).categories
   end
   
   it "should be a valid activity" do
