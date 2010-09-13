@@ -105,3 +105,22 @@ describe Activity do
   
   
 end
+
+
+describe "Activity url" do
+  
+  it "should have a valid seo url: type 1" do
+    a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :seourl => "http://active.com/running/funrun" } })
+    a.url.should == "http://active.com/running/funrun"
+  end
+  
+  it "should have a valid seo url: type 2"
+  it "should have a valid seo url: type 3"
+end
+
+
+
+
+
+
+

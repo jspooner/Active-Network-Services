@@ -10,7 +10,7 @@ module Active
         @url       = @data[:url]
   
         unless @data[:meta].nil?  
-          # @url               = @data[:meta][:seourl]      
+          @url               = @data[:meta][:trackbackurl]      
           self.asset_id      = @data[:meta][:assetId]      
           self.asset_type_id = @data[:meta][:assetTypeId]      
           @start_date        = Date.parse(@data[:meta][:startDate])    

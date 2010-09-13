@@ -30,7 +30,7 @@ module Active
 
     class Search
       attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset,
-                    :view, :facet, :sort, :num_results
+                    :view, :facet, :sort, :num_results, :asset_ids
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
        
@@ -52,9 +52,10 @@ module Active
         self.num_results = data[:num_results] || "10"
         self.search      = data[:search] || ""
         self.start_date  = data[:start_date] || "today"
-        self.end_date    = data[:end_date] || "+"
+        self.end_date    = data[:end_date] || "+"        
+        self.asset_ids   = data[:asset_ids] || []
+        self.asset_id    = data[:asset_id] 
         
-        # Search.construct_url
       end
       
       def location=(value)
@@ -77,8 +78,18 @@ module Active
         end
       end
       
+      def asset_ids=(value)
+        @asset_ids = value
+      end
+
+      def asset_id=(value)
+        return if value.nil?
+        @asset_ids = [value]
+      end
+      
       def end_point
         meta_data  = ""
+        # CHANNELS
         channel_keys = []
         @channels.each do |c|
           c.to_sym
@@ -88,10 +99,34 @@ module Active
         end
         meta_data = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }.join("+OR+")
         puts meta_data
+        # ASSET IDS
         
         
-        # meta_data  = self.channels.join("+OR+")
+        unless asset_ids.empty?
+          meta_data += "+AND+" unless meta_data == ""
+          temp_ids = []
+          asset_ids.each do |id|
+            temp_ids << "meta:" + CGI.escape("assetId=#{id.gsub("-","%2d")}")
+          end        
+          meta_data += temp_ids.join("+OR+")          
+        end
         
+        
+        # trending_asset_order=[]
+        # trending.each do |asset_id|
+        #   trending_asset_order << asset_id[0]
+        #   @m = @m + "+OR+" if @m!=""
+        # 
+        #   str = "assetId=#{asset_id[0].gsub("-","%2d")}"
+        #   str = CGI.escape(str)
+        #   @m = @m + "meta:#{str}"
+        # end
+        
+        
+        
+        
+# meta_data  = self.channels.join("+OR+")
+        # AND DATE
         meta_data += "+AND+" unless meta_data == ""
         if @start_date.class == Date
           @start_date = URI.escape(@start_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
@@ -100,7 +135,7 @@ module Active
           @end_date = URI.escape(@end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
         end
         meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
-
+        
         url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{@location}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
       end
       
@@ -145,46 +180,46 @@ module Active
         return search
       end
       
-      def self.construct_url(arg_options={})
-        return arg_options[:url] if arg_options.keys.index(:url) #todo use has_key? #a search url was specified - bypass parsing the options (trending)
-        # self.merge!(arg_options)
-
-        # options[:location] = CGI.escape(options[:location]) if options[:location]
-        
-        # if options[:keywords].class == String
-        #           options[:keywords] = options[:keywords].split(",")
-        #           options[:keywords].each { |k| k.strip! }
-        #         end
-
-        # if options[:channels] != nil     
-        #   channel_keys = []
-        #   options[:channels].each do |c|
-        #     c.to_sym
-        #     if self.CHANNELS.include?(c)
-        #       channel_keys << self.CHANNELS[c]
-        #     end
-        #   end
-        #   channels_a = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }
-        # end
-
-        meta_data  = ""
-        meta_data  = channels_a.join("+OR+") if channels_a
-
-        meta_data += "+AND+" unless meta_data == ""
-        if options[:start_date].class == Date
-          options[:start_date] = URI.escape(options[:start_date].strftime("%m/%d/%Y")).gsub(/\//,"%2F")
-        end
-
-        if options[:end_date].class == Date
-          options[:end_date] = URI.escape(options[:end_date].strftime("%m/%d/%Y")).gsub(/\//,"%2F")
-        end
-        meta_data += "meta:startDate:daterange:#{options[:start_date]}..#{options[:end_date]}"
-
-        url = "#{SEARCH_URL}/search?api_key=#{options[:api_key]}&num=#{options[:num_results]}&page=#{options[:page]}&l=#{options[:location]}&f=#{options[:facet]}&v=#{options[:view]}&r=#{options[:radius]}&s=#{options[:sort]}&k=#{options[:keywords].join("+")}&m=#{meta_data}"
-        puts url
-        url
-        self.end_point = url
-      end
+      # def self.construct_url(arg_options={})
+      #   return arg_options[:url] if arg_options.keys.index(:url) #todo use has_key? #a search url was specified - bypass parsing the options (trending)
+      #   # self.merge!(arg_options)
+      # 
+      #   # options[:location] = CGI.escape(options[:location]) if options[:location]
+      #   
+      #   # if options[:keywords].class == String
+      #   #           options[:keywords] = options[:keywords].split(",")
+      #   #           options[:keywords].each { |k| k.strip! }
+      #   #         end
+      # 
+      #   # if options[:channels] != nil     
+      #   #   channel_keys = []
+      #   #   options[:channels].each do |c|
+      #   #     c.to_sym
+      #   #     if self.CHANNELS.include?(c)
+      #   #       channel_keys << self.CHANNELS[c]
+      #   #     end
+      #   #   end
+      #   #   channels_a = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }
+      #   # end
+      # 
+      #   meta_data  = ""
+      #   meta_data  = channels_a.join("+OR+") if channels_a
+      # 
+      #   meta_data += "+AND+" unless meta_data == ""
+      #   if options[:start_date].class == Date
+      #     options[:start_date] = URI.escape(options[:start_date].strftime("%m/%d/%Y")).gsub(/\//,"%2F")
+      #   end
+      # 
+      #   if options[:end_date].class == Date
+      #     options[:end_date] = URI.escape(options[:end_date].strftime("%m/%d/%Y")).gsub(/\//,"%2F")
+      #   end
+      #   meta_data += "meta:startDate:daterange:#{options[:start_date]}..#{options[:end_date]}"
+      # 
+      #   url = "#{SEARCH_URL}/search?api_key=#{options[:api_key]}&num=#{options[:num_results]}&page=#{options[:page]}&l=#{options[:location]}&f=#{options[:facet]}&v=#{options[:view]}&r=#{options[:radius]}&s=#{options[:sort]}&k=#{options[:keywords].join("+")}&m=#{meta_data}"
+      #   puts url
+      #   url
+      #   self.end_point = url
+      # end
       
       private
         def self.double_encode_channel str

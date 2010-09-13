@@ -122,6 +122,19 @@ describe  "Search URL Construction" do
     uri.query.should have_param("r=666")
   end
   
+  it "should pass the given asset_id" do
+    s = Search.new({:asset_id => "12-34" })
+    s.should have(1).asset_ids    
+  end
+  
+  it "should pass the given asset_id's" do
+    s = Search.new({:asset_ids => ["12-34","5-67","77-7"] })
+    s.should have(3).asset_ids
+    uri = URI.parse( s.end_point )    
+    uri.query.should_not have_param("m=+AND+")
+    uri.query.should have_param("meta:assetId%3D12%2d34+OR+meta:assetId%3D5%2d67+OR+meta:assetId%3D77%2d7")
+  end
+  
 end
 
 describe "Handle http server codes" do 
@@ -145,7 +158,7 @@ describe Search do
   after(:each) do 
     FakeWeb.clean_registry
   end
-  
+    
   it "should have some channels" do
     Categories.CHANNELS.should_not be_nil
   end
@@ -269,6 +282,17 @@ describe "Call Live Data" do
 
   it "should order by date DATE_DESC"
   
+end
+
+
+describe  "Parametric search" do
+  describe  "Parametric search for running channel" do
+    it "should find by splitMediaType for the Running channel" do
+      # http://developer.active.com/docs/Activecom_Search_API_Reference
+    end  
+  end
+  describe  "Parametric search for triathlon channel" do
+  end  
 end
 
 
