@@ -10,7 +10,7 @@ module Active
         @url       = @data[:url]
   
         unless @data[:meta].nil?  
-          @url               = @data[:meta][:seourl]      
+          # @url               = @data[:meta][:seourl]      
           self.asset_id      = @data[:meta][:assetId]      
           self.asset_type_id = @data[:meta][:assetTypeId]      
           @start_date        = Date.parse(@data[:meta][:startDate])    
@@ -38,6 +38,7 @@ module Active
       end
       
       def title=(value)
+        return unless value
         @title = value.gsub(/<\/?[^>]*>/, "") 
         if value.include?("|")
           @title = @title.split("|")[0].strip!
