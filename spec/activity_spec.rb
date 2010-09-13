@@ -74,13 +74,13 @@ describe Activity do
   it "should be a valid activity" do
     a = Activity.new(@valid_attributes)
     a.url.should eql("http://www.active.com/running/lake-buena-vista-fl/walt-disney-world-marathon-2011")
-    a.category.should eql("action_sports")
+    a.categories.include?("action_sports").should be_true
     a.asset_id.should eql("3584C7D6-14FD-4FD1-BD07-C2A9B2925B6C")
     
     a.title.should_not be_nil                      
     a.start_date.should_not be_nil                 
     a.end_date.should_not be_nil                   
-    a.category.should_not be_nil                   
+    a.categories.should_not be_nil                   
     a.desc.should_not be_nil                
     a.start_time.should_not be_nil                 
     a.end_time.should_not be_nil    
@@ -110,12 +110,19 @@ end
 describe "Activity url" do
   
   it "should have a valid seo url: type 1" do
-    a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :seourl => "http://active.com/running/funrun" } })
+    a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :trackbackurl => "http://active.com/running/funrun", :seourl => "http://foo" } })
     a.url.should == "http://active.com/running/funrun"
   end
   
-  it "should have a valid seo url: type 2"
-  it "should have a valid seo url: type 3"
+  it "should have a valid seo url: type 2" do
+    a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :trackbackurl => "http://active.com/running/funrun" } })
+    a.url.should == "http://active.com/running/funrun"
+  end
+  it "should have a valid seo url: type 3" do
+    a = Activity.new({ :url => "http://active.com/foo.php" })
+    a.url.should == "http://active.com/foo.php"
+  end
+    
 end
 
 

@@ -10,10 +10,11 @@ module Active
         @url       = @data[:url]
   
         unless @data[:meta].nil?  
-          @url               = @data[:meta][:trackbackurl]      
+          @url               = @data[:meta][:seourl]        if @data[:meta][:seourl]
+          @url               = @data[:meta][:trackbackurl]  if @data[:meta][:trackbackurl]      
           self.asset_id      = @data[:meta][:assetId]      
           self.asset_type_id = @data[:meta][:assetTypeId]      
-          @start_date        = Date.parse(@data[:meta][:startDate])    
+          @start_date        = Date.parse(@data[:meta][:startDate]) if @data[:meta][:startDate]    
           @end_date          = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
           self.categories    = @data[:meta][:channel] 
           
@@ -30,10 +31,10 @@ module Active
             :lng     => @data[:meta][:longitude],
             :country => @data[:meta][:country]
           }
+          @onlineDonationAvailable     = @data[:meta][:onlineDonationAvailable]
+          @onlineRegistrationAvailable = @data[:meta][:onlineRegistrationAvailable]
+          @onlineMembershipAvailable   = @data[:meta][:onlineMembershipAvailable]
         end
-        @onlineDonationAvailable     = @data[:meta][:onlineDonationAvailable]
-        @onlineRegistrationAvailable = @data[:meta][:onlineRegistrationAvailable]
-        @onlineMembershipAvailable   = @data[:meta][:onlineMembershipAvailable]
 
       end
       
@@ -44,11 +45,6 @@ module Active
           @title = @title.split("|")[0].strip!
         end
       end
-      
-      # TODO add many channels
-      # def categories=(value)
-      #   @category = (value.class == Array) ? value : value
-      # end
       
       def asset_id=(value)        
         @asset_id = (value.class==Array) ? value[0] : value

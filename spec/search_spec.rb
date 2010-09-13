@@ -198,7 +198,7 @@ describe Search do
       a.title.should_not be_nil
       a.start_date.should_not be_nil
       a.end_date.should_not be_nil
-      a.category.should_not be_nil
+      a.categories.should_not be_nil
       a.desc.should_not be_nil
       a.start_time.should_not be_nil
       a.end_time.should_not be_nil
