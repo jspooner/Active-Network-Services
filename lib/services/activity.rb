@@ -10,11 +10,12 @@ module Active
         @url       = @data[:url]
   
         unless @data[:meta].nil?  
-          self.asset_id = @data[:meta][:assetId]      
+          @url               = @data[:meta][:seourl]      
+          self.asset_id      = @data[:meta][:assetId]      
           self.asset_type_id = @data[:meta][:assetTypeId]      
-          @start_date   = Date.parse(@data[:meta][:startDate])    
-          @end_date     = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
-          self.categories = @data[:meta][:channel] 
+          @start_date        = Date.parse(@data[:meta][:startDate])    
+          @end_date          = Date.parse(@data[:meta][:endDate])  if @data[:meta][:endDate]
+          self.categories    = @data[:meta][:channel] 
           
           @desc                        = @data[:meta][:description]  ||= ""
           @start_time                  = @data[:meta][:startTime]    ||= ""
