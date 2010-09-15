@@ -83,8 +83,8 @@ module Active
       end
 
       def asset_id=(value)
-        return if value.nil?
-        @asset_ids = [value]
+        return if value.empty?
+        @asset_ids<<value
       end
       
       def end_point
