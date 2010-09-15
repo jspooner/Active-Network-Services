@@ -54,7 +54,7 @@ module Active
         self.start_date  = data[:start_date] || "today"
         self.end_date    = data[:end_date] || "+"        
         self.asset_ids   = data[:asset_ids] || []
-        self.asset_id    = data[:asset_id] 
+        self.asset_id    = data[:asset_id] || ""
         
       end
       

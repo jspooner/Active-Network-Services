@@ -176,6 +176,10 @@ describe Search do
     s.numberOfResults.should == 3
     s.pageSize.should == 5
     s.searchTime.should == 0.600205
+  
+    
+    s.results = []
+    
   end
   
   it "should raise and error during a 404" do
