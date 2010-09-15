@@ -2,6 +2,7 @@
 require File.join(File.dirname(__FILE__), %w[spec_helper])
 require File.join(File.dirname(__FILE__), %w[ .. lib services search])
 require File.join(File.dirname(__FILE__), %w[ .. lib services activity])
+require File.join(File.dirname(__FILE__), %w[ .. lib services IActivity])
 
 # No need to type Britify:: before each call
 include Active::Services
@@ -74,13 +75,13 @@ describe Activity do
   it "should be a valid activity" do
     a = Activity.new(@valid_attributes)
     a.url.should eql("http://www.active.com/running/lake-buena-vista-fl/walt-disney-world-marathon-2011")
-    a.category.should eql("action_sports")
+    a.categories.include?("action_sports").should be_true
     a.asset_id.should eql("3584C7D6-14FD-4FD1-BD07-C2A9B2925B6C")
     
     a.title.should_not be_nil                      
     a.start_date.should_not be_nil                 
     a.end_date.should_not be_nil                   
-    a.category.should_not be_nil                   
+    a.categories.should_not be_nil                   
     a.desc.should_not be_nil                
     a.start_time.should_not be_nil                 
     a.end_time.should_not be_nil    
@@ -96,27 +97,85 @@ describe Activity do
     a.address[:lat].should_not be_nil               
     a.address[:lng].should_not be_nil               
     a.address[:name].should_not be_nil               
+  end
+  
+  describe "Activity url" do
+    it "should have a valid seo url: type 1" do
+      a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :trackbackurl => "http://active.com/running/funrun", :seourl => "http://foo" } })
+      a.url.should == "http://active.com/running/funrun"
+    end
+    it "should have a valid seo url: type 2" do
+      a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :trackbackurl => "http://active.com/running/funrun" } })
+      a.url.should == "http://active.com/running/funrun"
+    end
+    it "should have a valid seo url: type 3" do
+      a = Activity.new({ :url => "http://active.com/foo.php" })
+      a.url.should == "http://active.com/foo.php"
+    end
+  end
+  
+  describe  "ATS data fetch" do
+    it "should retrive the ats data"
+    it "should store the date when ats was"
+  end
+  
+  describe "ActiveNet data fetch" do
+    # todo get a list of ActiveNet ids
+    # assetTypeId: FB27C928-54DB-4ECD-B42F-482FC3C8681F
+    # assetTypeName: ActiveNet
+    # assetId: 4C2C70F1-9D53-4ECA-A04C-68A76C3A53F4
+    # assetId: 34DB5609-6697-400D-8C52-0305D479C9C1
+    # assetId: 65B56E1A-5C3E-4D9B-8EA6-0417C07E5956
     
-    # a.onlineDonationAvailable.should_not be_nil        
-    # a.onlineRegistrationAvailable.should_not be_nil
-    # a.onlineMembershipAvailable.should_not be_nil  
     
+    it "should retrive data from ActiveNet" do
+      # a = Activity.new({})
+      # a.should receive al call to a.get_ats_data
+      # a.rawdata.should be a freaking hash
+      pending
+    end
+    
+    describe "Lazy loading of params" do
+      it "should call ATS when only asset_id is set" do
+        ATS.should_receive(:find_by_id).with("A9EF9D79-F859-4443-A9BB-91E1833DF2D5").once
+        a = Activity.find_by_asset_id(:asset_id => "A9EF9D79-F859-4443-A9BB-91E1833DF2D5")
+      end
+      it "should save the asset_id" do
+        a = Activity.find_by_asset_id(:asset_id => "A9EF9D79-F859-4443-A9BB-91E1833DF2D5")
+        a.asset_id.should == "A9EF9D79-F859-4443-A9BB-91E1833DF2D5"      
+        a.title.should == "Fitness, Pilates  Mat Class (16 Yrs. &amp; Up)"  
+      end
+      it "should thorw an ActivityFindError if no record is found" do
+        lambda { Activity.find_by_asset_id( :asset_id => "666" ) }.should raise_error(ActivityFindError)                         
+      end
+      
+      
+      it "should save the asset_id and type" do        
+        a = Activity.find_by_asset_id(:asset_id => "A9EF9D79-F859-4443-A9BB-91E1833DF2D5", :asset_type_id => "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65")
+        a.asset_id.should == "A9EF9D79-F859-4443-A9BB-91E1833DF2D5"        
+        a.asset_type_id.should == "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
+      end
+      it "should obtain the asset_type_id if it wasn't provided" do
+        a = Activity.find_by_asset_id(:asset_id => "A9EF9D79-F859-4443-A9BB-91E1833DF2D5")
+        a.asset_type_id.should == "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
+      end
+      it "should have an event closing date" do
+        # a.eventCloseDate.should == "2010-09-13T00:00:00-07:00"
+      end
+      it "should return the start time" do
+        # mock 
+        # a = Activity.new({})
+        # a.start_time.should == 11:00 am
+        pending
+      end
+    end 
   end
   
   
 end
 
 
-describe "Activity url" do
-  
-  it "should have a valid seo url: type 1" do
-    a = Activity.new({ :url => "http://active.com/foo.php", :meta => { :seourl => "http://active.com/running/funrun" } })
-    a.url.should == "http://active.com/running/funrun"
-  end
-  
-  it "should have a valid seo url: type 2"
-  it "should have a valid seo url: type 3"
-end
+
 
 
 

@@ -13,5 +13,12 @@ Bones {
   authors  'Jonathan Spooner, Brian Levine'
   email    'jspooner [at] gmail.com'
   url      'http://developer.active.com/docs/Activecom_Search_API_Reference'
+  gem.extras[:post_install_message] = <<-MSG
+  --------------------------
+  Welcome to Active Network
+  --------------------------
+  MSG
+  depend_on  'savon'
+  depend_on  'fake_web'
 }
 
