@@ -8,7 +8,7 @@ module Active
      attr_accessor 
      
      attr_accessor :title, :url, :categories, :address, :start_date, :start_time, :end_time, :end_date, :category, :desc,
-                   :asset_id, :asset_id_type, :data
+                   :asset_id, :asset_type_id, :data
      
      attr_reader :asset_type_id
      

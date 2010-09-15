@@ -17,8 +17,8 @@ module Active
         @data          = HashWithIndifferentAccess.new(data)  
         self.title     = @data[:title]
         @url           = @data[:url]
-        @asset_id      = @data[:asset_id]
-        @asset_type_id = @data[:asset_type_id]
+        # @asset_id      = @data[:asset_id]
+        # @asset_type_id = @data[:asset_type_id]
         
         unless @data[:meta].nil?  
           @url               = @data[:meta][:seourl]        if @data[:meta][:seourl]
@@ -68,7 +68,8 @@ module Active
         return @primary.title unless @primary.nil?
         return @ats.title     unless @ats.nil?
         return @gsa.title     unless @gsa.nil?
-        return nil
+        return @title if @title
+        return ""
       end
       
       def asset_id=(value)        
@@ -78,6 +79,7 @@ module Active
         return @primary.asset_id unless @primary.nil?
         return @ats.asset_id     unless @ats.nil?
         return @gsa.asset_id     unless @gsa.nil?
+        return @asset_id      if @asset_id
         return nil
       end
       
@@ -100,6 +102,8 @@ module Active
           
         elsif data.has_key?(:asset_id) and data.has_key?(:asset_type_id)
           puts "look up data form the original source"
+           # TODO look up data form the original source"
+          return Activity.new(ATS.find_by_id(@asset_id))  
         end
       end
 

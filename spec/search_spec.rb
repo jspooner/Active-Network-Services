@@ -177,9 +177,6 @@ describe Search do
     s.numberOfResults.should == 3
     s.pageSize.should == 5
     s.searchTime.should == 0.600205
-  
-    
-    s.results = []
     
   end
   
@@ -249,6 +246,9 @@ describe "Call Live Data" do
       a.start_date.should satisfy { |d|
         d >= Date.new(2010,1,1) 
       }
+    end
+    s.results.each do |a|
+      a.asset_id.should_not be_nil
     end
   end
   
