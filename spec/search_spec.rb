@@ -132,7 +132,7 @@ describe  "Search URL Construction" do
     s.should have(3).asset_ids
     uri = URI.parse( s.end_point )    
     uri.query.should_not have_param("m=+AND+")
-    uri.query.should have_param("meta:assetId%3D12%2d34+OR+meta:assetId%3D5%2d67+OR+meta:assetId%3D77%2d7")
+    uri.query.should have_param("meta:assetId%3D12%252d34+OR+meta:assetId%3D5%252d67+OR+meta:assetId%3D77%252d7")
   end
   
 end
