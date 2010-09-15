@@ -53,6 +53,7 @@ describe  "Search URL Construction" do
     uri.query.include?("page=1").should be_true    
     uri.query.should have_param("num=10")
     uri.query.should have_param("daterange:today..+")
+    uri.query.should_not have_param("assetId=")
   end
   
   it "should construct a valid url with location" do

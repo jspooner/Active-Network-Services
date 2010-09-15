@@ -19,6 +19,5 @@ Bones {
   --------------------------
   MSG
   depend_on  'savon'
-  depend_on  'fake_web'
 }
 
