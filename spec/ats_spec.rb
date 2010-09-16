@@ -20,6 +20,20 @@ describe ATS do
   it "should thorw an ATSError if no record is found" do
     lambda { ATS.find_by_id( "666" ) }.should raise_error(ATSError)                         
   end
+  it "should get the asset metadata" do
+    ATS.get_asset_metadata(@valid_id).should_not be_nil
+  end
+  it "should load the asset metadata into @data" do
+    a = ATS.find_by_id(@valid_id)
+    a.load_metadata
+    a.data["isSearchable"].should_not be_nil
+  end
+  it "should load the lazy the asset metadata" do
+    a = ATS.find_by_id(@valid_id)
+    puts a.url
+    a.url.should_not be_nil
+  end
+  
   it "should have a title and desc ....." do
     
   end
