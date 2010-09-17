@@ -114,7 +114,7 @@ module Active
 
       def start_date
         load_metadata unless @metadata_loaded
-        DateTime.parse @data["startDate"] if @data.has_key? ("startDate")
+        DateTime.parse @data["startDate"] if @data.has_key?("startDate")
       end
 
       def start_time
@@ -129,7 +129,7 @@ module Active
 
       def end_date
         load_metadata unless @metadata_loaded
-        DateTime.parse @data["endDate"] if @data.has_key? ("endDate")
+        DateTime.parse @data["endDate"] if @data.has_key?("endDate")
       end
 
       def category
@@ -148,9 +148,9 @@ module Active
           ret
         else
           load_metadata unless @metadata_loaded
-          if @data.has_key? ("allText")
+          if @data.has_key?("allText")
             @data["allText"]
-          elsif @data.has_key? ("summary")
+          elsif @data.has_key?("summary")
             @data["summary"]
           end
         end
