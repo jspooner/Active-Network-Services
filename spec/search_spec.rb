@@ -64,6 +64,14 @@ describe  "Search URL Construction" do
     uri.query.should have_param("l=#{CGI.escape("San Diego, CA, US")}")
   end
   
+  it "should send an array of zips" do
+    uri = URI.parse( Search.new( {:location => "92121, 92078, 92114"} ).end_point )
+    # uri.query.should have_param("l=92121, 92078, 92114")    
+    uri = URI.parse( Search.new( {:location => [92121, 92078, 92114]} ).end_point )
+    # uri.query.should have_param("l=92121, 92078, 92114")    
+    pending
+  end
+  
   # it "should construct a valid url from a zip code" do
   #   s   = Search.new( {:zip => "92121"} )
   #   uri = URI.parse(s.end_point)    
@@ -295,6 +303,10 @@ describe "Call Live Data" do
   it "should not set sort to an empty string" do
     s = Search.search( {:sort => ""} )
     s.sort.should_not be_empty
+  end
+  
+  it "should get results given these area codes" do
+    Search.new( {:location => "92121, 92078, 92114"} ).results.should_not be_empty
   end
     
   it "should find activities that have been recently added" 
