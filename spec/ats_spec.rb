@@ -9,6 +9,7 @@ include Active::Services
 describe ATS do
   before(:each) do 
     @valid_id = "A9EF9D79-F859-4443-A9BB-91E1833DF2D5"
+    @reg_center_id = "D9A22F33-8A14-4175-8D5B-D11578212A98"
   end
   it "should set find by id" do
     a = ATS.find_by_id(@valid_id)
@@ -31,11 +32,25 @@ describe ATS do
   it "should load the lazy the asset metadata" do
     a = ATS.find_by_id(@valid_id)
     puts a.url
-    a.url.should_not be_nil
+    a.start_date.should_not be_nil
   end
-  
-  it "should have a title and desc ....." do
-    
+  it "should only load metadata once" do
+    a = ATS.find_by_id(@valid_id)
+    puts a.url
+    puts a.address
+    ATS.should_receive(:load_metadata).once
+  end
+  it "should have an address Hash" do
+    a = ATS.find_by_id(@valid_id)
+    a.address.should be_an_instance_of(Hash)
+  end
+  it "should have a startDate Date" do
+    a = ATS.find_by_id(@valid_id)
+    a.start_date.should be_an_instance_of(Date)
+  end
+  it "should have a title String" do
+    a = ATS.find_by_id(@valid_id)
+    a.title.should be_an_instance_of(String)
   end
   
   
