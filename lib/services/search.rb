@@ -35,7 +35,7 @@ module Active
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
        
       SEARCH_URL      = "http://search.active.com"
-      DEFAULT_TIMEOUT = 5
+      DEFAULT_TIMEOUT = 60
       
       def initialize(data={})
         self.api_key     = data[:api_key] || ""
@@ -230,7 +230,8 @@ module Active
         end
       
     end
-  
+    
+    # TODO move to a reflection service
     class Categories
       def self.CHANNELS 
         {
