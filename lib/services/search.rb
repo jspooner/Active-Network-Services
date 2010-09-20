@@ -40,6 +40,7 @@ module Active
       def initialize(data={})
         self.api_key     = data[:api_key] || ""
         self.location    = data[:location] || ""
+        self.zips        = data[:zips] || []
         self.channels    = data[:channels] || []
         self.keywords    = data[:keywords] || []
         self.radius      = data[:radius] || "50"
@@ -56,6 +57,18 @@ module Active
         self.asset_ids   = data[:asset_ids] || []
         self.asset_id    = data[:asset_id] || ""
         
+      end
+      
+      def zips=(value)
+        if value.class == String
+          @zips = value.split(",").each { |k| k.strip! }
+        else
+          @zips = value
+        end        
+      end
+      
+      def zips
+        @zips
       end
       
       def location=(value)
@@ -122,7 +135,11 @@ module Active
         #   @m = @m + "meta:#{str}"
         # end
         
-        
+        if @zips.empty?
+          loc_str = @location
+        else
+          loc_str = @zips.join(",")          
+        end
         
         
 # meta_data  = self.channels.join("+OR+")
@@ -136,7 +153,7 @@ module Active
         end
         meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
         
-        url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{@location}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
+        url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
       end
       
       def search
