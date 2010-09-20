@@ -29,7 +29,7 @@ module Active
     end
 
     class Search
-      attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset,
+      attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
                     :view, :facet, :sort, :num_results, :asset_ids
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
@@ -56,9 +56,14 @@ module Active
         self.end_date    = data[:end_date] || "+"        
         self.asset_ids   = data[:asset_ids] || []
         self.asset_id    = data[:asset_id] || ""
-        
+        self.latitude    = data[:latitude]
+        self.longitude   = data[:longitude]
       end
       
+      # Example
+      # Search.search( {:zips => "92121, 92078, 92114"} )
+      # or
+      # Search.new( {:zips => [92121, 92078, 92114]} )
       def zips=(value)
         if value.class == String
           @zips = value.split(",").each { |k| k.strip! }
@@ -111,10 +116,7 @@ module Active
           end
         end
         meta_data = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }.join("+OR+")
-        puts meta_data
         # ASSET IDS
-        
-        
         unless asset_ids.empty?
           meta_data += "+AND+" unless meta_data == ""
           temp_ids = []
@@ -123,26 +125,19 @@ module Active
           end        
           meta_data += temp_ids.join("+OR+")          
         end
-        
-        
-        # trending_asset_order=[]
-        # trending.each do |asset_id|
-        #   trending_asset_order << asset_id[0]
-        #   @m = @m + "+OR+" if @m!=""
-        # 
-        #   str = "assetId=#{asset_id[0].gsub("-","%2d")}"
-        #   str = CGI.escape(str)
-        #   @m = @m + "meta:#{str}"
-        # end
-        
-        if @zips.empty?
-          loc_str = @location
-        else
+        # LOCATION
+        # 1 Look for zip codes
+        # 2 Look for lat lng
+        # 3 Look for a formatted string "San Diego, CA, US"
+        if not @zips.empty?
           loc_str = @zips.join(",")          
+        elsif @latitude and @longitude
+          loc_str = "#{@latitude};#{@longitude}"
+        else
+          loc_str = @location
         end
         
         
-# meta_data  = self.channels.join("+OR+")
         # AND DATE
         meta_data += "+AND+" unless meta_data == ""
         if @start_date.class == Date
@@ -168,13 +163,23 @@ module Active
           http.get("#{searchurl.path}?#{searchurl.query}")
         }
         
-        if (200..307).include?(res.code.to_i)
-          parsed_json      = JSON.parse(res.body)
-          @endIndex        = parsed_json["endIndex"]
-          @pageSize        = parsed_json["pageSize"]
-          @searchTime      = parsed_json["searchTime"]
-          @numberOfResults = parsed_json["numberOfResults"]
-          @results         = parsed_json['_results'].collect { |a| Activity.new(a) }
+        if (200..307).include?(res.code.to_i)          
+          begin
+            parsed_json      = JSON.parse(res.body)
+            @endIndex        = parsed_json["endIndex"]
+            @pageSize        = parsed_json["pageSize"]
+            @searchTime      = parsed_json["searchTime"]
+            @numberOfResults = parsed_json["numberOfResults"]
+            @results         = parsed_json['_results'].collect { |a| Activity.new(a) }  
+          rescue JSON::ParserError => e
+            raise RuntimeError, "JSON::ParserError json=#{res.body}"
+            @endIndex        = 0
+            @pageSize        = 0
+            @searchTime      = 0
+            @numberOfResults = 0
+            @results         = []             
+          end
+          
         else
           raise RuntimeError, "Active Search responded with a #{res.code} for your query."
         end
@@ -182,12 +187,29 @@ module Active
       
       # examples
       #
-      # Search.new({:location => "San Diego"})
       #
+      # = Keywords = 
       # Keywords can be set like this
       # Search.new({:keywords => "Dog,Cat,Cow"})
       # Search.new({:keywords => %w(Dog Cat Cow)})
       # Search.new({:keywords => ["Dog","Cat","Cow"]})
+      #
+      # = Location =
+      # The location will be set in this order and will override other values.  For example is you set a zip code and a location only the zip will be used. 
+      #
+      # 1 Look for zip codes
+      #      Search.search( {:zips => "92121, 92078, 92114"} )
+      #      Search.search( {:zips => %w(92121, 92078, 92114)} )
+      #      Search.search( {:zips => [92121, 92078, 92114]} )
+      #
+      # 2 Look for lat lng
+      #      Search.search( {:latitude=>"37.785895", :longitude=>"-122.40638"} )
+      #
+      # 3 Look for a formatted string "San Diego, CA, US"
+      #       Search.search( {:location = "San Diego, CA, US"} )
+      #
+      # = How to look at the results =
+      #
       #
       # http://developer.active.com/docs/Activecom_Search_API_Reference
       # returns an array of results and query info
@@ -197,46 +219,9 @@ module Active
         return search
       end
       
-      # def self.construct_url(arg_options={})
-      #   return arg_options[:url] if arg_options.keys.index(:url) #todo use has_key? #a search url was specified - bypass parsing the options (trending)
-      #   # self.merge!(arg_options)
-      # 
-      #   # options[:location] = CGI.escape(options[:location]) if options[:location]
-      #   
-      #   # if options[:keywords].class == String
-      #   #           options[:keywords] = options[:keywords].split(",")
-      #   #           options[:keywords].each { |k| k.strip! }
-      #   #         end
-      # 
-      #   # if options[:channels] != nil     
-      #   #   channel_keys = []
-      #   #   options[:channels].each do |c|
-      #   #     c.to_sym
-      #   #     if self.CHANNELS.include?(c)
-      #   #       channel_keys << self.CHANNELS[c]
-      #   #     end
-      #   #   end
-      #   #   channels_a = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }
-      #   # end
-      # 
-      #   meta_data  = ""
-      #   meta_data  = channels_a.join("+OR+") if channels_a
-      # 
-      #   meta_data += "+AND+" unless meta_data == ""
-      #   if options[:start_date].class == Date
-      #     options[:start_date] = URI.escape(options[:start_date].strftime("%m/%d/%Y")).gsub(/\//,"%2F")
-      #   end
-      # 
-      #   if options[:end_date].class == Date
-      #     options[:end_date] = URI.escape(options[:end_date].strftime("%m/%d/%Y")).gsub(/\//,"%2F")
-      #   end
-      #   meta_data += "meta:startDate:daterange:#{options[:start_date]}..#{options[:end_date]}"
-      # 
-      #   url = "#{SEARCH_URL}/search?api_key=#{options[:api_key]}&num=#{options[:num_results]}&page=#{options[:page]}&l=#{options[:location]}&f=#{options[:facet]}&v=#{options[:view]}&r=#{options[:radius]}&s=#{options[:sort]}&k=#{options[:keywords].join("+")}&m=#{meta_data}"
-      #   puts url
-      #   url
-      #   self.end_point = url
-      # end
+      def []
+        @results
+      end
       
       private
         def self.double_encode_channel str
