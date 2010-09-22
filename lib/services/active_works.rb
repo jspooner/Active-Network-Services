@@ -19,6 +19,13 @@ module Active
       def source
         :active_works
       end
+      
+      def asset_id
+        if @data.has_key?("eventDetailDto") && @data["eventDetailDto"].has_key?("id")
+          @data["eventDetailDto"]["id"]
+        end
+      end
+      
 
       def title
         if @data.has_key?("eventDetailDto") && @data["eventDetailDto"].has_key?("name")

@@ -15,7 +15,7 @@ module Active
         @data = data || {}
         @asset_id      = data[:asset_id]
         @url           = data[:url]
-        @asset_id_type = data[:asset_type_id]
+        @asset_type_id = data[:asset_type_id]
         @title         = data[:asset_name] if data[:asset_name]
         @substitution_url = data[:substitution_url]
         @metadata_loaded = false
@@ -33,7 +33,6 @@ module Active
         else
           @title
         end
-        
       end
 
       def url
@@ -46,10 +45,15 @@ module Active
           @url
         end
       end
-      
+
       def categories
         load_metadata unless @metadata_loaded
-        @data["channel"]
+        categories = @data["channel"]
+        if categories.class==String
+          [@data["channel"]]
+        else
+          @data["channel"]
+        end
       end
 
       def address
@@ -63,36 +67,46 @@ module Active
           :lat     => @data["latitude"],
           :lng     => @data["longitude"],
           :country => @data["country"]
-        }        
+        }
       end
 
       def start_date
         load_metadata unless @metadata_loaded
         if @data.has_key?("startDate")
-          (DateTime.parse @data["startDate"]).to_date
+          if @data.has_key?("startTime")
+            (DateTime.parse "#{@data["startDate"]} #{@data["startTime"]}")
+          else
+            (DateTime.parse @data["startDate"])
+          end
         else
           nil
         end
       end
 
       def start_time
-        load_metadata unless @metadata_loaded
-        @data["startTime"]
-      end
-
-      def end_time
-        load_metadata unless @metadata_loaded
-        @data["endTime"]
+        start_date
       end
 
       def end_date
         load_metadata unless @metadata_loaded
-        DateTime.parse @data["endDate"] if @data.has_key?("endDate")
+        if @data.has_key?("endDate")
+          if @data.has_key?("endTime")
+            (DateTime.parse "#{@data["endDate"]} #{@data["endTime"]}")
+          else
+            (DateTime.parse @data["endDate"])
+          end
+        else
+          nil
+        end
       end
 
+      def end_time
+        end_date
+      end
+
+
       def category
-        load_metadata unless @metadata_loaded
-        @data["channel"]
+        categories.first
       end
 
       def desc

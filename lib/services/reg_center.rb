@@ -39,22 +39,46 @@ module Active
       end
 
       def url
-        if @data.has_key?("event") && @data["event"].has_key?("registrationUrl")
+        if @data.has_key?("event") && @data["event"].has_key?("eventDetailsPageUrl")
+          @data["event"]["eventDetailsPageUrl"]
+        elsif @data.has_key?("event") && @data["event"].has_key?("registrationUrl")
           @data["event"]["registrationUrl"]
+        elsif @data.has_key?("event") && @data["event"].has_key?("eventContactUrl")
+          @data["event"]["eventContactUrl"]          
         end
       end
       
       def categories
-        if @data["event"]["channels"]["channel"]!=nil
-          @data["event"]["channels"]["channel"].collect {|e| e["channelName"]}          
+        if @data.has_key?("event") && @data["event"].has_key?("channels") && @data["event"]["channels"]!=nil && @data["event"]["channels"].has_key?("channel") && @data["event"]["channels"]["channel"]!=nil
+          channels = @data["event"]["channels"]["channel"]
+          if channels.class==Array
+            @data["event"]["channels"]["channel"].collect {|e| e["channelName"]}          
+          else
+            #hash
+            [channels["channelName"]]
+          end
+        end
+      end
+      
+      def asset_id
+        if @data.has_key?("event") && @data["event"].has_key?("assetID")
+          @data["event"]["assetID"]
         end
       end
       
       def primary_category
         if @data["event"]["channels"]["channel"]!=nil
-          @data["event"]["channels"]["channel"].each do |c|
-            return c["channelName"] if c.has_key?("primaryChannel")
-          end  
+          channels = @data["event"]["channels"]["channel"]
+          if channels.class==Array
+            channels.each do |c|
+              return c["channelName"] if c.has_key?("primaryChannel") && c["primaryChannel"]=="true"
+            end
+          else
+            #hash
+            return channels["channelName"] if channels.has_key?("primaryChannel") && channels["primaryChannel"]=="true"
+          end
+          #fallback
+          return category
         end
       end
 
@@ -96,9 +120,15 @@ module Active
       def desc
         if @data.has_key?("event") && @data["event"].has_key?("briefDescription")
           ret=@data["event"]["briefDescription"]
-          if data["event"].has_key?("eventDetails")
-            data["event"]["eventDetails"]["eventDetail"].each do |detail|
-              ret +="<div><b>" + detail["eventDetailsName"] + ":</b> " + cleanup_reg_string(detail["eventDetailsValue"]) + "</div>"
+          if @data["event"].has_key?("eventDetails")  && @data["event"]["eventDetails"]!=nil && @data["event"]["eventDetails"].has_key?("eventDetail")
+            eventDetail = @data["event"]["eventDetails"]["eventDetail"]
+            if eventDetail.class==Array
+              @data["event"]["eventDetails"]["eventDetail"].each do |detail|
+                ret +="<div><b>" + detail["eventDetailsName"] + ":</b> " + cleanup_reg_string(detail["eventDetailsValue"]) + "</div>"
+              end
+            else
+              #hash
+              ret +="<div><b>" + eventDetail["eventDetailsName"] + ":</b> " + cleanup_reg_string(eventDetail["eventDetailsValue"]) + "</div>"
             end
           end
           ret
