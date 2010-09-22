@@ -15,6 +15,12 @@ end
 describe  "Search URL Construction" do
   include CustomMatchers
   
+  it "should search by the SF DMA" do
+    uri = URI.parse( Search.new({:dma=>"San Francisco - Oakland - San Jose"}).end_point )
+    uri.query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
+    # uri.query.should_not have_param("l=")
+  end
+  
   it "should place lat and lng in the l param" do
     location = {:latitude=>"37.785895", :longitude=>"-122.40638"}
     uri = URI.parse( Search.new(location).end_point )

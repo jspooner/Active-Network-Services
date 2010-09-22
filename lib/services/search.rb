@@ -30,7 +30,7 @@ module Active
 
     class Search
       attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
-                    :view, :facet, :sort, :num_results, :asset_ids
+                    :view, :facet, :sort, :num_results, :asset_ids, :dma
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
        
@@ -58,6 +58,7 @@ module Active
         self.asset_id    = data[:asset_id] || ""
         self.latitude    = data[:latitude]
         self.longitude   = data[:longitude]
+        self.dma         = data[:dma]
       end
       
       # Example
@@ -129,10 +130,15 @@ module Active
         # 1 Look for zip codes
         # 2 Look for lat lng
         # 3 Look for a formatted string "San Diego, CA, US"
+        # 4 Look for a dma
         if not @zips.empty?
           loc_str = @zips.join(",")          
         elsif @latitude and @longitude
           loc_str = "#{@latitude};#{@longitude}"
+        elsif @dma
+          loc_str = ""
+          meta_data += "+AND+" unless meta_data == ""
+          meta_data += "meta:dma=#{Search.double_encode_channel(@dma)}"
         else
           loc_str = @location
         end
@@ -207,6 +213,9 @@ module Active
       #
       # 3 Look for a formatted string "San Diego, CA, US"
       #       Search.search( {:location = "San Diego, CA, US"} )
+      #
+      # 4 Look for a DMA
+      #       Search.new({:dma=>"San Francisco - Oakland - San Jose"})
       #
       # = How to look at the results =
       #
