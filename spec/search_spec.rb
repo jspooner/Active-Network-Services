@@ -313,6 +313,11 @@ describe "Call Live Data" do
     end
   end
   
+  it "should search by keyword" do
+    s = Search.search( {:keywords => "Running Race"} )
+    s.results.should have_at_least(1).items
+  end
+  
   # our model should be updated to handle multiple categories 
   # I'm sure running is with in all of these events but we're only storing 1.
   # it "should find only running activities" do

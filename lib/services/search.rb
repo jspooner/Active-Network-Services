@@ -83,7 +83,7 @@ module Active
       
       def keywords=(value)
         if value.class == String
-          @keywords = value.split(",").each { |k| k.strip! }
+          @keywords = value.gsub(",", " ").split(" ").each { |k| k.strip! }
         else
           @keywords = value
         end
