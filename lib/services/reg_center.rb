@@ -73,12 +73,12 @@ module Active
             channels.each do |c|
               return c["channelName"] if c.has_key?("primaryChannel") && c["primaryChannel"]=="true"
             end
+            nil
           else
             #hash
             return channels["channelName"] if channels.has_key?("primaryChannel") && channels["primaryChannel"]=="true"
+            return nil
           end
-          #fallback
-          return category
         end
       end
 
@@ -131,7 +131,9 @@ module Active
               ret +="<div><b>" + eventDetail["eventDetailsName"] + ":</b> " + cleanup_reg_string(eventDetail["eventDetailsValue"]) + "</div>"
             end
           end
-          ret
+          return ret
+        elsif @data.has_key?("event") && @data["event"].has_key?("eventDescription")
+          return @data["event"]["eventDescription"]
         end
       end
       
