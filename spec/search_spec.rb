@@ -15,6 +15,12 @@ end
 describe  "Search URL Construction" do
   include CustomMatchers
   
+  it "should search by the SF DMA" do
+    uri = URI.parse( Search.new({:dma=>"San Francisco - Oakland - San Jose"}).end_point )
+    uri.query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
+    # uri.query.should_not have_param("l=")
+  end
+  
   it "should place lat and lng in the l param" do
     location = {:latitude=>"37.785895", :longitude=>"-122.40638"}
     uri = URI.parse( Search.new(location).end_point )
@@ -305,6 +311,11 @@ describe "Call Live Data" do
     s.results.each do |a|
       a.asset_id.should_not be_nil
     end
+  end
+  
+  it "should search by keyword" do
+    s = Search.search( {:keywords => "Running Race"} )
+    s.results.should have_at_least(1).items
   end
   
   # our model should be updated to handle multiple categories 
