@@ -154,7 +154,19 @@ module Active
         end
         meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
         
-        url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
+        # url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
+        urla = ["#{SEARCH_URL}/search?api_key=#{@api_key}"]
+        urla << "num=#{@num_results}" if @num_results
+        urla << "page=#{@page}" if @page
+        urla << "l=#{loc_str}" unless loc_str.empty?
+        urla << "f=#{@facet}" if @facet 
+        urla << "v=#{@view}" if @view
+        urla << "r=#{@radius}" if @radius
+        urla << "s=#{@sort}" if @sort
+        urla << "k=#{@keywords.join("+")}" if @keywords
+        urla << "m=#{meta_data}" if meta_data
+
+        return urla.join("&")
       end
       
       def search
