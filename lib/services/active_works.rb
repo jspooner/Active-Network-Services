@@ -6,6 +6,7 @@ module Active
     class ActiveWorks < IActivity
       require 'nokogiri'
       require 'open-uri'
+      
       attr_accessor :asset_type_id
       
       def initialize(data={})
@@ -87,7 +88,7 @@ module Active
       def desc
         if @data.has_key?("eventDetailDto") && @data["eventDetailDto"].has_key?("description")
 #          @data["eventDetailDto"]["description"].gsub('\"','"')
-          @data["eventDetailDto"]["description"]
+          sanitize @data["eventDetailDto"]["description"]
         end
       end
       

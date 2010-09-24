@@ -188,7 +188,7 @@ module Active
             @pageSize        = parsed_json["pageSize"]
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
-            @results         = parsed_json['_results'].collect { |a| Activity.new(a) }  
+            @results         = parsed_json['_results'].collect { |a| GSA.new(a) }  
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
             @endIndex        = 0
