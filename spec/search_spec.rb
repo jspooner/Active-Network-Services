@@ -47,7 +47,7 @@ describe  "Search URL Construction" do
   
   it "should escape the location" do
     s = Search.new()
-    s.location.should eql("")
+    s.location.should be_nil
     s = Search.new({:location => "San Diego"})
     s.location.should eql("San+Diego")
   end

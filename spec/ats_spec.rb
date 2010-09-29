@@ -4,6 +4,7 @@ require File.join(File.dirname(__FILE__), %w[custom_matchers_spec])
 require File.join(File.dirname(__FILE__), %w[ .. lib services search])
 require File.join(File.dirname(__FILE__), %w[ .. lib services activity])
 require File.join(File.dirname(__FILE__), %w[ .. lib services ats])
+require File.join(File.dirname(__FILE__), %w[ .. lib services address])
 include Active::Services
 
 describe ATS do

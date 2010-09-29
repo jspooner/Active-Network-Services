@@ -39,7 +39,7 @@ module Active
       
       def initialize(data={})
         self.api_key     = data[:api_key] || ""
-        self.location    = data[:location] || ""
+        self.location    = data[:location]
         self.zips        = data[:zips] || []
         self.channels    = data[:channels] || []
         self.keywords    = data[:keywords] || []
@@ -81,6 +81,7 @@ module Active
       end
       
       def location=(value)
+        return if value.nil?
         @location = CGI.escape(value)
       end
       
@@ -174,7 +175,7 @@ module Active
         urla = ["#{SEARCH_URL}/search?api_key=#{@api_key}"]
         urla << "num=#{@num_results}" if @num_results
         urla << "page=#{@page}" if @page
-        urla << "l=#{loc_str}" unless loc_str.empty?
+        urla << "l=#{loc_str}" unless loc_str.nil? or loc_str.empty?
         urla << "f=#{@facet}" if @facet 
         urla << "v=#{@view}" if @view
         urla << "r=#{@radius}" if @radius
