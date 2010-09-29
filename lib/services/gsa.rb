@@ -53,7 +53,7 @@ module Active
       end
 
       def address
-        @address = {
+        @address = Active::Address.new(  {
           :name    => @data["meta"]["location"],
           :state   => @data["meta"]["eventAddress"],
           :city    => @data["meta"]["city"],
@@ -62,7 +62,7 @@ module Active
           :lat     => @data["meta"]["latitude"],
           :lng     => @data["meta"]["longitude"],
           :country => @data["meta"]["country"]
-        }
+        })
       end
 
       def start_date
@@ -83,6 +83,18 @@ module Active
 
       def category
         primary_category
+      end
+
+      def contact_name
+        if @data["meta"].has_key?("contactName") && !@data["meta"]["contactName"].blank?
+          @data["meta"]["contactName"]
+        end
+      end
+
+      def contact_email
+        if @data["meta"].has_key?("contactEmail") && !@data["meta"]["contactEmail"].blank?
+          @data["meta"]["contactEmail"]
+        end
       end
 
       def desc

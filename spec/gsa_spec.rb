@@ -4,6 +4,7 @@ require File.join(File.dirname(__FILE__), %w[custom_matchers_spec])
 require File.join(File.dirname(__FILE__), %w[ .. lib services search])
 require File.join(File.dirname(__FILE__), %w[ .. lib services activity])
 require File.join(File.dirname(__FILE__), %w[ .. lib services reg_center])
+require File.join(File.dirname(__FILE__), %w[ .. lib address])
 include Active::Services
 
 describe GSA do
@@ -17,8 +18,9 @@ describe GSA do
     puts @a.data["meta"].inspect
     @a.asset_type_id.should_not be_nil
   end
-  it "should have an address Hash" do
-    @a.address.should be_an_instance_of(Hash)
+  it "should have an Address" do
+    puts @a.address.inspect
+    @a.address.should be_an_instance_of(Active::Address)
   end
   it "should have a desc String" do
 #    puts @a.data["meta"].keys.inspect

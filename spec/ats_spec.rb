@@ -8,7 +8,8 @@ include Active::Services
 
 describe ATS do
   before(:each) do 
-    @valid_id = "A9EF9D79-F859-4443-A9BB-91E1833DF2D5"
+#    @valid_id = "A9EF9D79-F859-4443-A9BB-91E1833DF2D5"
+    @valid_id="61BB7D71-EC01-46B8-A601-38CA1C9AE893"
     @reg_center_id = "D9A22F33-8A14-4175-8D5B-D11578212A98"
   end
   it "should set find by id" do

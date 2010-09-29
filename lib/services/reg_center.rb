@@ -141,6 +141,12 @@ module Active
         input.gsub("\r","").gsub("\n","").gsub("\"","""").gsub("\342\200\234","""").gsub("\342\200\235","""")
       end
 
+      def contact_email
+        if @data.has_key?("event") && @data["event"].has_key?("eventContactEmail")
+          return @data["event"]["eventContactEmail"]
+        end
+      end
+
 
       # EXAMPLE
       # lazy load the data for some_crazy_method

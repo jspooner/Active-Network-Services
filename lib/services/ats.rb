@@ -117,6 +117,16 @@ module Active
           @data["summary"]
         end
       end
+      
+      def contact_name
+        load_metadata unless @metadata_loaded
+        @data["contactName"] if @data.has_key?("contactName")
+      end
+
+      def contact_email
+        load_metadata unless @metadata_loaded
+        @data["contactEmail"] if @data.has_key?("contactEmail")
+      end
 
 
       # EXAMPLE
