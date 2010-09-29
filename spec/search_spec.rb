@@ -418,7 +418,11 @@ describe "Find things within X miles to me" do
   it "shoule be near this location"
 end
 
-
+describe "Address" do
+  it "should have a valid address, city, state, zip, lat, lng if the event was from ?___ATS__"
+  it "should have a valid address, city, state, zip, lat, lng if the event was from ?___Works__"
+  it "should have a valid address, city, state, zip, lat, lng if the event was from ?___NET__"
+end
 
 
 
