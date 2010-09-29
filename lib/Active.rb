@@ -1,5 +1,8 @@
 module Active
-
+  
+  # attr_reader :CACHE
+  attr_accessor :CACHE
+  
   # :stopdoc:
   LIBPATH = ::File.expand_path(::File.dirname(__FILE__)) + ::File::SEPARATOR
   PATH = ::File.dirname(LIBPATH) + ::File::SEPARATOR
@@ -57,7 +60,22 @@ module Active
 
     Dir.glob(search_me).sort.each {|rb| require rb}
   end
+  
+  # Active.memcache_host = "localhost:11211"
+  def self.memcache_host(url)
+    require 'memcache'
+    @CACHE = MemCache.new(url)
+  end
+  
+  def self.use_memcached
+    true
+  end
+  
+  def self.CACHE
+    @CACHE
+  end
 
+  
 end  # module Active
 
 Active.require_all_libs_relative_to(__FILE__)

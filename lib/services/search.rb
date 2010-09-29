@@ -30,7 +30,7 @@ module Active
 
     class Search
       attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
-                    :view, :facet, :sort, :num_results, :asset_ids, :dma
+                    :view, :facet, :sort, :num_results, :asset_ids, :dma, :city, :state, :country
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
        
@@ -43,7 +43,7 @@ module Active
         self.zips        = data[:zips] || []
         self.channels    = data[:channels] || []
         self.keywords    = data[:keywords] || []
-        self.radius      = data[:radius] || "50"
+        self.radius      = data[:radius] || nil
         self.limit       = data[:limit] || "10"
         self.sort        = data[:sort] || Sort.DATE_ASC
         self.page        = data[:page] || "1"
@@ -59,6 +59,9 @@ module Active
         self.latitude    = data[:latitude]
         self.longitude   = data[:longitude]
         self.dma         = data[:dma]
+        self.city        = data[:city]
+        self.state       = data[:state]
+        self.country     = data[:country]
       end
       
       # Example
@@ -107,7 +110,8 @@ module Active
       end
       
       def end_point
-        meta_data  = ""
+        meta_data = ""
+        loc_str   = ""
         # CHANNELS
         channel_keys = []
         @channels.each do |c|
@@ -127,16 +131,28 @@ module Active
           meta_data += temp_ids.join("+OR+")          
         end
         # LOCATION
-        # 1 Look for zip codes
-        # 2 Look for lat lng
-        # 3 Look for a formatted string "San Diego, CA, US"
-        # 4 Look for a dma
-        if not @zips.empty?
+        # 1 Look for :city, :state, :country
+        # 2 Look for zip codes
+        # 3 Look for lat lng
+        # 4 Look for a formatted string "San Diego, CA, US"
+        # 5 Look for a dma
+        
+        if @city or @state or @country
+          if @city
+            meta_data += "+AND+" unless meta_data == ""
+            meta_data += "meta:city=#{Search.double_encode_channel(@city)}" 
+          end
+          if @state
+            meta_data += "+AND+" unless meta_data == ""
+            meta_data += "meta:state=#{Search.double_encode_channel(@state)}"             
+          end
+        elsif !@zips.empty?
+        # if not @zips.empty?
           loc_str = @zips.join(",")          
         elsif @latitude and @longitude
           loc_str = "#{@latitude};#{@longitude}"
         elsif @dma
-          loc_str = ""
+          
           meta_data += "+AND+" unless meta_data == ""
           meta_data += "meta:dma=#{Search.double_encode_channel(@dma)}"
         else
@@ -154,7 +170,19 @@ module Active
         end
         meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
         
-        url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
+        # url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
+        urla = ["#{SEARCH_URL}/search?api_key=#{@api_key}"]
+        urla << "num=#{@num_results}" if @num_results
+        urla << "page=#{@page}" if @page
+        urla << "l=#{loc_str}" unless loc_str.empty?
+        urla << "f=#{@facet}" if @facet 
+        urla << "v=#{@view}" if @view
+        urla << "r=#{@radius}" if @radius
+        urla << "s=#{@sort}" if @sort
+        urla << "k=#{@keywords.join("+")}" if @keywords and !@keywords.empty? 
+        urla << "m=#{meta_data}" if meta_data
+
+        return urla.join("&")
       end
       
       def search
@@ -163,7 +191,7 @@ module Active
         http              = Net::HTTP.new(searchurl.host, searchurl.port)
         http.read_timeout = DEFAULT_TIMEOUT
         
-        puts "#{searchurl.path}?#{searchurl.query}"
+        return_cached(end_point)
         
         res = http.start { |http|
           http.get("#{searchurl.path}?#{searchurl.query}")
@@ -177,6 +205,9 @@ module Active
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
             @results         = parsed_json['_results'].collect { |a| GSA.new(a) }  
+            
+            Active.CACHE.set(end_point, self) if Active.CACHE
+
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
             @endIndex        = 0
@@ -239,7 +270,13 @@ module Active
           str.gsub!(/\-/,"%252D")
           str
         end
-      
+        
+        def return_cached url
+          if Active.CACHE
+            cached_version = Active.CACHE.get(url)
+            return cached_version if cached_version
+          end
+        end
     end
     
     # TODO move to a reflection service
