@@ -23,7 +23,7 @@ module Active
       end
 
       def source
-        :reg_center
+        :primary
       end
 
       def title
@@ -84,7 +84,7 @@ module Active
 
       def address
         if @data.has_key?("event") && @data["event"].has_key?("eventAddress") && !@data["event"]["eventAddress"].blank?
-          @address = {
+          @address = Active::Address.new({
             :name    => @data["event"]["eventLocation"],
             :address => @data["event"]["eventAddress"],
             :city    => @data["event"]["eventCity"],
@@ -93,7 +93,7 @@ module Active
             :lat     => @data["event"]["latitude"],
             :lng     => @data["event"]["longitude"],
             :country => @data["event"]["eventCountry"]
-          }        
+          } )
         end
       end
 

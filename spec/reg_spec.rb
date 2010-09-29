@@ -28,9 +28,9 @@ describe RegCenter do
     a = RegCenter.find_by_id(@valid_id)
     a.data["event"].should_not be_nil
   end
-  it "should have an address Hash" do
+  it "should have an address Address" do
     a = RegCenter.find_by_id(@valid_id)
-    a.address.should be_an_instance_of(Hash)
+    a.address.should be_an_instance_of(Active::Address)
   end
   it "should have a desc String" do
     a = RegCenter.find_by_id(@valid_id)

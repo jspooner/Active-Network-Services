@@ -58,7 +58,7 @@ module Active
 
       def address
         load_metadata unless @metadata_loaded
-        @address = {
+        @address = Active::Address.new({
           :name    => @data["location"],
           :address => @data["address"],
           :city    => @data["city"],
@@ -67,7 +67,7 @@ module Active
           :lat     => @data["latitude"],
           :lng     => @data["longitude"],
           :country => @data["country"]
-        }
+        })
       end
 
       def start_date
@@ -126,6 +126,10 @@ module Active
       def contact_email
         load_metadata unless @metadata_loaded
         @data["contactEmail"] if @data.has_key?("contactEmail")
+      end
+      
+      def substitutionUrl
+        @data[:substitution_url]
       end
 
 

@@ -82,3 +82,5 @@ Active.require_all_libs_relative_to(__FILE__)
 Active.require_all_libs_relative_to(__FILE__, 'services')
 require 'Address'
 require 'savon'
+include Active
+include Active::Services

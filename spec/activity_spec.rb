@@ -117,7 +117,21 @@ describe Activity do
   
   describe  "ATS data fetch" do
     it "should retrive the ats data"
-    it "should store the date when ats was"
+#    it "should store the date when ats was"
+    gsa = Active::Services::Search.search(:asset_id=>"4f698038-3a02-cf94-5d34-495fa28479dc").results.first
+    a = Activity.new(gsa)
+#    a.ats.should be_an_instance_of(ATS)
+    a.ats.should==gsa
+  end
+  
+  describe "should be instatiated with a reg center asset" do
+     a = Activity.new(RegCenter.find_by_id("1819585"))
+     a.url.should_not be_nil                      
+  end
+
+  describe "should have an asset_id when  instatiated with a reg center asset" do
+     a = Activity.new(RegCenter.find_by_id("1819585"))
+     a.asset_id.should_not be_nil                      
   end
   
   describe "ActiveNet data fetch" do
@@ -130,10 +144,9 @@ describe Activity do
     
     
     it "should retrive data from ActiveNet" do
-      # a = Activity.new({})
-      # a.should receive al call to a.get_ats_data
-      # a.rawdata.should be a freaking hash
-      pending
+      gsa = Active::Services::Search.search(:asset_id=>"4f698038-3a02-cf94-5d34-495fa28479dc").results.first
+      a = Activity.new(gsa)
+      a.primary.should be_an_instance_of(ActiveWorks)
     end
     
     describe "Lazy loading of params" do

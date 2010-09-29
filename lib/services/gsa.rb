@@ -108,6 +108,12 @@ module Active
           ""
         end
       end
+      
+      def substitutionUrl
+        if @data["meta"].has_key?("substitutionUrl")
+          @data["meta"]["substitutionUrl"]
+        end
+      end
 
 
     end

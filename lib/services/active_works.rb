@@ -18,7 +18,7 @@ module Active
       end
 
       def source
-        :active_works
+        :primary
       end
       
       def asset_id
@@ -55,13 +55,13 @@ module Active
       end
 
       def address
-          @address = {
+          @address = Active::Address.new({
             :address => @data["eventDetailDto"]["addressLine1"],
             :city    => @data["eventDetailDto"]["addressCity"],
             :state   => @data["eventDetailDto"]["state"],
             :zip     => @data["eventDetailDto"]["addressPostalCode"],
             :country => @data["eventDetailDto"]["countryName"]
-          }        
+          })
       end
 
       def start_date
