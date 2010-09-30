@@ -16,6 +16,14 @@ end
 describe  "Search URL Construction" do
   include CustomMatchers
   
+  it "should return an array of Activity objects" do
+    pending
+    Search.new({:state=>"California"}).results.each do |a|
+      a.should be_an_instance_of(Activity)
+    end
+    # @results         = parsed_json['_results'].collect { |a| GSA.new(a) }  
+  end
+  
   it "should search by city" do
     uri = URI.parse( Search.new({:city=>"Oceanside"}).end_point )
     uri.query.should have_param("meta:city=Oceanside")
