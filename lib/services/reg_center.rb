@@ -84,7 +84,7 @@ module Active
 
       def address
         if @data.has_key?("event") && @data["event"].has_key?("eventAddress") && !@data["event"]["eventAddress"].blank?
-          @address = Address.new({
+          @address = validated_address({
             :name    => @data["event"]["eventLocation"],
             :address => @data["event"]["eventAddress"],
             :city    => @data["event"]["eventCity"],

@@ -12,6 +12,14 @@ module Active
      
      attr_reader :asset_type_id
      
+     def validated_address(address)
+       #ensure a hash with the proper keys
+       returnAddress = HashWithIndifferentAccess.new({ :name =>"", :address => "", :city => "", :state => "",:zip => "", :lat => "", :lng => "", :country => ""})
+       returnAddress.merge!(address)
+       # validations
+       returnAddress
+     end
+     
      def source
       raise StandardError, "You must override this method"
      end

@@ -26,7 +26,7 @@ describe ActiveWorks do
   end
   it "should have an address Hash" do
     a = ActiveWorks.find_by_id(@valid_id)
-    a.address.should be_an_instance_of(Hash)
+    a.address.should be_an_instance_of(HashWithIndifferentAccess)
   end
   it "should have a desc" do
     a = ActiveWorks.find_by_id(@valid_id)

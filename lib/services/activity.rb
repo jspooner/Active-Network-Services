@@ -5,6 +5,7 @@ module Active
 
     class Activity < IActivity
       REG_CENTER_ASSET_TYPE_ID="EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
+      REG_CENTER_ASSET_TYPE_ID2="3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6"
       ACTIVE_WORKS_ASSET_TYPE_ID="DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
 
       attr_accessor :primary, :gsa, :ats
@@ -24,7 +25,7 @@ module Active
       		@gsa = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results.first if @gsa==nil
 
           if @primary==nil
-            if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID
+            if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
               @primary= RegCenter.find_by_id(@ats.substitutionUrl)
             elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
               @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)

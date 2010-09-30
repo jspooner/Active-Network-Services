@@ -44,7 +44,7 @@ describe ATS do
   end
   it "should have an address Hash" do
     a = ATS.find_by_id(@valid_id)
-    a.address.should be_an_instance_of(Hash)
+    a.address.should be_an_instance_of(HashWithIndifferentAccess)
   end
   it "should have a startDate Date" do
     a = ATS.find_by_id(@valid_id)

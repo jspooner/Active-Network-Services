@@ -53,7 +53,7 @@ module Active
       end
 
       def address
-        @address = Address.new({
+        @address = validated_address({
           :name    => @data["meta"]["location"],
           :state   => @data["meta"]["eventAddress"],
           :city    => @data["meta"]["city"],

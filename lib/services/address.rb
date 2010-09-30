@@ -1,6 +1,6 @@
 module Active
   module Services  
-    class Address
+    class AddressDeprecated
       attr_accessor  :name, :state, :city, :state, :zip, :lat, :lng, :country
       def initialize(data={})
         @name    = data[:name]

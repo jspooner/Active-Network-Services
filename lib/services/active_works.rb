@@ -55,7 +55,7 @@ module Active
       end
 
       def address
-          @address = Active::Address.new({
+          @address = validated_address({
             :address => @data["eventDetailDto"]["addressLine1"],
             :city    => @data["eventDetailDto"]["addressCity"],
             :state   => @data["eventDetailDto"]["state"],

@@ -20,7 +20,7 @@ describe GSA do
   end
   it "should have an Address" do
     puts @a.address.inspect
-    @a.address.should be_an_instance_of(Address)
+    @a.address.should be_an_instance_of(HashWithIndifferentAccess)
   end
   it "should have a desc String" do
 #    puts @a.data["meta"].keys.inspect
