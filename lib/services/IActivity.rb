@@ -17,6 +17,10 @@ module Active
        returnAddress = HashWithIndifferentAccess.new({ :name =>"", :address => "", :city => "", :state => "",:zip => "", :lat => "", :lng => "", :country => ""})
        returnAddress.merge!(address)
        # validations
+       # ensure no nil
+       returnAddress.keys.each do |key|
+         returnAddress[key] = "" if returnAddress[key].nil?
+       end
        returnAddress
      end
      

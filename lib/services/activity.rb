@@ -99,11 +99,11 @@ module Active
       end
 
       def address
-        return @primary.address unless @primary.nil?
+        return @primary.address unless (@primary.nil? || @primary.address.nil?)
         return @ats.address     unless @ats.nil?
         return @gsa.address     unless @gsa.nil?
         return @address      if @address
-        return nil
+        return validated_address({})
       end
 
       def start_date
