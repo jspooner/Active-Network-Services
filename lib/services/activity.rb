@@ -12,20 +12,26 @@ module Active
       attr_reader :datasources_loaded
 
       # data is a GSA object              
-      def initialize(data,preload_data=false)
+      def initialize(gsa,preload_data=false)
         @datasources_loaded=false
         
-        if data.respond_to?(:source)
-          @ats     = data if data.source == :ats
-          @gsa     = data if data.source == :gsa
-          @primary = data if data.source == :primary
-          
-          @asset_id = @ats.asset_id if @ats!=nil
-          @asset_id = @gsa.asset_id if @gsa!=nil
-          @asset_id = @primary.asset_id if @primary!=nil
-          
-          load_datasources if preload_data
-        end
+        @gsa = gsa
+        
+        # if data.respond_to?('source')
+        #   @ats     = gsa if data.source == :ats
+        #   @gsa     = gsa if data['source'] == :gsa
+        #   @primary = gsa if data.source == :primary
+        #   
+        #   @asset_id = @ats.asset_id if @ats!=nil
+        #   @asset_id = @gsa.asset_id if @gsa!=nil
+        #   @asset_id = @primary.asset_id if @primary!=nil
+        #   
+        #   load_datasources if preload_data
+        # end
+      end
+      
+      def source
+        :active
       end
       
       def load_datasources
@@ -45,26 +51,19 @@ module Active
         @datasources_loaded=true
       end
 
-      
-      def asset_id=(value)        
-        @asset_id = (value.class==Array) ? value[0] : value
-      end
-
       def title
-        return @primary.title unless @primary.nil?
-        load_datasources
-        return @ats.title     unless @ats.nil?
-        return @gsa.title     unless @gsa.nil?
-        return @title if @title
-        return ""
+        return @gsa.title unless @gsa.nil?
+        return nil
       end
 
+      # id within a system
+      def asset_id=(value)        
+        @gsa.asset_id
+        # @asset_id = (value.class==Array) ? value[0] : value
+      end
+      # The asset type id lets us know what system is came from
       def asset_type_id
-        return @primary.asset_type_id unless @primary.nil?
-        load_datasources
-        return @ats.asset_type_id     unless @ats.nil?
         return @gsa.asset_type_id     unless @gsa.nil?
-        return @asset_type_id      if @asset_type_id
         return nil
       end
 
@@ -96,11 +95,7 @@ module Active
       end
 
       def asset_id
-        return @primary.asset_id unless @primary.nil?
-        load_datasources
-        return @ats.asset_id     unless @ats.nil?
         return @gsa.asset_id     unless @gsa.nil?
-        return @asset_id      if @asset_id
         return nil
       end
 
@@ -114,90 +109,74 @@ module Active
       end
 
       def address
-        returned_address = validated_address({})
-        returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
-        load_datasources
-        returned_address = @ats.address     unless @ats.nil?
+        # returned_address = validated_address({})
+        # returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
+        # load_datasources
+        # returned_address = @ats.address     unless @ats.nil?
         returned_address = @gsa.address     unless @gsa.nil?
-        returned_address =  @address        if @address
-        
-        #ensure lat/lng
-        if (returned_address["lat"]=="")
-          load_datasources
-          if @primary.address["lat"]!=""
-            returned_address["lat"] = @primary.address["lat"] 
-            returned_address["lng"] = @primary.address["lng"] 
-          elsif @ats.address["lat"]!=""
-            returned_address["lat"] = @ats.address["lat"] 
-            returned_address["lng"] = @ats.address["lng"] 
-          elsif @gsa.address["lat"]!=""
-            returned_address["lat"] = @gsa.address["lat"] 
-            returned_address["lng"] = @gsa.address["lng"] 
-          end
-        end
-
-        if (returned_address["lat"]=="")
-          #geocode
-          geocode_url=""
-          if returned_address["zip"]!="" && returned_address["zip"]!="00000"
-            geocode_url="http://api.active.com/Rest/addressvalidator/Handler.ashx?z=#{returned_address["zip"]}"
-          elsif returned_address["city"]!="" && returned_address["state"]!=""
-            geocode_url="http://api.active.com/Rest/addressvalidator/Handler.ashx?c=#{returned_address["city"]}&s=#{returned_address["state"]}"
-          end
-          puts "geocode_url: #{geocode_url}"
-          if geocode_url!=""
-            require 'open-uri'
-            begin
-              Nokogiri::XML(open(geocode_url)).root.children.each do |node|
-                returned_address["lat"]=node.content if node.name=="Latitude"
-                returned_address["lng"]=node.content if node.name=="Longitude"
-                returned_address["city"]=Validators.valid_state(node.content) if node.name=="City" && returned_address["city"]==""
-                returned_address["zip"]=node.content if node.name=="ZipCode" && returned_address["zip"]==""
-                returned_address["state"]=node.content if node.name=="StateCode" && returned_address["state"]==""
-              end
-            rescue 
-              puts { "[GEO ERROR] #{geocode_url}" }
-            end
-            
-          end
-        end
+        # returned_address =  @address        if @address
+        # 
+        # #ensure lat/lng
+        # if (returned_address["lat"]=="")
+        #   load_datasources
+        #   if @primary.address["lat"]!=""
+        #     returned_address["lat"] = @primary.address["lat"] 
+        #     returned_address["lng"] = @primary.address["lng"] 
+        #   elsif @ats.address["lat"]!=""
+        #     returned_address["lat"] = @ats.address["lat"] 
+        #     returned_address["lng"] = @ats.address["lng"] 
+        #   elsif @gsa.address["lat"]!=""
+        #     returned_address["lat"] = @gsa.address["lat"] 
+        #     returned_address["lng"] = @gsa.address["lng"] 
+        #   end
+        # end
+        # 
+        # if (returned_address["lat"]=="")
+        #   #geocode
+        #   geocode_url=""
+        #   if returned_address["zip"]!="" && returned_address["zip"]!="00000"
+        #     geocode_url="http://api.active.com/Rest/addressvalidator/Handler.ashx?z=#{returned_address["zip"]}"
+        #   elsif returned_address["city"]!="" && returned_address["state"]!=""
+        #     geocode_url="http://api.active.com/Rest/addressvalidator/Handler.ashx?c=#{returned_address["city"]}&s=#{returned_address["state"]}"
+        #   end
+        #   puts "geocode_url: #{geocode_url}"
+        #   if geocode_url!=""
+        #     require 'open-uri'
+        #     begin
+        #       Nokogiri::XML(open(geocode_url)).root.children.each do |node|
+        #         returned_address["lat"]=node.content if node.name=="Latitude"
+        #         returned_address["lng"]=node.content if node.name=="Longitude"
+        #         returned_address["city"]=Validators.valid_state(node.content) if node.name=="City" && returned_address["city"]==""
+        #         returned_address["zip"]=node.content if node.name=="ZipCode" && returned_address["zip"]==""
+        #         returned_address["state"]=node.content if node.name=="StateCode" && returned_address["state"]==""
+        #       end
+        #     rescue 
+        #       puts { "[GEO ERROR] #{geocode_url}" }
+        #     end
+        #     
+        #   end
+        # end
 
         return returned_address
       end
 
       def start_date
-        return @primary.start_date unless @primary.nil?
-        load_datasources
-        return @ats.start_date     unless @ats.nil?
         return @gsa.start_date     unless @gsa.nil?
-        return @start_date      if @start_date
         return nil
       end
 
       def start_time
-        return @primary.start_time unless @primary.nil?
-        load_datasources
-        return @ats.start_time     unless @ats.nil?
         return @gsa.start_time     unless @gsa.nil?
-        return @start_time      if @start_time
         return nil
       end
 
       def end_date
-        return @primary.end_date unless @primary.nil?
-        load_datasources
-        return @ats.end_date     unless @ats.nil?
         return @gsa.end_date     unless @gsa.nil?
-        return @end_date      if @end_date
         return nil
       end
 
       def end_time
-        return @primary.end_time unless @primary.nil?
-        load_datasources
-        return @ats.end_time     unless @ats.nil?
         return @gsa.end_time     unless @gsa.nil?
-        return @end_time      if @end_date
         return nil
       end
 

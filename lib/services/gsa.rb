@@ -11,21 +11,24 @@ module Active
       # EXAMPLE Data hash
       # {"title"=>"Birds of a Feather Run | Ashland, Oregon 97520 | Thursday ...", "language"=>"en", "url"=>"http://www.active.com/running/ashland-or/birds-of-a-feather-run-2010", "escapedUrl"=>"http://www.active.com/running/ashland-or/birds-of-a-feather-run-2010", "meta"=>{"city"=>"Ashland", "assetId"=>["4365AF63-B2AE-4A98-A403-5E30EB6D2D69", "4365af63-b2ae-4a98-a403-5e30eb6d2d69"], "substitutionUrl"=>"1845585", "trackbackurl"=>"http://www.active.com/running/ashland-or/birds-of-a-feather-run-2010", "contactName"=>"Hal Koerner", "eventDate"=>"2010-09-23T00:00:00-07:00", "eventLongitude"=>"-122.5526", "eventId"=>"1845585", "zip"=>"97520", "category"=>"Activities", "latitude"=>"42.12607", "google-site-verification"=>"", "participationCriteria"=>"All", "dma"=>"Medford - Klamath Falls", "country"=>"United States", "sortDate"=>"2000-09-23", "tag"=>["event:10", "Running:10"], "lastModifiedDateTime"=>"2010-09-23 03:04:55.463", "lastModifiedDate"=>"2010-09-23", "startDate"=>"2010-09-23", "contactPhone"=>"541-201-0014", "eventState"=>"Oregon", "splitMediaType"=>"Event", "onlineDonationAvailable"=>"0", "market"=>"Medford - Klamath Falls", "assetName"=>["Birds of a Feather Run", "Birds of a Feather Run"], "seourl"=>"http://www.active.com/running/ashland-or/birds-of-a-feather-run-2010", "assetTypeId"=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "channel"=>"Running", "endTime"=>"0:00:00", "mediaType"=>"Event", "startTime"=>"0:00:00", "description"=>"", "longitude"=>"-122.5526", "UpdateDateTime"=>"9/22/2010 11:46:24 AM", "endDate"=>"2010-09-23", "onlineMembershipAvailable"=>"0", "onlineRegistrationAvailable"=>"false", "eventZip"=>"97520", "state"=>"Oregon", "estParticipants"=>"2000", "eventURL"=>"http://sorunners.org/", "eventLatitude"=>"42.12607", "keywords"=>"Event"}, "summary"=>"... Similar Running Events. I Ran for Sudan - Maple Valley First Annual 10K/2Mile      Kid's Run/Walk Maple Valley, Washington Sat, Oct 02, 2010; ... "}
 
-      def initialize(data={})
+      def initialize(json={})
         # need to hold on to original data
-        @data = HashWithIndifferentAccess.new(data) || HashWithIndifferentAccess.new
+        @data = HashWithIndifferentAccess.new(json) || HashWithIndifferentAccess.new
+        # self.title = @data['meta']['assetName'] || nil
+        self.title = @data['title'] || nil
       end
 
       def source
         :gsa
       end
 
-      def title
-        @data["title"]
-      end
-
-      def asset_type_id
-        @data["meta"]["assetTypeId"]
+      def title=(value)
+        @title = value
+        if @title 
+          @title = @title.split("|")[0].strip if @title.include?("|")          
+          @title = @title.gsub(/<\/?[^>]*>/, "")
+          @title = @title.gsub("...", "")
+        end
       end
 
       def url
@@ -41,21 +44,24 @@ module Active
       end
 
       def asset_id
-        if @data["meta"]["assetId"].class==String
-          @data["meta"]["assetId"]
-        else
-          @data["meta"]["assetId"].first
-        end
+        return nil unless @data["meta"] and @data["meta"]["assetId"]
+        value = @data["meta"]["assetId"]
+        @asset_id = (value.class==Array) ? value[0] : value
       end
-
+      
+      def asset_type_id
+        return nil unless @data["meta"] and @data["meta"]["assetTypeId"]        
+        @data["meta"]["assetTypeId"]
+      end
+      
       def primary_category
         categories.first
       end
 
       def address
-        @address = validated_address({
+        @address = HashWithIndifferentAccess.new({
           :name    => @data["meta"]["location"],
-          :state   => @data["meta"]["eventAddress"],
+          :address => @data["meta"]["eventAddress"],
           :city    => @data["meta"]["city"],
           :state   => @data["meta"]["eventState"],
           :zip     => @data["meta"]["eventZip"],
@@ -63,10 +69,15 @@ module Active
           :lng     => @data["meta"]["longitude"],
           :country => @data["meta"]["country"]
         })
+       
       end
 
       def start_date
-        DateTime.parse @data["meta"]["eventDate"] if @data["meta"].has_key?("eventDate")
+        if @data.has_key?("meta") and  @data["meta"].has_key?("eventDate")
+          DateTime.parse @data["meta"]["eventDate"] 
+        else
+          nil
+        end
       end
 
       def start_time
@@ -74,7 +85,11 @@ module Active
       end
 
       def end_date
-        DateTime.parse @data["meta"]["endDate"] if @data["meta"].has_key?("endDate")
+        if @data.has_key?("meta") and  @data["meta"].has_key?("endDate")
+          DateTime.parse @data["meta"]["endDate"]
+        else
+          nil
+        end
       end
 
       def end_time

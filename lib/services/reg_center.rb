@@ -6,6 +6,7 @@ module Active
     class RegCenter < IActivity
       require 'nokogiri'
       require 'open-uri'
+      require 'digest/sha1'
       attr_accessor :asset_type_id
       
 #      attr_reader :metadata_loaded
@@ -15,11 +16,8 @@ module Active
       # :asset_type_id=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", :xmlns=>"http://api.asset.services.active.com"}
 
       def initialize(data={})
-        # need to hold on to original data
         @data = HashWithIndifferentAccess.new(data) || HashWithIndifferentAccess.new
-        @api_data_loaded = false
         @asset_type_id = "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
-        get_app_api
       end
 
       def source
@@ -156,7 +154,23 @@ module Active
       # end
 
       def self.find_by_id(id) #local id
-          return RegCenter.new({:id=>id})
+        
+        search_hash = Digest::SHA1.hexdigest("reg_#{id}")
+        if Active.CACHE
+          cached_version = Active.CACHE.get(search_hash)
+          return cached_version if cached_version
+        end
+        
+        begin
+          doc  = Nokogiri::XML(open("http://apij.active.com/regcenter/event/#{id}"))
+          reg  = RegCenter.new(Hash.from_xml(doc.to_s))
+          Active.CACHE.set(search_hash, reg) if Active.CACHE          
+        rescue Exception => e
+          raise RegCenterError, "Couldn't find Reg Center activity with the id of #{id} - #{e.inspect}"
+          return
+        end
+        
+        return reg
       end
 
       private
@@ -190,17 +204,17 @@ module Active
       #   @metadata_loaded=true
       # end
       
-      def get_app_api
-        puts "loading reg center api"
-        begin
-          doc = Nokogiri::XML(open("http://apij.active.com/regcenter/event/#{@data[:id]}"))
-          @data.merge! Hash.from_xml doc.to_s
-          @api_data_loaded=true
-        rescue
-          raise RegCenterError, "Couldn't find Reg Center activity with the id of #{id}"
-          return
-        end
-      end
+      # def get_app_api
+      #   puts "loading reg center api"
+      #   begin
+      #     doc = Nokogiri::XML(open("http://apij.active.com/regcenter/event/#{@data[:id]}"))
+      #     @data.merge! Hash.from_xml doc.to_s
+      #     @api_data_loaded=true
+      #   rescue
+      #     raise RegCenterError, "Couldn't find Reg Center activity with the id of #{id}"
+      #     return
+      #   end
+      # end
 
     end # end ats
   end

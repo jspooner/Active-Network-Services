@@ -4,6 +4,7 @@ require 'cgi'
 require 'rubygems'
 require 'mysql' 
 require 'active_record'
+require 'digest/sha1'
 
 module Active
   module Services
@@ -137,7 +138,6 @@ module Active
         # 3 Look for lat lng
         # 4 Look for a formatted string "San Diego, CA, US"
         # 5 Look for a dma
-        
         if @city or @state or @country
           if @city
             meta_data += "+AND+" unless meta_data == ""
@@ -192,7 +192,8 @@ module Active
         http              = Net::HTTP.new(searchurl.host, searchurl.port)
         http.read_timeout = DEFAULT_TIMEOUT
         
-        return_cached(end_point)
+        search_hash = Digest::SHA1.hexdigest(end_point)
+        return_cached(search_hash)
         
         res = http.start { |http|
           http.get("#{searchurl.path}?#{searchurl.query}")
@@ -207,7 +208,7 @@ module Active
             @numberOfResults = parsed_json["numberOfResults"]
             @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
             
-            Active.CACHE.set(end_point, self) if Active.CACHE
+            Active.CACHE.set(search_hash, self) if Active.CACHE
 
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
@@ -271,7 +272,7 @@ module Active
           str.gsub!(/\-/,"%252D")
           str
         end
-        
+        # DRY ME
         def return_cached url
           if Active.CACHE
             cached_version = Active.CACHE.get(url)
