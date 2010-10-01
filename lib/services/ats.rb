@@ -10,7 +10,7 @@ module Active
       # {"destinationID"=>"", "assetId"=>"A9EF9D79-F859-4443-A9BB-91E1833DF2D5", "substitutionUrl"=>"1878023", "city"=>"Antioch", "contactName"=>"City of Antioch", "trackbackurl"=>"http://www.active.com/page/Event_Details.htm?event_id=1878023&assetId=A9EF9D79-F859-4443-A9BB-91E1833DF2D5", "category"=>"Activities", "zip"=>"94531", "userCommentText"=>nil, "location"=>"Multi-use Room (prewett) - Prewett Family Park & Center", "latitude"=>"37.95761", :asset_id=>"A9EF9D79-F859-4443-A9BB-91E1833DF2D5", "searchWeight"=>"1", "country"=>"United States", "participationCriteria"=>"All", "dma"=>"San Francisco - Oakland - San Jose", "isSearchable"=>"true", :asset_name=>"Fitness, Pilates  Mat Class (16 Yrs. &amp; Up)", :substitution_url=>"1878023", :asset_type_id=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "row"=>"1", "image1"=>"http://www.active.com/images/events/hotrace.gif", "startDate"=>"2010-09-13", "contactPhone"=>"925-779-7070", :asset_type_name=>"Active.com Event Registration", "onlineDonationAvailable"=>"0", "avgUserRating"=>nil, "market"=>"San Francisco - Oakland - San Jose", "assetTypeId"=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "assetName"=>"Fitness, Pilates  Mat Class (16 Yrs. & Up)", "channel"=>"Not Specified", "seourl"=>"http://www.active.com/not-specified-recware-activities/antioch-ca/fitness-pilates-mat-class-16-yrs-and-up-2010", :xmlns=>"http://api.asset.services.active.com", :url=>"http://www.active.com/page/Event_Details.htm?event_id=1878023", "mediaType"=>"Recware Activities", "startTime"=>"18:15:00", "endTime"=>"18:15:00", "contactEmail"=>"dadams@ci.antioch.ca.us", "eventResults"=>nil, "longitude"=>"-121.7936", "endDate"=>"2010-09-13", "onlineRegistrationAvailable"=>"true", "onlineMembershipAvailable"=>"0", "state"=>"California"}
       # {"destinationID"=>"", "assetId"=>"D9A22F33-8A14-4175-8D5B-D11578212A98", "substitutionUrl"=>"1847738", "city"=>"Encino", "contactName"=>"Lilliane Ballesteros", "trackbackurl"=>"http://www.active.com/page/Event_Details.htm?event_id=1847738&assetId=D9A22F33-8A14-4175-8D5B-D11578212A98", "category"=>"Activities", "zip"=>"91406", "userCommentText"=>nil, "location"=>"Balboa Park/Lake Balboa", "latitude"=>"34.19933", :asset_id=>"D9A22F33-8A14-4175-8D5B-D11578212A98", "searchWeight"=>"1", "country"=>"United States", "participationCriteria"=>"All", "dma"=>"Los Angeles", "isSearchable"=>"1", :asset_name=>"2nd Annual weSPARK 10K Run &amp; 5K Run Walk", :substitution_url=>"1847738", :asset_type_id=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "row"=>"1", "image1"=>"http://www.active.com/images/events/hotrace.gif", "startDate"=>"2010-11-14", "contactPhone"=>"818-906-3022", :asset_type_name=>"Active.com Event Registration", "onlineDonationAvailable"=>"0", "avgUserRating"=>nil, "market"=>"Los Angeles", "assetTypeId"=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "assetName"=>"2nd Annual weSPARK 10K Run & 5K Run Walk", "channel"=>["Running", "Walking"], "seourl"=>"http://www.active.com/running/encino-ca/2nd-annual-wespark-10k-run-and-5k-run-walk-2010", :xmlns=>"http://api.asset.services.active.com", :url=>"http://www.active.com/page/Event_Details.htm?event_id=1847738", "mediaType"=>["Event", "Event\\10K", "Event\\5K"], "startTime"=>"8:00:00", "endTime"=>"8:00:00", "contactEmail"=>"lilliane@wespark.org", "eventResults"=>nil, "longitude"=>"-118.4924", "endDate"=>"2010-11-14", "onlineRegistrationAvailable"=>"1", "onlineMembershipAvailable"=>"0", "state"=>"California", "estParticipants"=>"1400", "eventURL"=>"http://www.wespark.org"}
 
-      def initialize(data={})
+      def initialize(data={},preload_metadata=false)
         # need to hold on to original data
         @data = data || {}
         @asset_id      = data[:asset_id]
@@ -19,6 +19,7 @@ module Active
         @title         = data[:asset_name] if data[:asset_name]
         @substitution_url = data[:substitution_url]
         @metadata_loaded = false
+        load_metadata if preload_metadata
       end
 
       def source
@@ -140,14 +141,20 @@ module Active
       #   @some_crazy = @data[:some_crazy_method_from_ats].split replace twist bla bla bla
       # end
 
-      def self.find_by_id(id)
+      def self.find_by_id(id,preload_metadata=false)
         begin
           r = self.get_asset_by_id(id)
-          return ATS.new(r.to_hash[:get_asset_by_id_response][:out])
+          return ATS.new(r.to_hash[:get_asset_by_id_response][:out],preload_metadata)
         rescue Savon::SOAPFault => e
           raise ATSError, "Couldn't find activity with the id of #{id}"
           return
         end
+      end
+
+      def load_metadata
+        metadata = ATS.get_asset_metadata(@asset_id)
+        @data.merge! Hash.from_xml(metadata.to_hash[:get_asset_metadata_response][:out])["importSource"]["asset"]
+        @metadata_loaded=true
       end
 
       private
@@ -173,11 +180,6 @@ module Active
         return r
       end
 
-      def load_metadata
-        metadata = ATS.get_asset_metadata(@asset_id)
-        @data.merge! Hash.from_xml(metadata.to_hash[:get_asset_metadata_response][:out])["importSource"]["asset"]
-        @metadata_loaded=true
-      end
 
     end # end ats
   end

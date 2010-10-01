@@ -205,7 +205,7 @@ module Active
             @pageSize        = parsed_json["pageSize"]
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
-            @results         = parsed_json['_results'].collect { |a| GSA.new(a) }  
+            @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
             
             Active.CACHE.set(end_point, self) if Active.CACHE
 
