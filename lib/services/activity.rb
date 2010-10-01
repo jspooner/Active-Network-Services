@@ -9,9 +9,12 @@ module Active
       ACTIVE_WORKS_ASSET_TYPE_ID="DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
 
       attr_accessor :primary, :gsa, :ats
-      
+      attr_reader :datasources_loaded
+
       # data is a GSA object              
-      def initialize(data)
+      def initialize(data,preload_data=false)
+        @datasources_loaded=false
+        
         if data.respond_to?(:source)
           @ats     = data if data.source == :ats
           @gsa     = data if data.source == :gsa
@@ -20,20 +23,26 @@ module Active
           @asset_id = @ats.asset_id if @ats!=nil
           @asset_id = @gsa.asset_id if @gsa!=nil
           @asset_id = @primary.asset_id if @primary!=nil
-
-          @ats = ATS.find_by_id(@asset_id) if @ats==nil
-      		@gsa = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results.first if @gsa==nil
-
-          if @primary==nil
-            if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
-              @primary= RegCenter.find_by_id(@ats.substitutionUrl)
-            elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
-              @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
-            end
-          end
-
-
+          
+          load_datasources if preload_data
         end
+      end
+      
+      def load_datasources
+        return if @datasources_loaded==true
+        
+        @ats = ATS.find_by_id(@asset_id,true) if @ats==nil
+        @ats.load_metadata
+    		@gsa = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results.first if @gsa==nil
+
+        if @primary==nil
+          if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
+            @primary= RegCenter.find_by_id(@ats.substitutionUrl)
+          elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
+            @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
+          end
+        end
+        @datasources_loaded=true
       end
 
       
@@ -43,6 +52,7 @@ module Active
 
       def title
         return @primary.title unless @primary.nil?
+        load_datasources
         return @ats.title     unless @ats.nil?
         return @gsa.title     unless @gsa.nil?
         return @title if @title
@@ -51,6 +61,7 @@ module Active
 
       def asset_type_id
         return @primary.asset_type_id unless @primary.nil?
+        load_datasources
         return @ats.asset_type_id     unless @ats.nil?
         return @gsa.asset_type_id     unless @gsa.nil?
         return @asset_type_id      if @asset_type_id
@@ -59,6 +70,7 @@ module Active
 
       def url
         #prefer seo a2 url first, then non seo a2 url, then primary url
+        load_datasources
         sources = [@ats,@primary,@gsa]
         sources.each do |source|
           return source.url if source.url.downcase.index("www.active.com") && !source.url.downcase.index("detail")
@@ -76,6 +88,7 @@ module Active
 
       def categories
         return @primary.categories unless @primary.nil?
+        load_datasources
         return @ats.categories     unless @ats.nil?
         return @gsa.categories     unless @gsa.nil?
         return @categories      if @categories
@@ -84,6 +97,7 @@ module Active
 
       def asset_id
         return @primary.asset_id unless @primary.nil?
+        load_datasources
         return @ats.asset_id     unless @ats.nil?
         return @gsa.asset_id     unless @gsa.nil?
         return @asset_id      if @asset_id
@@ -92,6 +106,7 @@ module Active
 
       def primary_category
         return @primary.primary_category unless @primary.nil?
+        load_datasources
         return @ats.primary_category     unless @ats.nil?
         return @gsa.primary_category     unless @gsa.nil?
         return @primary_category      if @primary_category
@@ -99,15 +114,60 @@ module Active
       end
 
       def address
-        return @primary.address unless (@primary.nil? || @primary.address.nil?)
-        return @ats.address     unless @ats.nil?
-        return @gsa.address     unless @gsa.nil?
-        return @address      if @address
-        return validated_address({})
+        returned_address = validated_address({})
+        returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
+        load_datasources
+        returned_address = @ats.address     unless @ats.nil?
+        returned_address = @gsa.address     unless @gsa.nil?
+        returned_address =  @address        if @address
+        
+        #ensure lat/lng
+        if (returned_address["lat"]=="")
+          load_datasources
+          if @primary.address["lat"]!=""
+            returned_address["lat"] = @primary.address["lat"] 
+            returned_address["lng"] = @primary.address["lng"] 
+          elsif @ats.address["lat"]!=""
+            returned_address["lat"] = @ats.address["lat"] 
+            returned_address["lng"] = @ats.address["lng"] 
+          elsif @gsa.address["lat"]!=""
+            returned_address["lat"] = @gsa.address["lat"] 
+            returned_address["lng"] = @gsa.address["lng"] 
+          end
+        end
+
+        if (returned_address["lat"]=="")
+          #geocode
+          geocode_url=""
+          if returned_address["zip"]!="" && returned_address["zip"]!="00000"
+            geocode_url="http://api.active.com/Rest/addressvalidator/Handler.ashx?z=#{returned_address["zip"]}"
+          elsif returned_address["city"]!="" && returned_address["state"]!=""
+            geocode_url="http://api.active.com/Rest/addressvalidator/Handler.ashx?c=#{returned_address["city"]}&s=#{returned_address["state"]}"
+          end
+          puts "geocode_url: #{geocode_url}"
+          if geocode_url!=""
+            require 'open-uri'
+            begin
+              Nokogiri::XML(open(geocode_url)).root.children.each do |node|
+                returned_address["lat"]=node.content if node.name=="Latitude"
+                returned_address["lng"]=node.content if node.name=="Longitude"
+                returned_address["city"]=Validators.valid_state(node.content) if node.name=="City" && returned_address["city"]==""
+                returned_address["zip"]=node.content if node.name=="ZipCode" && returned_address["zip"]==""
+                returned_address["state"]=node.content if node.name=="StateCode" && returned_address["state"]==""
+              end
+            rescue 
+              puts { "[GEO ERROR] #{geocode_url}" }
+            end
+            
+          end
+        end
+
+        return returned_address
       end
 
       def start_date
         return @primary.start_date unless @primary.nil?
+        load_datasources
         return @ats.start_date     unless @ats.nil?
         return @gsa.start_date     unless @gsa.nil?
         return @start_date      if @start_date
@@ -116,6 +176,7 @@ module Active
 
       def start_time
         return @primary.start_time unless @primary.nil?
+        load_datasources
         return @ats.start_time     unless @ats.nil?
         return @gsa.start_time     unless @gsa.nil?
         return @start_time      if @start_time
@@ -124,6 +185,7 @@ module Active
 
       def end_date
         return @primary.end_date unless @primary.nil?
+        load_datasources
         return @ats.end_date     unless @ats.nil?
         return @gsa.end_date     unless @gsa.nil?
         return @end_date      if @end_date
@@ -132,6 +194,7 @@ module Active
 
       def end_time
         return @primary.end_time unless @primary.nil?
+        load_datasources
         return @ats.end_time     unless @ats.nil?
         return @gsa.end_time     unless @gsa.nil?
         return @end_time      if @end_date
@@ -140,6 +203,7 @@ module Active
 
       def category
         return @primary.category unless @primary.nil?
+        load_datasources
         return @ats.category     unless @ats.nil?
         return @gsa.category     unless @gsa.nil?
         return @category      if @category
@@ -148,6 +212,7 @@ module Active
 
       def contact_name
         return @primary.contact_name unless @primary.nil?
+        load_datasources
         return @ats.contact_name     unless @ats.nil?
         return @gsa.contact_name     unless @gsa.nil?
         return @contact_name      if @contact_name
@@ -156,6 +221,7 @@ module Active
 
       def contact_email
         return @primary.contact_email unless @primary.nil?
+        load_datasources
         return @ats.contact_email     unless @ats.nil?
         return @gsa.contact_email     unless @gsa.nil?
         return @contact_email      if @contact_email
@@ -164,6 +230,7 @@ module Active
 
       def desc
         return @primary.desc unless @primary.nil?
+        load_datasources
         return @ats.desc     unless @ats.nil?
         return @gsa.desc     unless @gsa.nil?
         return @desc      if @desc
@@ -172,6 +239,7 @@ module Active
       
       def substitutionUrl
         return @primary.substitutionUrl unless @primary.nil?
+        load_datasources
         return @ats.substitutionUrl     unless @ats.nil?
         return @gsa.substitutionUrl     unless @gsa.nil?
         return @substitutionUrl      if @substitutionUrl
@@ -192,17 +260,19 @@ module Active
           rescue ATSError => e
             raise ActivityFindError, "We could not find the activity with the asset_id of #{@asset_id}"
           end
-          
-
-          
-          
-        elsif data.has_key?(:asset_id) and data.has_key?(:asset_type_id)
+        elsif data.has_key?(:substitutionUrl) and data.has_key?(:asset_type_id)
           puts "look up data form the original source"
-           # TODO look up data form the original source"
-          return Activity.new(ATS.find_by_id(@asset_id))  
-        end
-      end
 
+          if data[:asset_type_id]==REG_CENTER_ASSET_TYPE_ID ||  data[:asset_type_id]==REG_CENTER_ASSET_TYPE_ID2
+            return Activity.new(RegCenter.find_by_id(data[:substitutionUrl]))  
+          elsif data[:asset_type_id]==ACTIVE_WORKS_ASSET_TYPE_ID
+            return Activity.new(ActiveWorks.find_by_id(data[:substitutionUrl]))  
+          end
+
+        end
+        raise ActivityFindError, "We could not find the activity with the asset_id of #{@asset_id}"
+
+      end
       
     end
   end
