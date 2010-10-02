@@ -63,13 +63,13 @@ module Active
           :name    => @data["meta"]["location"],
           :address => @data["meta"]["eventAddress"],
           :city    => @data["meta"]["city"],
-          :state   => @data["meta"]["eventState"],
-          :zip     => @data["meta"]["eventZip"],
           :lat     => @data["meta"]["latitude"],
           :lng     => @data["meta"]["longitude"],
           :country => @data["meta"]["country"]
-        })
-       
+        })       
+       @address[:state] = @data["meta"]["eventState"] || @data["meta"]["state"]
+       @address[:zip]   = @data["meta"]["eventZip"] || @data["meta"]["zip"]
+       @address
       end
 
       def start_date
@@ -123,11 +123,24 @@ module Active
           ""
         end
       end
-      
+      # substitutionUrl could be formatted like this
+      # 1. "meta":{"substitutionUrl":"vistarecreation/registrationmain.sdi?source=showAsset.sdi&activity_id=4900"}
+      # 2. "meta":{"substitutionUrl":"4900"}
       def substitutionUrl
         if @data["meta"].has_key?("substitutionUrl")
-          @data["meta"]["substitutionUrl"]
+          if /activity_id=/ =~ @data["meta"]["substitutionUrl"]
+            @data["meta"]["substitutionUrl"].split("activity_id=")[1]
+          else
+            @data["meta"]["substitutionUrl"]
+          end
         end
+      end
+      # TODO
+      def activeworks_id
+        0
+      end
+      def regcenter_id
+        0
       end
 
 

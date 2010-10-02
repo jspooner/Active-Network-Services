@@ -73,6 +73,12 @@ describe GSA do
     GSA.new().asset_type_id.should be_nil
     @a.asset_type_id.should_not be_nil
   end
+# substitutionUrl
+  it "should have an id for substitutionUrl" do
+    @a.substitutionUrl.should eql("1838902")
+    g = GSA.new(JSON.parse('{"title":"Calabasas", "meta":{"substitutionUrl":"vistarecreation/registrationmain.sdi?source=showAsset.sdi&activity_id=4900"}}'))    
+    g.substitutionUrl.should eql("4900")
+  end
 # address
   it "should have a full address" do
     g = GSA.new(JSON.parse('{"title":"Calabasas", "meta":{"location":"Oceanside Harbor","eventLongitude":"-117.3586","locationName":"Oceanside Harbor","eventAddress":"1540 Harbor Drive North", "city":"San Diego", "eventState":"CA", "eventZip":"92121", "latitude":"-22", "longitude":"222", "country":"USA" }}'))
@@ -85,6 +91,17 @@ describe GSA do
     g.address[:country].should eql("USA")
     g.address[:lat].should eql("-22")
     g.address[:lng].should eql("222")
+  end
+  it "should have a partial address" do
+    g = GSA.new(JSON.parse('{"language":"en", "title":"Zumba Punch Card (Adult) - Oct. (5) | Vista, CA, 92084 |", "url":"http://www.active.com/community-services-class/vista-ca/zumba-punch-card-adult-oct-5-2010", "escapedUrl":"http://www.active.com/community-services-class/vista-ca/zumba-punch-card-adult-oct-5-2010", "meta":{"city":"Vista", "assetId":"3ae995d9-5c16-4176-b44e-fa0577644ca4", "substitutionUrl":"vistarecreation/registrationmain.sdi?source=showAsset.sdi&activity_id=4900", "trackbackurl":"http://www.active.com/community-services-class/vista-ca/zumba-punch-card-adult-oct-5-2010", "onlineRegistrationAvailable":"false", "zip":"92084", "sortDate":"2000-10-02", "category":"Activities", "latitude":"33.2000368", "dma":"San Diego", "lastModifiedDate":"2010-09-29", "tags":"2348.321", "lastModifiedDateTime":"2010-09-29 16:46:43.33", "country":"United States of America", "startDate":"2010-10-02", "assetName":"Zumba Punch Card (Adult) -  Oct. (5)", "summary":"People of all ages are falling in love with Zumba, one of the fastest growing dance-based fitness crazes in the country. With Zumbas easy-to-follow dance moves you receive body beautifying benefits while enjoying Latin rhythms including Salsa, Meringue, Cumbia, Reggaeton, even belly dance and hip-hop. Zumba is ", "description":"", "seourl":"http://www.active.com/community-services-class/vista-ca/zumba-punch-card-adult-oct-5-2010", "channel":"Community Services", "splitMediaType":"Class", "mediaType":"Class", "longitude":"-117.2425355", "UpdateDateTime":"8/20/2008 9:03:50 AM", "assetTypeId":"FB27C928-54DB-4ECD-B42F-482FC3C8681F", "state":"California", "keywords":""}, "summary":""}'))
+    g.address[:name].should be_nil
+    g.address[:address].should be_nil
+    g.address[:city].should eql("Vista")
+    g.address[:state].should eql("California")
+    g.address[:zip].should eql("92084")
+    g.address[:country].should eql("United States of America")
+    g.address[:lat].should eql("33.2000368")
+    g.address[:lng].should eql("-117.2425355")
   end
   
 end

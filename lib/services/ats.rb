@@ -60,7 +60,7 @@ module Active
 
       def address
         # load_metadata unless @metadata_loaded
-        @address = validated_address({
+        @address = Hash.new({
           :name    => @data["location"],
           :address => @data["address"],
           :city    => @data["city"],

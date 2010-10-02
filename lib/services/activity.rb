@@ -107,13 +107,41 @@ module Active
         return @primary_category      if @primary_category
         return categories.first
       end
-
+      
+      def load_master
+        # @ats = ATS.find_by_id(@gsa.asset_id)
+        # throw StandardError.new "ATS type=#{@gsa.asset_type_id} id=#{@gsa.substitutionUrl}"
+        # if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
+        #   throw StandardError.new "REG"
+        # elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
+        #   throw StandardError.new "WORKS"
+        # else
+        #   throw StandardError.new @gsa.asset_type_id
+        #   return false
+        # end
+        # if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
+        #   @primary= RegCenter.find_by_id(@ats.substitutionUrl)
+        # elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
+        #   @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
+        # end
+        
+      end
+      # if address is incomplete we will load data from the primary data source
+      # if the primary data source is unknow (ex asset_type_id is unknow ) we will return the GSA address.
+      # ?
       def address
         # returned_address = validated_address({})
         # returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
         # load_datasources
         # returned_address = @ats.address     unless @ats.nil?
-        returned_address = @gsa.address     unless @gsa.nil?
+        returned_address = @gsa.address     
+        if @gsa.address[:address] != nil #and returned_address.city and returned_address.state and returned_address.country
+          return returned_address
+        else
+          if load_master
+            return @gsa.address
+          end
+        end
         # returned_address =  @address        if @address
         # 
         # #ensure lat/lng
