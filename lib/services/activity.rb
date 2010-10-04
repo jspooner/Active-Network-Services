@@ -34,6 +34,16 @@ module Active
         :active
       end
       
+      def origin
+        if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
+          return "RegCenter id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
+        elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
+          return "ActiveWorks id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
+        else
+          return "Unknow id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
+        end 
+      end
+      
       def load_datasources
         return if @datasources_loaded==true
         

@@ -1,3 +1,4 @@
+require 'memcache'
 module Active
   
   # attr_reader :CACHE
@@ -63,7 +64,6 @@ module Active
   
   # Active.memcache_host = "localhost:11211"
   def self.memcache_host(url)
-    require 'memcache'
     @CACHE = MemCache.new(url)
   end
   

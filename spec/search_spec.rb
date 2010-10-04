@@ -5,7 +5,8 @@ require File.join(File.dirname(__FILE__), %w[custom_matchers_spec])
 require File.join(File.dirname(__FILE__), %w[ .. lib services search])
 require File.join(File.dirname(__FILE__), %w[ .. lib services activity])
 include Active::Services
-
+# Active.memcache_host "localhost:11211"
+    
 describe Search do
   include CustomMatchers
   describe  "Set up" do
@@ -372,7 +373,10 @@ describe Search do
 
     it "should find activities that have been recently added" 
 
-    it "should find upcoming events"
+    it "should find upcoming events" do
+      # {:sort=>"created_at_asc"}
+      pending
+    end
 
     it "should find popular events"
 

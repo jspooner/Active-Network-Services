@@ -193,8 +193,10 @@ module Active
         http.read_timeout = DEFAULT_TIMEOUT
         
         search_hash = Digest::SHA1.hexdigest(end_point)
-        return_cached(search_hash)
+        cache = return_cached(search_hash)
+        return cache if cache != nil
         
+        puts "Active Search [GET] #{"#{searchurl.path}?#{searchurl.query}"}"
         res = http.start { |http|
           http.get("#{searchurl.path}?#{searchurl.query}")
         }
@@ -207,7 +209,7 @@ module Active
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
             @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
-            
+            puts "ACTIVE SEARCH RESULTS #{self.results.length}"
             Active.CACHE.set(search_hash, self) if Active.CACHE
 
           rescue JSON::ParserError => e
@@ -276,8 +278,12 @@ module Active
         def return_cached url
           if Active.CACHE
             cached_version = Active.CACHE.get(url)
-            return cached_version if cached_version
+            if cached_version
+              puts "Active Search [CACHE] #{url} #{cached_version}"
+              return cached_version 
+            end
           end
+          nil
         end
     end
     
