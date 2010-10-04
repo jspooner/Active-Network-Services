@@ -80,6 +80,9 @@ describe GSA do
     g.substitutionUrl.should eql("4900")
   end
 # bounding_box
+  it "should raise an error with a bad bounding box" do
+    lambda {s = Search.search({ :bounding_box => { :sw => "37.695141,-123.013657"}}) }.should raise_error(RuntimeError)                         
+  end
   it "should search a bounding box" do
     s = Search.search({ :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.832371,-122.356979"}})
     r =  s.results.first

@@ -372,8 +372,14 @@ describe Search do
     end
 
     it "should find activities that have been recently added" do
-      # {:sort=>"created_at_asc"}
-      pending
+      s = Search.search(  {:sort=>Sort.DATE_DESC})
+      s.should be_an_instance_of Search
+      s.results.should_not be_empty
+      s.results.each do |a|
+        DateTime.parse(a.gsa.last_modified).should satisfy { |d|
+          d >= DateTime.now-2
+        }
+      end
     end
 
     it "should find upcoming events" 

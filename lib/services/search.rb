@@ -63,7 +63,7 @@ module Active
         self.city        = data[:city]
         self.state       = data[:state]
         self.country     = data[:country]
-        self.bounding_box = HashWithIndifferentAccess.new(data[:bounding_box])
+        self.bounding_box = data[:bounding_box]
       end
       
       # Example
@@ -108,6 +108,7 @@ module Active
       end
       
       def bounding_box=(value)
+        return if value==nil
         value = HashWithIndifferentAccess.new(value)
         if value.has_key?("sw") && value.has_key?("ne")
           @bounding_box=value
