@@ -356,7 +356,7 @@ describe Search do
 
     it "should find yoga activities by channel" do
       s = Search.search( {:channels => [:yoga]} )
-      s.should have(10).results        
+      s.should have_at_least(1).results        
     end
 
     it "should not set sort to an empty string" do
@@ -371,12 +371,12 @@ describe Search do
       s.results.should_not be_empty
     end
 
-    it "should find activities that have been recently added" 
-
-    it "should find upcoming events" do
+    it "should find activities that have been recently added" do
       # {:sort=>"created_at_asc"}
       pending
     end
+
+    it "should find upcoming events" 
 
     it "should find popular events"
 
