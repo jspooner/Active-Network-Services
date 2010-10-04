@@ -79,6 +79,13 @@ describe GSA do
     g = GSA.new(JSON.parse('{"title":"Calabasas", "meta":{"substitutionUrl":"vistarecreation/registrationmain.sdi?source=showAsset.sdi&activity_id=4900"}}'))    
     g.substitutionUrl.should eql("4900")
   end
+# bounding_box
+  it "should search a bounding box" do
+    s = Search.search({ :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.832371,-122.356979"}})
+    r =  s.results.first
+    r.address["city"].should eql("San Francisco")
+  end
+
 # address
   it "should have a full address" do
     g = GSA.new(JSON.parse('{"title":"Calabasas", "meta":{"location":"Oceanside Harbor","eventLongitude":"-117.3586","locationName":"Oceanside Harbor","eventAddress":"1540 Harbor Drive North", "city":"San Diego", "eventState":"CA", "eventZip":"92121", "latitude":"-22", "longitude":"222", "country":"USA" }}'))

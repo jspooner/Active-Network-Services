@@ -31,7 +31,7 @@ module Active
 
     class Search
       attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
-                    :view, :facet, :sort, :num_results, :asset_ids, :dma, :city, :state, :country
+                    :view, :facet, :sort, :num_results, :asset_ids, :dma, :city, :state, :country, :bounding_box
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
        
@@ -63,6 +63,7 @@ module Active
         self.city        = data[:city]
         self.state       = data[:state]
         self.country     = data[:country]
+        self.bounding_box = HashWithIndifferentAccess.new(data[:bounding_box])
       end
       
       # Example
@@ -104,6 +105,15 @@ module Active
       
       def asset_ids=(value)
         @asset_ids = value
+      end
+      
+      def bounding_box=(value)
+        value = HashWithIndifferentAccess.new(value)
+        if value.has_key?("sw") && value.has_key?("ne")
+          @bounding_box=value
+        else
+          raise "bounding_box must be hash with keys sw and ne"
+        end
       end
 
       def asset_id=(value)
@@ -170,6 +180,19 @@ module Active
           @end_date = URI.escape(@end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
         end
         meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
+        
+        # BOUNDING BOX
+        if @bounding_box!=nil
+          #The values in the GSA metadata are shifted to  prevent negative values.  This was done b/c lat/long
+          # are searched as a number range and the GSA doesn't allow negative values in number ranges.  
+          # We shift latitude values by 90 and longitude values by 180.
+          latitude1 = @bounding_box[:sw].split(",").first.to_f+90
+          latitude2 = @bounding_box[:ne].split(",").first.to_f+90
+          longitude1 = @bounding_box[:sw].split(",").last.to_f+180
+          longitude2 = @bounding_box[:ne].split(",").last.to_f+180
+          meta_data += "+AND+" unless meta_data == ""
+          meta_data += "meta:latitudeShifted:#{latitude1}..#{latitude2}+AND+meta:longitudeShifted:#{longitude1}..#{longitude2}"
+        end
         
         # url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
         urla = ["#{SEARCH_URL}/search?api_key=#{@api_key}"]

@@ -105,6 +105,10 @@ module Active
           @data["meta"]["contactName"]
         end
       end
+      
+      def last_modified
+        @data["meta"]["lastModifiedDateTime"] if @data["meta"].has_key?("lastModifiedDateTime") 
+      end
 
       def contact_email
         if @data["meta"].has_key?("contactEmail") && !@data["meta"]["contactEmail"].blank?
