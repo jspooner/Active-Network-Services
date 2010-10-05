@@ -187,10 +187,20 @@ module Active
           #The values in the GSA metadata are shifted to  prevent negative values.  This was done b/c lat/long
           # are searched as a number range and the GSA doesn't allow negative values in number ranges.  
           # We shift latitude values by 90 and longitude values by 180.
-          latitude1 = @bounding_box[:sw].split(",").first.to_f+90
-          latitude2 = @bounding_box[:ne].split(",").first.to_f+90
-          longitude1 = @bounding_box[:sw].split(",").last.to_f+180
-          longitude2 = @bounding_box[:ne].split(",").last.to_f+180
+          
+          if @bounding_box[:sw].class==String
+            #String :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.832371,-122.356979"}
+            latitude1 = @bounding_box[:sw].split(",").first.to_f+90
+            latitude2 = @bounding_box[:ne].split(",").first.to_f+90
+            longitude1 = @bounding_box[:sw].split(",").last.to_f+180
+            longitude2 = @bounding_box[:ne].split(",").last.to_f+180
+          else 
+            #hash query[:bounding_box] = { :sw => [123, 10], :ne => [222,10] }
+            latitude1 = @bounding_box[:sw].first.to_f+90
+            latitude2 = @bounding_box[:ne].first.to_f+90
+            longitude1 = @bounding_box[:sw].last.to_f+180
+            longitude2 = @bounding_box[:ne].last.to_f+180
+          end
           meta_data += "+AND+" unless meta_data == ""
           meta_data += "meta:latitudeShifted:#{latitude1}..#{latitude2}+AND+meta:longitudeShifted:#{longitude1}..#{longitude2}"
         end
