@@ -4,7 +4,7 @@ require 'cgi'
 require 'rubygems'
 require 'mysql' 
 require 'active_record'
-require 'digest/sha1'
+require 'digest/md5'
 
 module Active
   module Services
@@ -226,10 +226,6 @@ module Active
         http              = Net::HTTP.new(searchurl.host, searchurl.port)
         http.read_timeout = DEFAULT_TIMEOUT
         
-        search_hash = Digest::SHA1.hexdigest(end_point)
-        cache = return_cached(search_hash)
-        return cache if cache != nil
-        
         puts "Active Search [GET] #{"#{searchurl.path}?#{searchurl.query}"}"
         res = http.start { |http|
           http.get("#{searchurl.path}?#{searchurl.query}")
@@ -244,7 +240,10 @@ module Active
             @numberOfResults = parsed_json["numberOfResults"]
             @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
             puts "ACTIVE SEARCH RESULTS #{self.results.length}"
-            Active.CACHE.set(search_hash, self) if Active.CACHE
+            
+            Active.CACHE.set( Digest::MD5.hexdigest(end_point), self) if Active.CACHE
+
+
 
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
@@ -292,10 +291,29 @@ module Active
       # http://developer.active.com/docs/Activecom_Search_API_Reference
       # returns an array of results and query info
       def self.search(data=nil)
-        search = Search.new(data)
-        search.search
-        return search
+        search      = Search.new(data)
+        search_hash = Digest::MD5.hexdigest(search.end_point)
+        puts "search_hash #{search_hash}"
+        cache = Search.return_cached(search_hash)
+        if cache != nil
+          return cache
+        else
+          search.search
+          return search  
+        end
       end
+
+      def self.return_cached key
+        if Active.CACHE
+          cached_version = Active.CACHE.get(key)
+          if cached_version
+            puts "Active Search [CACHE] #{key}"
+            return cached_version 
+          end
+        end
+        nil
+      end
+
       
       def []
         @results
@@ -307,17 +325,6 @@ module Active
           str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
           str.gsub!(/\-/,"%252D")
           str
-        end
-        # DRY ME
-        def return_cached url
-          if Active.CACHE
-            cached_version = Active.CACHE.get(url)
-            if cached_version
-              puts "Active Search [CACHE] #{url} #{cached_version}"
-              return cached_version 
-            end
-          end
-          nil
         end
     end
     

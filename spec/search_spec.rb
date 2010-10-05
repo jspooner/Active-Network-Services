@@ -5,7 +5,7 @@ require File.join(File.dirname(__FILE__), %w[custom_matchers_spec])
 require File.join(File.dirname(__FILE__), %w[ .. lib services search])
 require File.join(File.dirname(__FILE__), %w[ .. lib services activity])
 include Active::Services
-# Active.memcache_host "localhost:11211"
+Active.memcache_host "localhost:11211"
     
 describe Search do
   include CustomMatchers

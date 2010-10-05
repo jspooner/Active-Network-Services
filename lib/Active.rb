@@ -1,8 +1,8 @@
-require 'memcache'
 module Active
+
   
   # attr_reader :CACHE
-  attr_accessor :CACHE
+  # attr_accessor :CACHE
   
   # :stopdoc:
   LIBPATH = ::File.expand_path(::File.dirname(__FILE__)) + ::File::SEPARATOR
@@ -64,13 +64,10 @@ module Active
   
   # Active.memcache_host = "localhost:11211"
   def self.memcache_host(url)
-    @CACHE = MemCache.new(url)
+    require 'dalli'
+    @CACHE = Dalli::Client.new(url)
   end
-  
-  def self.use_memcached
-    true
-  end
-  
+    
   def self.CACHE
     @CACHE
   end
