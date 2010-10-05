@@ -19,5 +19,6 @@ Bones {
   --------------------------
   MSG
   depend_on  'savon'
+  depend_on  'dalli', '0.9.8'
 }
 

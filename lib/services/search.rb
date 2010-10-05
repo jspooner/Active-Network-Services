@@ -239,11 +239,8 @@ module Active
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
             @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
-            puts "ACTIVE SEARCH RESULTS #{self.results.length}"
             
             Active.CACHE.set( Digest::MD5.hexdigest(end_point), self) if Active.CACHE
-
-
 
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
