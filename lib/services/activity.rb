@@ -171,10 +171,8 @@ module Active
       # returns the best address possible by loading other data sources
       # 2. if the primary data source is unknow (ex asset_type_id is unknow ) we will return the GSA address.
       # 3. if no address but we have lat/lng we'll do a reverse look up
-      def _address
-        if Validators.full_address(@gsa.address)
-          return @gsa.address
-        end
+      def full_address
+        @primary.address
         # 3.  MOVE TO A PRIVATE METHOD OR A NEW CLASS
         # if (returned_address["lat"]=="")
         #   #geocode

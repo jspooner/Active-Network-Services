@@ -155,16 +155,12 @@ module Active
 
       def self.find_by_id(id) #local id
         
-        search_hash = Digest::SHA1.hexdigest("reg_#{id}")
-        if Active.CACHE
-          cached_version = Active.CACHE.get(search_hash)
-          return cached_version if cached_version
-        end
-        
         begin
           doc  = Nokogiri::XML(open("http://apij.active.com/regcenter/event/#{id}"))
+          puts "////////<br/>"
+          puts doc.to_s
+          puts "////////<br/>"
           reg  = RegCenter.new(Hash.from_xml(doc.to_s))
-          Active.CACHE.set(search_hash, reg) if Active.CACHE          
         rescue Exception => e
           raise RegCenterError, "Couldn't find Reg Center activity with the id of #{id} - #{e.inspect}"
           return
