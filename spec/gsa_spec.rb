@@ -145,6 +145,17 @@ describe GSA do
     g.address[:lat].should eql("37.7800000")
     g.address[:lng].should eql("-122.4200000")    
   end
+  it "should have an address from this hash" do
+    g = GSA.new(JSON.parse('{"escapedUrl":"http://www.active.com/running/san-francisco-ca/nike-womens-marathon-2010","language":"en","title":"Nike Women\u0026#39;s Marathon | San Francisco, California 94102 \u003cb\u003e...\u003c/b\u003e","url":"http://www.active.com/running/san-francisco-ca/nike-womens-marathon-2010","summary":"","meta":{"startDate":"2010-10-17","eventDate":"2010-10-17T07:00:00-07:00","location":"Union Square","tag":["event:10","Running:10"],"state":"California","eventLongitude":"-122.4212","endDate":"2010-10-17","lastModifiedDateTime":"2010-10-01 21:04:24.977","splitMediaType":["Event","Marathon"],"locationName":"Union Square","endTime":"7:00:00","mediaType":["Event","Event\\Marathon"],"city":"San Francisco","google-site-verification":"","estParticipants":"2000","startTime":"7:00:00","assetId":["715ED4EF-E4FF-42F2-B24B-2E4255649676","715ed4ef-e4ff-42f2-b24b-2e4255649676"],"eventId":"1854168","participationCriteria":"All","description":"","longitude":"-122.4212","onlineDonationAvailable":"0","substitutionUrl":"1854168","assetName":["Nike Womens Marathon","Nike Womens Marathon"],"eventURL":"http://inside.nike.com/blogs/nikerunning_events-en_US/?tags\u003dnike_womens_marathon_2010","zip":"94102","contactPhone":"866-786-6453","eventState":"California","sortDate":"2000-10-17","eventLatitude":"37.77869","keywords":"Event","onlineMembershipAvailable":"0","dma":"San Francisco - Oakland - San Jose","trackbackurl":"http://www.active.com/running/san-francisco-ca/nike-womens-marathon-2010","seourl":"http://www.active.com/running/san-francisco-ca/nike-womens-marathon-2010","country":"United States","onlineRegistrationAvailable":"false","category":"Activities","market":"San Francisco - Oakland - San Jose","assetTypeId":"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65","lastModifiedDate":"2010-10-01","eventZip":"94102","UpdateDateTime":"9/22/2010 11:46:24 AM","latitude":"37.77869","channel":"Running"}}'))
+    g.address[:name].should eql("Union Square")
+    g.address[:address].should eql("Union Square")
+    g.address[:city].should eql("San Francisco")
+    g.address[:state].should eql("California")
+    g.address[:zip].should eql("94102")
+    g.address[:country].should eql("United States")
+    g.address[:lat].should eql("37.77869")
+    g.address[:lng].should eql("-122.4212")    
+  end
 end
 
 
