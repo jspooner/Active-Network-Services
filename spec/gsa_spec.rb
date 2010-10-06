@@ -49,8 +49,14 @@ describe GSA do
   end
 # start time
   it "should have a valid start date" do
+
     @a.start_time.should_not be_nil
     @a.start_time.should be_an_instance_of(DateTime)
+  end
+  it "should have a valid start date when data has meta.startDate" do
+    g = GSA.new(JSON.parse('{"escapedUrl":"http://www.active.com/community-services-class/belmont-ca/modern-teen-adult-2010","language":"en","title":"Modern - Teen Adult | Belmont, CA, 94002 |","url":"http://www.active.com/community-services-class/belmont-ca/modern-teen-adult-2010","summary":"active espn. Active Home | Directory | Community | eteamz | Results | Support |\u003cbr\u003e Event Directors \u0026amp; Organizers. Active.com. New beta search! \u003cb\u003e...\u003c/b\u003e  ","meta":{"summary":"Barefoot dance with emphasis on floor work, release technique, and partnering. Emotion and story line are core elements in this class. Attire is loose fitting clothing any style or color.","startDate":"2010-11-03","tag":"class:10","state":"California","splitMediaType":"Class","lastModifiedDateTime":"2010-09-08 16:32:50.49","mediaType":"Class","city":"Belmont","assetId":"b06cbfb8-ff63-488c-92c6-d060680cc208","description":"","longitude":"-122.2758","substitutionUrl":"belmontparksandrecreation/registrationmain.sdi?source\u003dshowAsset.sdi\u0026activity_id\u003d3722","tags":"1510.306","assetName":"Modern - Teen Adult","zip":"94002","sortDate":"2000-11-03","keywords":"","dma":"San Francisco - Oakland - San Jose","trackbackurl":"http://www.active.com/community-services-class/belmont-ca/modern-teen-adult-2010","seourl":"http://www.active.com/community-services-class/belmont-ca/modern-teen-adult-2010","country":"United States of America","onlineRegistrationAvailable":"true","category":"Activities","assetTypeId":"FB27C928-54DB-4ECD-B42F-482FC3C8681F","lastModifiedDate":"2010-09-08","UpdateDateTime":"8/20/2008 9:03:50 AM","latitude":"37.52021","channel":"Community Services"}}'))
+    g.start_time.should_not be_nil    
+    g.start_time.should eql(DateTime.parse("Wed, 03 Nov 2010 00:00:00"))
   end
   it "should have nil is no date" do
     g = GSA.new(JSON.parse('{"title":"Calabasas Classic 2010 - 5k \u003cb\u003e10k\u003c/b\u003e Runs | Calabasas, California 91302 \u003cb\u003e...\u003c/b\u003e"}'))

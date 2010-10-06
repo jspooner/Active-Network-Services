@@ -381,25 +381,10 @@ describe Search do
         }
       end
     end
-
-    it "should find upcoming events" 
-
-    it "should find popular events"
-
-    it "should order by trending with params"
-    #   results = Search.search( {:channels => ['Running'], :sort => 'trending'} )
+    
+    # it "should have a start date" do
+    #   Search.search(:asset_id => "b06cbfb8-ff63-488c-92c6-d060680cc208").start_date.should_not be_nil
     # end
-
-    it "should order by RELEVANCE"
-
-    it "should order by date DATE_ASC"
-
-    it "should order by date DATE_DESC"
-
-    it "should order by the date created" do
-    #   results = Search.search( {:channels => ['Running'], :sort => 'created_at_asc'} )
-      pending
-    end
 
   end
   describe  "Parametric search" do

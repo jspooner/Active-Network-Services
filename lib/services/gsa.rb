@@ -74,7 +74,9 @@ module Active
 
       def start_date
         if @data.has_key?("meta") and  @data["meta"].has_key?("eventDate")
-          DateTime.parse @data["meta"]["eventDate"] 
+          DateTime.parse( @data["meta"]["eventDate"] )
+        elsif @data.has_key?("meta") and  @data["meta"].has_key?("startDate")
+          DateTime.parse( @data["meta"]["startDate"] )
         else
           nil
         end

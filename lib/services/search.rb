@@ -244,8 +244,6 @@ module Active
               Active.CACHE.set( Digest::MD5.hexdigest(end_point), self) if Active.CACHE
             rescue Exception => e              
             end
-            
-            
 
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
