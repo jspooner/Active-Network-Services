@@ -129,6 +129,13 @@ module Active
           ""
         end
       end
+      
+      def user
+        u = User.new
+        u.email = @data["meta"]["contactEmail"] || nil
+        u
+      end
+      
       # substitutionUrl could be formatted like this
       # 1. "meta":{"substitutionUrl":"vistarecreation/registrationmain.sdi?source=showAsset.sdi&activity_id=4900"}
       # 2. "meta":{"substitutionUrl":"4900"}
