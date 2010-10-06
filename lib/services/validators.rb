@@ -2,14 +2,22 @@ module Active
   module Services
     class Validators
       
-      def self.full_address address
-        
+      def self.email arg
+        if (arg =~  /^(\w|\.|-)+?@(\w|-)+?\.\w{2,4}($|\.\w{2,4})$/) == nil
+          return false
+        else
+          return true
+        end
       end
       
       # return true or false
       # very short check for 5 consecutive digits, no leading or trailing whitespace.
       def self.zip(arg)
-        # arg ~= /\be(\w*)s\b/
+        # if (arg =~ /\be(\w*)/) != -1
+        #   true
+        # else
+        #   false
+        # end
       end
       
       def self.state

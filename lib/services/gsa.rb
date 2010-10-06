@@ -131,8 +131,9 @@ module Active
       end
       
       def user
-        u = User.new
-        u.email = @data["meta"]["contactEmail"] || nil
+        email   = @data["meta"]["contactEmail"] || nil
+        u       = User.new
+        u.email = email if Validators.email(email)
         u
       end
       
