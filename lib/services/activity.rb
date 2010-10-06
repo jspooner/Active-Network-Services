@@ -136,9 +136,8 @@ module Active
         # end
         
       end
-      # if address is incomplete we will load data from the primary data source
-      # if the primary data source is unknow (ex asset_type_id is unknow ) we will return the GSA address.
-      # ?
+
+      # returns the best address possible from the data returned by the GSA
       def address
         # returned_address = validated_address({})
         # returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
@@ -147,10 +146,8 @@ module Active
         returned_address = @gsa.address     
         if @gsa.address[:address] != nil #and returned_address.city and returned_address.state and returned_address.country
           return returned_address
-        else
-          if load_master
-            return @gsa.address
-          end
+        else          
+          return @gsa.address if load_master
         end
         # returned_address =  @address        if @address
         # 
@@ -169,6 +166,16 @@ module Active
         #   end
         # end
         # 
+        return returned_address
+      end
+      # returns the best address possible by loading other data sources
+      # 2. if the primary data source is unknow (ex asset_type_id is unknow ) we will return the GSA address.
+      # 3. if no address but we have lat/lng we'll do a reverse look up
+      def _address
+        if Validators.full_address(@gsa.address)
+          return @gsa.address
+        end
+        # 3.  MOVE TO A PRIVATE METHOD OR A NEW CLASS
         # if (returned_address["lat"]=="")
         #   #geocode
         #   geocode_url=""
@@ -193,9 +200,7 @@ module Active
         #     end
         #     
         #   end
-        # end
-
-        return returned_address
+        # end        
       end
 
       def start_date

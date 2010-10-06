@@ -381,10 +381,13 @@ describe Search do
         }
       end
     end
+    it "should find events that have online regristration"
+    it "should find events that do not have online regristration"
     
-    # it "should have a start date" do
-    #   Search.search(:asset_id => "b06cbfb8-ff63-488c-92c6-d060680cc208").start_date.should_not be_nil
-    # end
+    it "should have a start date" do
+      Search.search(:asset_id => "81A4A089-CAB5-4293-BFBF-87C74A1C6370").results.first.should_not be_nil
+      # first.address["address"].should_not be_nil
+    end
 
   end
   describe  "Parametric search" do

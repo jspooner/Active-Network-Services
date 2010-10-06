@@ -1,11 +1,13 @@
+require 'rubygems'
+require 'nokogiri'
+require 'open-uri'
+
 module Active
   module Services
 
     class ActiveWorksError < StandardError;  end
 
     class ActiveWorks < IActivity
-      require 'nokogiri'
-      require 'open-uri'
       
       attr_accessor :asset_type_id
       

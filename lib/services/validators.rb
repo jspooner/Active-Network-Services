@@ -1,7 +1,29 @@
 module Active
   module Services
     class Validators
-
+      
+      def self.full_address address
+        
+      end
+      
+      # return true or false
+      # very short check for 5 consecutive digits, no leading or trailing whitespace.
+      def self.zip(arg)
+        # arg ~= /\be(\w*)s\b/
+      end
+      
+      def self.state
+        true
+      end
+      
+      def self.city
+        false
+      end
+      
+      def self.address
+        false
+      end
+      
       STATES = [
         [ "Alabama", "AL" ],
         [ "Alaska", "AK" ],
@@ -76,7 +98,8 @@ module Active
         return nil
       end
 
-      # clean zip 
+      # NO MODIFYING IN A VALIDATION CLASS 
+      # !! clean zip 
       # (http://geekswithblogs.net/MainaD/archive/2007/12/03/117321.aspx)
       def self.valid_zip(zip)
         if zip!="00000" && zip.to_s.strip=~/(^\d{5}(-\d{4})?$)|(^[ABCEGHJKLMNPRSTVXY]{1}\d{1}[A-Z]{1} *\d{1}[A-Z]{1}\d{1}$)/

@@ -61,12 +61,12 @@ module Active
       def address
         @address = HashWithIndifferentAccess.new({
           :name    => @data["meta"]["location"],
-          :address => @data["meta"]["eventAddress"],
           :city    => @data["meta"]["city"],
           :lat     => @data["meta"]["latitude"],
           :lng     => @data["meta"]["longitude"],
           :country => @data["meta"]["country"]
         })       
+       @address[:address] = @data["meta"]["eventAddress"] || @data["meta"]["location"] || nil
        @address[:state] = @data["meta"]["eventState"] || @data["meta"]["state"]
        @address[:zip]   = @data["meta"]["eventZip"] || @data["meta"]["zip"]
        @address
