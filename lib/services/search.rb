@@ -239,8 +239,13 @@ module Active
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
             @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
+
+            begin
+              Active.CACHE.set( Digest::MD5.hexdigest(end_point), self) if Active.CACHE
+            rescue Exception => e              
+            end
             
-            Active.CACHE.set( Digest::MD5.hexdigest(end_point), self) if Active.CACHE
+            
 
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
@@ -302,7 +307,14 @@ module Active
 
       def self.return_cached key
         if Active.CACHE
-          cached_version = Active.CACHE.get(key)
+          begin
+            cached_version = Active.CACHE.get(key)
+          rescue Exception => e
+            return nil
+          end
+          
+          
+          
           if cached_version
             puts "Active Search [CACHE] #{key}"
             return cached_version 
