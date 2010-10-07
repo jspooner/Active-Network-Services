@@ -82,13 +82,16 @@ module Active
         end_date
       end
       
+      def contact_name
+        nil
+      end
+
+      def contact_email
+        nil
+      end
+      
       def user
-        email        = nil #not found in api
-        u            = User.new
-        u.email      = email if Validators.email(email)
-        u.first_name = nil
-        u.phone      = nil
-        u
+        User.new
       end
 
 
