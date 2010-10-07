@@ -88,6 +88,7 @@ module Active
       end
 
       def self.valid_state(name)
+        return nil if name.nil?
         STATES.find do |i|
           if i[0].upcase==name.strip.upcase
             return i[0]
