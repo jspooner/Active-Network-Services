@@ -44,22 +44,36 @@ module Active
         end 
       end
       
-      def load_datasources
-        return if @datasources_loaded==true
-        
-        @ats = ATS.find_by_id(@asset_id,true) if @ats==nil
-        @ats.load_metadata
-    		@gsa = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results.first if @gsa==nil
-
-        if @primary==nil
-          if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
-            @primary= RegCenter.find_by_id(@ats.substitutionUrl)
-          elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
-            @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
-          end
-        end
-        @datasources_loaded=true
+      def ats
+        return @ats if @ats
+        return @ats = ATS.find_by_id(@gsa.asset_id)
       end
+       
+      def primary_source
+        return @primary_source if @primary_source
+        if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2   
+          return @primary_source = RegCenter.find_by_id(@gsa.substitutionUrl)
+        elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
+          return @primary_source = ActiveWorks.find_by_id(@gsa.substitutionUrl)  
+        end
+      end
+      
+      # def load_datasources
+      #   return if @datasources_loaded==true
+      #   
+      #   @ats = ATS.find_by_id(@asset_id,true) if @ats==nil
+      #   @ats.load_metadata
+      #         @gsa = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results.first if @gsa==nil
+      # 
+      #   if @primary==nil
+      #     if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
+      #       @primary= RegCenter.find_by_id(@ats.substitutionUrl)
+      #     elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
+      #       @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
+      #     end
+      #   end
+      #   @datasources_loaded=true
+      # end
 
       def title
         return @gsa.title unless @gsa.nil?
@@ -118,24 +132,24 @@ module Active
         return categories.first
       end
       
-      def load_master
-        # @ats = ATS.find_by_id(@gsa.asset_id)
-        # throw StandardError.new "ATS type=#{@gsa.asset_type_id} id=#{@gsa.substitutionUrl}"
-        # if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
-        #   throw StandardError.new "REG"
-        # elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
-        #   throw StandardError.new "WORKS"
-        # else
-        #   throw StandardError.new @gsa.asset_type_id
-        #   return false
-        # end
-        # if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
-        #   @primary= RegCenter.find_by_id(@ats.substitutionUrl)
-        # elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
-        #   @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
-        # end
-        
-      end
+      # def load_master
+      #   # @ats = ATS.find_by_id(@gsa.asset_id)
+      #   # throw StandardError.new "ATS type=#{@gsa.asset_type_id} id=#{@gsa.substitutionUrl}"
+      #   # if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
+      #   #   throw StandardError.new "REG"
+      #   # elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
+      #   #   throw StandardError.new "WORKS"
+      #   # else
+      #   #   throw StandardError.new @gsa.asset_type_id
+      #   #   return false
+      #   # end
+      #   # if @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID ||  @ats.asset_type_id==REG_CENTER_ASSET_TYPE_ID2
+      #   #   @primary= RegCenter.find_by_id(@ats.substitutionUrl)
+      #   # elsif @ats.asset_type_id==ACTIVE_WORKS_ASSET_TYPE_ID
+      #   #   @primary= ActiveWorks.find_by_id(@ats.substitutionUrl)
+      #   # end
+      #   
+      # end
 
       # returns the best address possible from the data returned by the GSA
       def address
@@ -213,25 +227,6 @@ module Active
         u.first_name = ats.user.first_name  || @gsa.user.first_name || nil
         # Last name is only found in ATS
         u.last_name  = ats.user.last_name   || nil
-      end
-      
-      def ats
-        return @ats if @ats
-        return @ats = ATS.find_by_id(@gsa.asset_id)
-      end
-       
-      def primary_source
-        return @primary_source if @primary_source
-        if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
-          
-          return @primary_source = RegCenter.find_by_id(@gsa.substitutionUrl)
-          
-        elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
-          
-          return @primary_source = ActiveWorks.find_by_id(@gsa.substitutionUrl)  
-          
-        end
-        
       end
       
       def start_date
