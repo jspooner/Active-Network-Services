@@ -384,8 +384,8 @@ describe Search do
     it "should find events that have online regristration"
     it "should find events that do not have online regristration"
     
-    it "should have a start date" do
-      Search.search(:asset_id => "715ED4EF-E4FF-42F2-B24B-2E4255649676").results.first.should_not be_nil
+    it "should have a nil email address from GSA" do
+      Search.search(:asset_id => "715ED4EF-E4FF-42F2-B24B-2E4255649676").results.first.user.email.should be_nil
       # first.address["address"].should_not be_nil
     end
 

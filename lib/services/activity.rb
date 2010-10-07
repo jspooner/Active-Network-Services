@@ -200,6 +200,10 @@ module Active
         #   end
         # end        
       end
+      
+      def user
+        @gsa.user
+      end
 
       def start_date
         return @gsa.start_date     unless @gsa.nil?

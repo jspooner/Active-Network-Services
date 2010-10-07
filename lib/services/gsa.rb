@@ -129,6 +129,16 @@ module Active
           ""
         end
       end
+      
+      def user
+        email        = @data["meta"]["contactEmail"] || nil
+        u            = User.new
+        u.email      = email if Validators.email(email)
+        u.first_name = @data["meta"]["contactName"] || nil
+        u.phone      = @data["meta"]["contactPhone"] || nil
+        u
+      end
+      
       # substitutionUrl could be formatted like this
       # 1. "meta":{"substitutionUrl":"vistarecreation/registrationmain.sdi?source=showAsset.sdi&activity_id=4900"}
       # 2. "meta":{"substitutionUrl":"4900"}
