@@ -81,18 +81,16 @@ module Active
       end
 
       def address
-        if @data.has_key?("event") && @data["event"].has_key?("eventAddress") && !@data["event"]["eventAddress"].blank?
-          @address = validated_address({
-            :name    => @data["event"]["eventLocation"],
-            :address => @data["event"]["eventAddress"],
-            :city    => @data["event"]["eventCity"],
-            :state   => @data["event"]["eventState"],
-            :zip     => @data["event"]["eventZip"],
-            :lat     => @data["event"]["latitude"],
-            :lng     => @data["event"]["longitude"],
-            :country => @data["event"]["eventCountry"]
-          } )
-        end
+        @address = validated_address({
+          :name    => @data["event"]["eventLocation"],
+          :address => @data["event"]["eventAddress"],
+          :city    => @data["event"]["eventCity"],
+          :state   => @data["event"]["eventState"],
+          :zip     => @data["event"]["eventZip"],
+          :lat     => @data["event"]["latitude"],
+          :lng     => @data["event"]["longitude"],
+          :country => @data["event"]["eventCountry"]
+        } )
       end
 
       def start_date
@@ -113,6 +111,15 @@ module Active
 
       def category
         primary_category
+      end
+      
+      def user
+        email        = contact_email
+        u            = User.new
+        u.email      = email if Validators.email(email)
+#        u.first_name = @data["meta"]["contactName"] || nil
+#        u.phone      = @data["meta"]["contactPhone"] || nil
+        u
       end
 
       def desc

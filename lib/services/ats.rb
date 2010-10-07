@@ -31,7 +31,7 @@ module Active
       def title
         # load_metadata unless @metadata_loaded
         # if @data.has_key?("assetName")
-          @data["assetName"]
+        @data["assetName"]
         # else
         #   @title
         # end
@@ -60,7 +60,7 @@ module Active
 
       def address
         # load_metadata unless @metadata_loaded
-        @address = Hash.new({
+        @address = validated_address({
           :name    => @data["location"],
           :address => @data["address"],
           :city    => @data["city"],
@@ -119,7 +119,7 @@ module Active
           @data["summary"]
         end
       end
-      
+
       def contact_name
         # load_metadata unless @metadata_loaded
         @data["contactName"] if @data.has_key?("contactName")
@@ -129,7 +129,7 @@ module Active
         # load_metadata unless @metadata_loaded
         @data["contactEmail"] if @data.has_key?("contactEmail")
       end
-      
+
       def substitutionUrl
         @data[:substitution_url]
       end
@@ -144,62 +144,63 @@ module Active
 
       def self.find_by_id(id)
         begin
-
-          # return self.get_asset_by_id(id)
-          search_hash = Digest::SHA1.hexdigest("ats_m_#{id}")
-          if Active.CACHE
-            cached_version = Active.CACHE.get(search_hash)
-            return cached_version if cached_version
-          end
-
           c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService")
           c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
-          r = c.get_asset_metadata! do |soap|
+          r = c.get_asset_by_id! do |soap|
             soap.namespace = "http://api.asset.services.active.com"
             soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
           end
-          ats = ATS.new(r.to_hash[:get_asset_metadata_response][:out])
-          Active.CACHE.set(search_hash, ats) if Active.CACHE
-          return ats          
-          
+          ats = ATS.new(r.to_hash[:get_asset_by_id_response][:out])
+          ats.load_metadata
+
+          return ats
+
         rescue Savon::SOAPFault => e
           raise ATSError, "Couldn't find activity with the id of #{id} error #{e.inspect}"
           return
         end
       end
 
-      # def load_metadata
-      #   metadata = ATS.get_asset_metadata(@asset_id)
-      #   @data.merge! Hash.from_xml(metadata.to_hash[:get_asset_metadata_response][:out])["importSource"]["asset"]
-      #   @metadata_loaded=true
-      # end
+      def load_metadata
+        metadata = ATS.get_asset_metadata(@asset_id)
+        @data.merge! Hash.from_xml(metadata.to_hash[:get_asset_metadata_response][:out])["importSource"]["asset"]
+        @metadata_loaded=true
+      end
 
       private
+
       def self.get_asset_metadata(id)
-        search_hash = Digest::SHA1.hexdigest("ats_m_#{id}")
-        if Active.CACHE
-          cached_version = Active.CACHE.get(search_hash)
-          return cached_version if cached_version
-        end
-        
-        c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService")
+        c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService?wsdl")
         c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
-        r = c.get_asset_metadata! do |soap|
+        r = c.get_asset_metadata do |soap|
           soap.namespace = "http://api.asset.services.active.com"
           soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
         end
-        ats = ATS.new(r.to_hash[:get_asset_metadata_response][:out])
-        Active.CACHE.set(search_hash, ats) if Active.CACHE
-        return ats
+        # puts "==========="
+        # puts r.to_hash[:get_asset_metadata_response][:out].inspect
+        return r
       end
 
+      # 
+      # def self.get_asset_metadata(id)
+      #   search_hash = Digest::SHA1.hexdigest("ats_m_#{id}")
+      #   if Active.CACHE
+      #     cached_version = Active.CACHE.get(search_hash)
+      #     return cached_version if cached_version
+      #   end
+      # 
+      #   c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService")
+      #   c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
+      #   r = c.get_asset_metadata! do |soap|
+      #     soap.namespace = "http://api.asset.services.active.com"
+      #     soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
+      #   end
+      #   ats = ATS.new(r.to_hash[:get_asset_metadata_response][:out])
+      #   Active.CACHE.set(search_hash, ats) if Active.CACHE
+      #   return ats
+      # end
+
       def self.get_asset_by_id(id)
-        search_hash = Digest::SHA1.hexdigest("ats_#{id}")
-        if Active.CACHE
-          cached_version = Active.CACHE.get(search_hash)
-          return cached_version if cached_version
-        end
-        
         c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService")
         c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
         r = c.get_asset_by_id! do |soap|
@@ -207,10 +208,9 @@ module Active
           soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
         end
         ats = ATS.new(r.to_hash[:get_asset_by_id_response][:out])
-        Active.CACHE.set(search_hash, ats) if Active.CACHE
         return ats
       end
-      
+
 
     end # end ats
   end
