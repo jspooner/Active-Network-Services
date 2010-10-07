@@ -129,10 +129,22 @@ module Active
         # load_metadata unless @metadata_loaded
         @data["contactEmail"] if @data.has_key?("contactEmail")
       end
+      def contact_phone
+        @data["contactPhone"]  if @data.has_key?("contactPhone")
+      end
 
       def substitutionUrl
         @data[:substitution_url]
       end
+
+       def user
+          email        = contact_email
+          u            = User.new
+          u.email      = email if Validators.email(email)
+          u.first_name = contact_name
+          u.phone      = contact_phone
+          u
+        end
 
 
       # EXAMPLE
