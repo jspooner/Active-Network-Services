@@ -82,6 +82,14 @@ module Active
         end_date
       end
       
+      def contact_name
+        nil
+      end
+
+      def contact_email
+        nil
+      end
+      
       def user
         User.new
       end
