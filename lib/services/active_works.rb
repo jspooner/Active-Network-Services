@@ -81,6 +81,15 @@ module Active
       def end_time
         end_date
       end
+      
+      def user
+        email        = nil #not found in api
+        u            = User.new
+        u.email      = email if Validators.email(email)
+        u.first_name = nil
+        u.phone      = nil
+        u
+      end
 
 
       def category
@@ -138,7 +147,7 @@ module Active
       # end
       
       def get_app_api
-        puts "loading active works api"
+#        puts "loading active works api"
         begin
           doc = Nokogiri::XML(open("http://apij.active.com/activeworks/event/#{@data[:id]}"))
           @data.merge! Hash.from_xml doc.to_s

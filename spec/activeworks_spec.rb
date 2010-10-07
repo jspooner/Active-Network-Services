@@ -14,6 +14,10 @@ describe ActiveWorks do
     a = ActiveWorks.find_by_id(@valid_id)
     a.data["id"].should == @valid_id
   end
+  it "should have a nil user email" do
+    a = ActiveWorks.find_by_id(@valid_id)
+    a.user.email.should be_nil    
+  end
   it "should set the asset_type_id" do
     ActiveWorks.find_by_id(@valid_id).asset_type_id.should_not be_nil
   end
