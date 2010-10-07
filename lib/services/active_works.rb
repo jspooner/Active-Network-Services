@@ -20,7 +20,7 @@ module Active
       end
 
       def source
-        :primary
+        :active_works
       end
       
       def asset_id
@@ -83,12 +83,7 @@ module Active
       end
       
       def user
-        email        = nil #not found in api
-        u            = User.new
-        u.email      = email if Validators.email(email)
-        u.first_name = nil
-        u.phone      = nil
-        u
+        User.new
       end
 
 

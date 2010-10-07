@@ -21,7 +21,7 @@ module Active
       end
 
       def source
-        :primary
+        :reg_center
       end
 
       def title
@@ -159,9 +159,8 @@ module Active
       #   return @some_crazy unless @some_crazy.nil?
       #   @some_crazy = @data[:some_crazy_method_from_ats].split replace twist bla bla bla
       # end
-
-      def self.find_by_id(id) #local id
-        
+      # local id
+      def self.find_by_id(id) 
         begin
           doc  = Nokogiri::XML(open("http://apij.active.com/regcenter/event/#{id}"))
           puts "////////<br/>"
@@ -170,10 +169,9 @@ module Active
           reg  = RegCenter.new(Hash.from_xml(doc.to_s))
         rescue Exception => e
           raise RegCenterError, "Couldn't find Reg Center activity with the id of #{id} - #{e.inspect}"
-          return
+          return nil
         end
-        
-        return reg
+        reg
       end
 
       private

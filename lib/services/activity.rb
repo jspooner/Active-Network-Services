@@ -202,9 +202,38 @@ module Active
       end
       
       def user
-        @gsa.user
+        return @gsa.user
       end
 
+      def _user
+        u            = User.new
+        # If GSA doesn't have the email ATS should
+        u.email      = @gsa.user.email      || ats.user.email || primary_source.user.email || nil
+        # First name is only in ATS but GSA has a username that is kept in first_name
+        u.first_name = ats.user.first_name  || @gsa.user.first_name || nil
+        # Last name is only found in ATS
+        u.last_name  = ats.user.last_name   || nil
+      end
+      
+      def ats
+        return @ats if @ats
+        return @ats = ATS.find_by_id(@gsa.asset_id)
+      end
+       
+      def primary_source
+        return @primary_source if @primary_source
+        if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
+          
+          return @primary_source = RegCenter.find_by_id(@gsa.substitutionUrl)
+          
+        elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
+          
+          return @primary_source = ActiveWorks.find_by_id(@gsa.substitutionUrl)  
+          
+        end
+        
+      end
+      
       def start_date
         return @gsa.start_date     unless @gsa.nil?
         return nil

@@ -3,7 +3,8 @@ module Active
     class Validators
       
       def self.email arg
-        if (arg =~  /^(\w|\.|-)+?@(\w|-)+?\.\w{2,4}($|\.\w{2,4})$/) == nil
+        if (arg =~  /((\w|-)+(\.\w+)?)+@\w+\.\w+/) == nil  
+        # if (arg =~  /^(\w|\.|-)+?@(\w|-)+?\.\w{2,4}($|\.\w{2,4})$/) == nil
           return false
         else
           return true
