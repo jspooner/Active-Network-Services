@@ -182,9 +182,9 @@ module Active
       private
 
       def self.get_asset_metadata(id)
-        c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService?wsdl")
+        c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService")
         c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
-        r = c.get_asset_metadata do |soap|
+        r = c.get_asset_metadata! do |soap|
           soap.namespace = "http://api.asset.services.active.com"
           soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
         end
