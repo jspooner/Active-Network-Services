@@ -2,12 +2,7 @@ module Active
   module Services
     
     class User
-      def email=(value)
-        @email = value
-      end
-      def email
-        @email
-      end
+      attr_accessor  :first_name, :last_name, :email, :phone
     end  
   
   end
