@@ -153,16 +153,17 @@ module Active
 
       # returns the best address possible from the data returned by the GSA
       def address
+        @gsa.address
         # returned_address = validated_address({})
         # returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
         # load_datasources
         # returned_address = @ats.address     unless @ats.nil?
-        returned_address = @gsa.address     
-        if @gsa.address[:address] != nil #and returned_address.city and returned_address.state and returned_address.country
-          return returned_address
-        else          
-          return @gsa.address if load_master
-        end
+        # returned_address = @gsa.address     
+        # if @gsa.address[:address] != nil #and returned_address.city and returned_address.state and returned_address.country
+        #   return returned_address
+        # else          
+        #   return nil
+        # end
         # returned_address =  @address        if @address
         # 
         # #ensure lat/lng
@@ -180,7 +181,7 @@ module Active
         #   end
         # end
         # 
-        return returned_address
+        # return returned_address
       end
       # returns the best address possible by loading other data sources
       # 2. if the primary data source is unknow (ex asset_type_id is unknow ) we will return the GSA address.
@@ -227,6 +228,7 @@ module Active
         u.first_name = ats.user.first_name  || @gsa.user.first_name || nil
         # Last name is only found in ATS
         u.last_name  = ats.user.last_name   || nil
+        u
       end
       
       def start_date
