@@ -101,22 +101,16 @@ module Active
       def category
         primary_category
       end
-
-      def contact_name
-        if @data["meta"].has_key?("contactName") && !@data["meta"]["contactName"].blank?
-          @data["meta"]["contactName"]
-        end
-      end
       
       def last_modified
         @data["meta"]["lastModifiedDateTime"] if @data["meta"].has_key?("lastModifiedDateTime") 
       end
 
-      def contact_email
-        if @data["meta"].has_key?("contactEmail") && !@data["meta"]["contactEmail"].blank?
-          @data["meta"]["contactEmail"]
-        end
-      end
+      # def contact_email
+      #   if @data["meta"].has_key?("contactEmail") && !@data["meta"]["contactEmail"].blank?
+      #     @data["meta"]["contactEmail"]
+      #   end
+      # end
 
       def desc
         if @data["meta"].has_key?("allText") && !@data["meta"]["allText"].blank?
@@ -134,7 +128,7 @@ module Active
         email        = @data["meta"]["contactEmail"] || nil
         u            = User.new
         u.email      = email if Validators.email(email)
-        u.first_name = @data["meta"]["contactName"] || nil
+        u.first_name, u.last_name = parse_contact_name(@data["meta"]["contactName"])
         u.phone      = @data["meta"]["contactPhone"] || nil
         u
       end
@@ -151,13 +145,16 @@ module Active
           end
         end
       end
-      # TODO
-      def activeworks_id
-        0
-      end
-      def regcenter_id
-        0
-      end
+      
+      private
+        # parse_contact_name("Jonathan Spooner")
+        # return ["Jonathan","Spooner"]
+        # return ["Jonathan",nil]
+        # return [nil,nil]
+        def parse_contact_name(value)
+          return nil,nil if value.nil?
+          return value.split(" ")
+        end
 
 
     end
