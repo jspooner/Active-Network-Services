@@ -32,12 +32,20 @@ module Active
       end
 
       def url
-        @data["url"]
+        if @data["meta"].has_key?("seourl")
+          @data["meta"]["seourl"]
+        else
+          @data["url"]
+        end
       end
 
       def categories
         if @data["meta"]["channel"].class==String
-          [@data["meta"]["channel"]]
+          if @data["meta"]["channel"].index(",")
+            @data["meta"]["channel"].split(",")
+          else
+            [@data["meta"]["channel"]]
+          end
         else
           @data["meta"]["channel"]
         end
@@ -55,7 +63,16 @@ module Active
       end
       
       def primary_category
-        categories.first
+        # do we have it in the seo url?
+        if @data["meta"].has_key?("seourl")
+          seo_channel = @data["meta"]["seourl"].split("/")
+          if seo_channel.length >2
+            categories.each do |cat|
+              return cat if cat.downcase==seo_channel[3].downcase
+            end
+          end
+        end
+        return categories.first
       end
 
       def address
@@ -153,7 +170,12 @@ module Active
         # return [nil,nil]
         def parse_contact_name(value)
           return nil,nil if value.nil?
-          return value.split(" ")
+          #first name is whats before the space, last name is everything else
+          name = value.split(" ")
+          fname= name[0]
+          name.delete_at(0)
+          lname = name.join(" ")
+          return fname,lname
         end
 
 
