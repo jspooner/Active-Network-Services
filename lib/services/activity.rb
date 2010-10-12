@@ -105,7 +105,7 @@ module Active
       # end
 
       def title
-        return @primary.title if primary_loaded?
+        return @primary_source.title if primary_loaded?
         return @ats.title if ats_loaded?
         return @gsa.title if gsa_loaded?
         return nil
@@ -116,7 +116,7 @@ module Active
       end
       
       def url
-        return @primary.url if primary_loaded?
+        return @primary_source.url if primary_loaded?
         return @ats.url if ats_loaded?
         return @gsa.url if  gsa_loaded?
         return nil
@@ -132,14 +132,14 @@ module Active
           return source.url if source.url.downcase.index("www.active.com")
         end
             
-        return primary.url unless primary.nil?
+        return primary_source.url unless primary_source.nil?
         return ats.url     unless ats.nil?
         return gsa.url     unless gsa.nil?
         return nil
       end
 
       def categories
-        return primary.categories if primary_loaded?
+        return primary_source.categories if primary_loaded?
         return ats.categories     if ats_loaded?
         return gsa.categories     if gsa_loaded?
         return []
@@ -149,14 +149,13 @@ module Active
         return primary_source.categories unless primary_source.nil?  || primary_source.categories.length==0
         return ats.categories     unless ats.nil? || ats.categories.length==0
         return gsa.categories     unless gsa.nil? || gsa.categories.length==0
-        return nil
         return []
       end
 
       def address
-        return primary.address if primary_loaded?
-        return ats.address     if ats_loaded?
-        return gsa.address     if gsa_loaded?
+        return @primary_source.address if primary_loaded?
+        return @ats.address     if ats_loaded?
+        return @gsa.address     if gsa_loaded?
         return nil
       end
 
@@ -168,9 +167,9 @@ module Active
       end
 
       def start_date
-        return primary.start_date if primary_loaded?
-        return ats.start_date     if ats_loaded?
-        return gsa.start_date     if gsa_loaded?
+        return @primary_source.start_date if primary_loaded?
+        return @ats.start_date     if ats_loaded?
+        return @gsa.start_date     if gsa_loaded?
         return nil
       end
 
@@ -182,9 +181,9 @@ module Active
       end
 
       def start_time
-        return primary.start_time if primary_loaded?
-        return ats.start_time     if ats_loaded?
-        return gsa.start_time     if gsa_loaded?
+        return @primary_source.start_time if primary_loaded?
+        return @ats.start_time     if ats_loaded?
+        return @gsa.start_time     if gsa_loaded?
         return nil
       end
 
@@ -197,9 +196,9 @@ module Active
       
 
       def end_date
-        return primary.end_date if primary_loaded?
-        return ats.end_date     if ats_loaded?
-        return gsa.end_date     if gsa_loaded?
+        return @primary_source.end_date if primary_loaded?
+        return @ats.end_date     if ats_loaded?
+        return @gsa.end_date     if gsa_loaded?
         return nil
       end
 
@@ -211,9 +210,9 @@ module Active
       end
 
       def end_time
-        return primary.end_time if primary_loaded?
-        return ats.end_time     if ats_loaded?
-        return gsa.end_time     if gsa_loaded?
+        return @primary_source.end_time if primary_loaded?
+        return @ats.end_time     if ats_loaded?
+        return @gsa.end_time     if gsa_loaded?
         return nil
       end
 
@@ -225,9 +224,9 @@ module Active
       end
 
       def category
-        return primary.category if primary_loaded?
-        return ats.category     if ats_loaded?
-        return gsa.category     if gsa_loaded?
+        return @primary_source.category if primary_loaded?
+        return @ats.category     if ats_loaded?
+        return @gsa.category     if gsa_loaded?
         return nil
       end      
 
@@ -239,9 +238,9 @@ module Active
       end
 
       def desc
-          return primary.desc if primary_loaded?
-          return ats.desc     if ats_loaded?
-          return gsa.desc     if gsa_loaded?
+          return @primary_source.desc if primary_loaded?
+          return @ats.desc     if ats_loaded?
+          return @gsa.desc     if gsa_loaded?
           return nil
         end      
 
@@ -253,9 +252,9 @@ module Active
         end
 
         def asset_id
-          return primary.asset_id if primary_loaded?
-          return ats.asset_id     if ats_loaded?
-          return gsa.asset_id     if gsa_loaded?
+          return @primary_source.asset_id if primary_loaded?
+          return @ats.asset_id     if ats_loaded?
+          return @gsa.asset_id     if gsa_loaded?
           return nil
         end
 
@@ -267,9 +266,9 @@ module Active
         end
 
         def asset_type_id
-          return primary.asset_type_id if primary_loaded?
-          return ats.asset_type_id     if ats_loaded?
-          return gsa.asset_type_id     if gsa_loaded?
+          return @primary_source.asset_type_id if primary_loaded?
+          return @ats.asset_type_id     if ats_loaded?
+          return @gsa.asset_type_id     if gsa_loaded?
           return nil
         end
 
