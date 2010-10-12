@@ -261,6 +261,19 @@ describe Activity do
       @a._asset_type_id.should eql("EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65")
       @a.primary_loaded?.should eql(true)
     end
-
+    it "should find by asset_id" do
+      @a = Activity.find({:asset_id=>"3292945B-08DE-41E5-BF6E-95ED5E59E800"})
+      @a.primary_loaded?.should eql(false)
+      @a._asset_type_id.should eql("EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65")
+      @a.primary_loaded?.should eql(true)
+    end
+    it "should find by substitutionUrl and asset_type_id" do
+      @a = Activity.find({:substitutionUrl=>"1877935", :asset_type_id=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"})
+      @a.primary_loaded?.should eql(true)
+      @a.gsa_loaded?.should eql(false)
+      @a.ats_loaded?.should eql(false)
+      @a._url.should eql("http://www.active.com/not-specified-recware-activities/antioch-ca/young-rembrandts-drawing-612-yrs-2010")
+      @a.ats_loaded?.should eql(true)
+    end
   end
 end

@@ -52,12 +52,12 @@ module Active
       
       def ats
         return @ats if @ats
-        return @ats = ATS.find_by_id(@gsa.asset_id)
+        return @ats = ATS.find_by_id(asset_id)
       end
 
       def gsa
         return @gsa if @gsa
-        s = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results
+        s = Search.search({:asset_id=>asset_id, :start_date=>"01/01/2000"})
         if s.results.length > 0
           @gsa = s.results.first
         else
@@ -68,10 +68,10 @@ module Active
        
       def primary_source
         return @primary_source if @primary_source
-        if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2   
-          return @primary_source = RegCenter.find_by_id(@gsa.substitutionUrl)
-        elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
-          return @primary_source = ActiveWorks.find_by_id(@gsa.substitutionUrl)  
+        if asset_type_id == REG_CENTER_ASSET_TYPE_ID || asset_type_id == REG_CENTER_ASSET_TYPE_ID2   
+          return @primary_source = RegCenter.find_by_id(substitutionUrl)
+        elsif asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
+          return @primary_source = ActiveWorks.find_by_id(substitutionUrl)  
         end
       end
       
@@ -421,11 +421,10 @@ module Active
 
       
       def substitutionUrl
-        return @primary.substitutionUrl unless @primary.nil?
-        load_datasources
-        return @ats.substitutionUrl     unless @ats.nil?
-        return @gsa.substitutionUrl     unless @gsa.nil?
-        return @substitutionUrl      if @substitutionUrl
+        return @gsa.substitutionUrl if !@gsa.nil?
+        return @ats.substitutionUrl if !@ats.nil?
+        return @primary.substitutionUrl if !@primary.nil?
+        
         return nil
       end
 
@@ -435,23 +434,25 @@ module Active
       # Activity.find_by_asset_id(:asset_id => "A9EF9D79-F859-4443-A9BB-91E1833DF2D5", :asset_type_id => "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65")
       # Activity.find_by_asset_id(:asset_id => "A9EF9D79-F859-4443-A9BB-91E1833DF2D5")
       #
-      def self.find_by_asset_id(data)
-        if data.has_key?(:asset_id) and data.has_key?(:asset_type_id) == false
-          @asset_id = data[:asset_id]
-          begin
-            return Activity.new(ATS.find_by_id(@asset_id))  
-          rescue ATSError => e
-            raise ActivityFindError, "We could not find the activity with the asset_id of #{@asset_id}"
-          end
-        elsif data.has_key?(:substitutionUrl) and data.has_key?(:asset_type_id)
+      def self.find(data)
+        data = HashWithIndifferentAccess.new(data) || HashWithIndifferentAccess.new
+        if data.has_key?(:substitutionUrl) and data.has_key?(:asset_type_id)
           puts "look up data form the original source"
 
           if data[:asset_type_id]==REG_CENTER_ASSET_TYPE_ID ||  data[:asset_type_id]==REG_CENTER_ASSET_TYPE_ID2
             return Activity.new(RegCenter.find_by_id(data[:substitutionUrl]))  
           elsif data[:asset_type_id]==ACTIVE_WORKS_ASSET_TYPE_ID
             return Activity.new(ActiveWorks.find_by_id(data[:substitutionUrl]))  
+          else
+            return Activity.new(ATS.find_by_id(@asset_id))  
           end
-
+        elsif data.has_key?(:asset_id) 
+          @asset_id = data[:asset_id]
+          begin
+            return Activity.new(ATS.find_by_id(@asset_id))  
+          rescue ATSError => e
+            raise ActivityFindError, "We could not find the activity with the asset_id of #{@asset_id}"
+          end
         end
         raise ActivityFindError, "We could not find the activity with the asset_id of #{@asset_id}"
 
