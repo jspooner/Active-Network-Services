@@ -7,19 +7,22 @@ include Active::Services
 #   x.report("array:") { Search.new({:keywords => %w(running swimming yoga)}) }
 #   x.report("Array:")  { Search.new({:keywords => ["running","swimming","yoga"]}) }
 # end
-arr = []
-Search.search(:num_results => 100, :page => 1).results.each do |a|
-  match = (a.user.email == a.ats.contact_email)
-  email = "--"
-  if a.primary_source
-    email = a.primary_source.user.email
-  end
-  arr << "#{a.asset_id}"
-  arr << "                                    GSA= #{a.user.email}  ATS= #{a.ats.user.email}  #{a.primary_source}=> #{email} "
-end
-puts " "
-puts " "
-puts " "
-puts " "
-puts " "
-puts arr
+
+# arr = []
+# Search.search(:num_results => 100, :page => 1).results.each do |a|
+#   match = (a.user.email == a.ats.contact_email)
+#   email = "--"
+#   if a.primary_source
+#     email = a.primary_source.user.email
+#   end
+#   arr << "#{a.asset_id}"
+#   arr << "                                    GSA= #{a.user.email}  ATS= #{a.ats.user.email}  #{a.primary_source}=> #{email} "
+# end
+# puts " "
+# puts " "
+# puts " "
+# puts " "
+# puts " "
+# puts arr
+
+puts Search.search(:asset_id => "FBF1EF76-B8BF-427A-85DD-D310DB9E075D")
