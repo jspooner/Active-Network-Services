@@ -12,10 +12,16 @@ module Active
       attr_reader :datasources_loaded
 
       # data is a GSA object              
-      def initialize(gsa,preload_data=false)
+      def initialize(iactivity,preload_data=false)
         @datasources_loaded=false
         
-        @gsa = gsa
+        if iactivity.source==:gsa
+          @gsa = iactivity
+        elsif iactivity.source==:ats
+          @ats = iactivity
+        else
+          @primary_source = iactivity
+        end
         
         # if data.respond_to?('source')
         #   @ats     = gsa if data.source == :ats

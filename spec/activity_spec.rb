@@ -217,6 +217,12 @@ describe Activity do
       @a.category.should eql("Triathlon")
       @a.primary_loaded?.should eql(false)
     end
+    it "should have an ats category" do
+      ats = Activity.new(ATS.find_by_id("77acabbd-ba83-4c78-925d-ce49deddf20c"))
+      ats.gsa_loaded?.should eql(false)
+      ats.category.should eql("Triathlon")
+      ats.primary_loaded?.should eql(false)
+    end
     it "should have an primary source category" do
       @a.primary_loaded?.should eql(false)
       @a._category.should eql("Triathlon")
