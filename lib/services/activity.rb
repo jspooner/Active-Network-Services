@@ -48,6 +48,17 @@ module Active
         return @ats if @ats
         return @ats = ATS.find_by_id(@gsa.asset_id)
       end
+
+      def gsa
+        return @gsa if @gsa
+        s = Search.search({:asset_id=>@asset_id, :start_date=>"01/01/2000"}).results
+        if s.results.length > 0
+          @gsa = s.results.first
+        else
+          nil
+        end
+        
+      end
        
       def primary_source
         return @primary_source if @primary_source
@@ -56,6 +67,18 @@ module Active
         elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
           return @primary_source = ActiveWorks.find_by_id(@gsa.substitutionUrl)  
         end
+      end
+      
+      def primary_loaded?
+        return true if @primary_source else false
+      end
+
+      def ats_loaded?
+        return true if @ats else false
+      end
+
+      def gsa_loaded?
+        return true if @gsa else false
       end
       
       # def load_datasources
@@ -76,25 +99,26 @@ module Active
       # end
 
       def title
-        return @gsa.title unless @gsa.nil?
+        return @primary.title if primary_loaded?
+        return @ats.title if ats_loaded?
+        return @gsa.title if gsa_loaded?
         return nil
       end
-
-      # id within a system
-      def asset_id=(value)        
-        @gsa.asset_id
-        # @asset_id = (value.class==Array) ? value[0] : value
+      
+      def _title
+        primary_source.title || ats.title || gsa.title || nil
       end
-      # The asset type id lets us know what system is came from
-      def asset_type_id
-        return @gsa.asset_type_id     unless @gsa.nil?
-        return nil
-      end
-
+      
       def url
+        return @primary.url if primary_loaded?
+        return @ats.url if ats_loaded?
+        return @gsa.url if  gsa_loaded?
+        return nil
+      end
+
+      def _url
         #prefer seo a2 url first, then non seo a2 url, then primary url
-        load_datasources
-        sources = [@ats,@primary,@gsa]
+        sources = [ats,primary_source,gsa]
         sources.each do |source|
           return source.url if source.url.downcase.index("www.active.com") && !source.url.downcase.index("detail")
         end
@@ -102,26 +126,162 @@ module Active
           return source.url if source.url.downcase.index("www.active.com")
         end
             
-        return @primary.url unless @primary.nil?
-        return @ats.url     unless @ats.nil?
-        return @gsa.url     unless @gsa.nil?
-        return @url      if @url
+        return primary.url unless primary.nil?
+        return ats.url     unless ats.nil?
+        return gsa.url     unless gsa.nil?
         return nil
       end
 
       def categories
-        return @primary.categories unless @primary.nil?
-        load_datasources
-        return @ats.categories     unless @ats.nil?
-        return @gsa.categories     unless @gsa.nil?
-        return @categories      if @categories
+        return primary.categories if primary_loaded?
+        return ats.categories     if ats_loaded?
+        return gsa.categories     if gsa_loaded?
         return []
       end
 
-      def asset_id
-        return @gsa.asset_id     unless @gsa.nil?
+      def _categories
+        return primary_source.categories unless primary_source.nil?  || primary_source.categories.length==0
+        return ats.categories     unless ats.nil? || ats.categories.length==0
+        return gsa.categories     unless gsa.nil? || gsa.categories.length==0
+        return nil
+        return []
+      end
+
+      def address
+        return primary.address if primary_loaded?
+        return ats.address     if ats_loaded?
+        return gsa.address     if gsa_loaded?
         return nil
       end
+
+      def _address
+        return primary_source.address unless primary_source.nil? || primary_source.address["address"].nil?
+        return ats.address     unless ats.nil? || ats.address["address"].nil?
+        return gsa.address     unless gsa.nil? || gsa.address["address"].nil?
+        return nil
+      end
+
+      def start_date
+        return primary.start_date if primary_loaded?
+        return ats.start_date     if ats_loaded?
+        return gsa.start_date     if gsa_loaded?
+        return nil
+      end
+
+      def _start_date
+        return primary_source.start_date unless primary_source.nil? || primary_source.start_date.nil?
+        return ats.start_date     unless ats.nil? || ats.start_date.nil?
+        return gsa.start_date     unless gsa.nil? || gsa.start_date.nil?
+        return nil
+      end
+
+      def start_time
+        return primary.start_time if primary_loaded?
+        return ats.start_time     if ats_loaded?
+        return gsa.start_time     if gsa_loaded?
+        return nil
+      end
+
+      def _start_time
+        return primary_source.start_time unless primary_source.nil? || primary_source.start_time.nil?
+        return ats.start_time     unless ats.nil? || ats.start_time.nil?
+        return gsa.start_time     unless gsa.nil? || gsa.start_time.nil?
+        return nil
+      end
+      
+
+      def end_date
+        return primary.end_date if primary_loaded?
+        return ats.end_date     if ats_loaded?
+        return gsa.end_date     if gsa_loaded?
+        return nil
+      end
+
+      def _end_date
+        return primary_source.end_date unless primary_source.nil? || primary_source.end_date.nil?
+        return ats.end_date     unless ats.nil? || ats.end_date.nil?
+        return gsa.end_date     unless gsa.nil? || gsa.end_date.nil?
+        return nil
+      end
+
+      def end_time
+        return primary.end_time if primary_loaded?
+        return ats.end_time     if ats_loaded?
+        return gsa.end_time     if gsa_loaded?
+        return nil
+      end
+
+      def _end_time
+        return primary_source.end_time unless primary_source.nil? || primary_source.end_time.nil?
+        return ats.end_time     unless ats.nil? || ats.end_time.nil?
+        return gsa.end_time     unless gsa.nil? || gsa.end_time.nil?
+        return nil
+      end
+
+      def category
+        return primary.category if primary_loaded?
+        return ats.category     if ats_loaded?
+        return gsa.category     if gsa_loaded?
+        return nil
+      end      
+
+      def _category
+        return primary_source.category unless primary_source.nil? || primary_source.category.nil?
+        return ats.category     unless ats.nil? || ats.category.nil?
+        return gsa.category     unless gsa.nil? || gsa.category.nil?
+        return nil
+      end
+
+      def desc
+          return primary.desc if primary_loaded?
+          return ats.desc     if ats_loaded?
+          return gsa.desc     if gsa_loaded?
+          return nil
+        end      
+
+        def _desc
+          return primary_source.desc unless primary_source.nil? || primary_source.desc.nil?
+          return ats.desc     unless ats.nil? || ats.desc.nil?
+          return gsa.desc     unless gsa.nil? || gsa.desc.nil?
+          return nil
+        end
+
+        def asset_id
+          return primary.asset_id if primary_loaded?
+          return ats.asset_id     if ats_loaded?
+          return gsa.asset_id     if gsa_loaded?
+          return nil
+        end
+
+        def _asset_id
+          return primary_source.asset_id unless primary_source.nil? || primary_source.asset_id.nil?
+          return ats.asset_id     unless ats.nil? || ats.asset_id.nil?
+          return gsa.asset_id     unless gsa.nil? || gsa.asset_id.nil?
+          return nil
+        end
+
+        def asset_type_id
+          return primary.asset_type_id if primary_loaded?
+          return ats.asset_type_id     if ats_loaded?
+          return gsa.asset_type_id     if gsa_loaded?
+          return nil
+        end
+
+        def _asset_type_id
+          return primary_source.asset_type_id unless primary_source.nil? || primary_source.asset_type_id.nil?
+          return ats.asset_type_id     unless ats.nil? || ats.asset_type_id.nil?
+          return gsa.asset_type_id     unless gsa.nil? || gsa.asset_type_id.nil?
+          return nil
+        end
+        
+      # id within a system
+      def asset_id=(value)        
+        @gsa.asset_id
+        # @asset_id = (value.class==Array) ? value[0] : value
+      end
+      # The asset type id lets us know what system is came from
+
+
 
       def primary_category
         return @primary.primary_category unless @primary.nil?
@@ -152,8 +312,8 @@ module Active
       # end
 
       # returns the best address possible from the data returned by the GSA
-      def address
-        @gsa.address
+      #def address
+#        @gsa.address
         # returned_address = validated_address({})
         # returned_address = @primary.address unless (@primary.nil? || @primary.address.nil?)
         # load_datasources
@@ -182,7 +342,7 @@ module Active
         # end
         # 
         # return returned_address
-      end
+      #end
       # returns the best address possible by loading other data sources
       # 2. if the primary data source is unknow (ex asset_type_id is unknow ) we will return the GSA address.
       # 3. if no address but we have lat/lng we'll do a reverse look up
@@ -217,7 +377,9 @@ module Active
       end
       
       def user
-        return @gsa.user
+        return @gsa.user if !@gsa.nil?
+        return @ats.user if !@ats.nil?
+        return @primary.user if !@primary.nil?
       end
 
       def _user
@@ -231,34 +393,8 @@ module Active
         u
       end
       
-      def start_date
-        return @gsa.start_date     unless @gsa.nil?
-        return nil
-      end
 
-      def start_time
-        return @gsa.start_time     unless @gsa.nil?
-        return nil
-      end
 
-      def end_date
-        return @gsa.end_date     unless @gsa.nil?
-        return nil
-      end
-
-      def end_time
-        return @gsa.end_time     unless @gsa.nil?
-        return nil
-      end
-
-      def category
-        return @primary.category unless @primary.nil?
-        load_datasources
-        return @ats.category     unless @ats.nil?
-        return @gsa.category     unless @gsa.nil?
-        return @category      if @category
-        primary_category
-      end
 
       def contact_name
         return @primary.contact_name unless @primary.nil?
@@ -278,14 +414,6 @@ module Active
         return nil
       end
 
-      def desc
-        return @primary.desc unless @primary.nil?
-        load_datasources
-        return @ats.desc     unless @ats.nil?
-        return @gsa.desc     unless @gsa.nil?
-        return @desc      if @desc
-        return nil
-      end
       
       def substitutionUrl
         return @primary.substitutionUrl unless @primary.nil?

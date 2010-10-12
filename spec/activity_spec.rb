@@ -134,7 +134,127 @@ describe Activity do
         g.user.email.should eql("eventinfo@sfaf.org")
       end
 
+    # title
+    it "should have a gsa title" do
+      @a.title.should eql("2011 Rohto Ironman 70.3 California")
+    end
+    it "should have a primary title" do
+      @a.primary_loaded?.should eql(false)
+      @a._title.should eql("2011 Rohto Ironman 70.3 California")
+      @a.primary_loaded?.should eql(true)
+    end
+    it "should have a gsa url" do
+      @a.url.should eql("http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011")
+    end
+    it "should have an ats url" do
+      @a.ats_loaded?.should eql(false)
+      @a._url.should eql("http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011")
+      @a.ats_loaded?.should eql(true)
+    end
+    it "should have a gsa categories" do
+      @a.categories.should eql(["Triathlon"])
+    end
+    it "should have an primary source categories" do
+      @a.primary_loaded?.should eql(false)
+      @a._categories.should eql(["Triathlon"])
+      @a.primary_loaded?.should eql(true)
+    end
+    it "should have a gsa address" do
+      @a.primary_loaded?.should eql(false)
+      @a.address["address"].should eql("1540 Harbor Drive North")
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source address" do
+      @a.primary_loaded?.should eql(false)
+      @a._address["address"].should eql("1540 Harbor Drive North")
+      @a.primary_loaded?.should eql(true)
+    end
+    it "should have a gsa start_date" do
+      @a.primary_loaded?.should eql(false)
+      @a.start_date.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source start_date" do
+      @a.primary_loaded?.should eql(false)
+      @a._start_date.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(true)
+    end
+    it "should have a gsa start_time" do
+      @a.primary_loaded?.should eql(false)
+      @a.start_time.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source start_time" do
+      @a.primary_loaded?.should eql(false)
+      @a._start_time.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(true)
+    end
 
+    it "should have a gsa end_date" do
+      @a.primary_loaded?.should eql(false)
+      @a.end_date.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source end_date" do
+      @a.primary_loaded?.should eql(false)
+      @a._end_date.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(true)
+    end
+
+    it "should have a gsa end_time" do
+      @a.primary_loaded?.should eql(false)
+      @a.end_time.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source end_time" do
+      @a.primary_loaded?.should eql(false)
+      @a._end_time.should be_an_instance_of(DateTime)
+      @a.primary_loaded?.should eql(true)
+    end
+
+    it "should have a gsa category" do
+      @a.primary_loaded?.should eql(false)
+      @a.category.should eql("Triathlon")
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source category" do
+      @a.primary_loaded?.should eql(false)
+      @a._category.should eql("Triathlon")
+      @a.primary_loaded?.should eql(true)
+    end
+
+    it "should have a gsa desc" do
+      @a.primary_loaded?.should eql(false)
+      @a.desc.should eql("")
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source desc" do
+      @a.primary_loaded?.should eql(false)
+      @a._desc.should_not eql("")
+      @a.primary_loaded?.should eql(true)
+    end
+
+    it "should have a gsa asset_id" do
+      @a.primary_loaded?.should eql(false)
+      @a.asset_id.should eql("77ACABBD-BA83-4C78-925D-CE49DEDDF20C")
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source asset_id" do
+      @a.primary_loaded?.should eql(false)
+      @a._asset_id.should eql("77acabbd-ba83-4c78-925d-ce49deddf20c")
+      @a.primary_loaded?.should eql(true)
+    end
+
+    it "should have a gsa asset_type_id" do
+      @a.primary_loaded?.should eql(false)
+      @a.asset_type_id.should eql("3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6")
+      @a.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source asset_type_id" do
+      @a.primary_loaded?.should eql(false)
+      @a._asset_type_id.should eql("EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65")
+      @a.primary_loaded?.should eql(true)
+    end
 
   end
 end
