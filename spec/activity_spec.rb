@@ -11,6 +11,7 @@ describe Activity do
   describe "Creating an activity from a GSA object" do
     before(:each) do 
       @a = Activity.new( GSA.new(JSON.parse('{"escapedUrl":"http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011","language":"en","title":"2011 Rohto Ironman 70.3 California | Oceanside, California \u003cb\u003e...\u003c/b\u003e","url":"http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011","summary":"","meta":{"eventDate":"2011-04-02T00:00:00-07:00","location":"Oceanside Harbor","tag":["event:10","Triathlon:10"],"eventLongitude":"-117.3586","endDate":"2011-04-02","locationName":"Oceanside Harbor","lastModifiedDateTime":"2010-09-30 06:16:05.107","splitMediaType":["Event","Ironman","Long Course"],"endTime":"0:00:00","city":"Oceanside","google-site-verification":"","startTime":"0:00:00","eventId":"1838902","description":"","longitude":"-117.3586","substitutionUrl":"1838902","sortDate":"2001-04-02","eventState":"California","eventLatitude":"33.19783","keywords":"Event","eventAddress":"1540 Harbor Drive North","dma":"San Diego","seourl":"http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011","country":"United States","category":"Activities","market":"San Diego","contactName":"World Triathlon Corporation","assetTypeId":"3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6","eventZip":"92054","UpdateDateTime":"9/22/2010 11:46:24 AM","latitude":"33.19783","startDate":"2011-04-02","state":"California","mediaType":["Event","Event\\Ironman","Event\\Long Course"],"estParticipants":"2500","assetId":["77ACABBD-BA83-4C78-925D-CE49DEDDF20C","77acabbd-ba83-4c78-925d-ce49deddf20c"],"participationCriteria":"All","onlineDonationAvailable":"0","assetName":["2011 Rohto Ironman 70.3 California","2011 Rohto Ironman 70.3 California"],"zip":"92054","eventURL":"http://www.ironmancalifornia.com/","contactPhone":"813-868-5940","contactEmail":"california70.3@ironman.com","onlineMembershipAvailable":"0","trackbackurl":"http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011","onlineRegistrationAvailable":"true","image1":"http://www.active.com/images/events/hotrace.gif","lastModifiedDate":"2010-09-30","channel":"Triathlon"}}')) )
+      @ats_activity = Activity.new(ATS.new( {"destinationID"=>"", "assetId"=>"EEBC04D9-EA80-46C6-B9DD-6EBF49F8678F", "substitutionUrl"=>"1875345", "city"=>"San Francisco", "contactName"=>"Pete Berg", "trackbackurl"=>"http://www.active.com/page/Event_Details.htm?event_id=1875345&assetId=EEBC04D9-EA80-46C6-B9DD-6EBF49F8678F", :asset_id=>"EEBC04D9-EA80-46C6-B9DD-6EBF49F8678F", "category"=>"Activities", "zip"=>"94111", "userCommentText"=>nil, "location"=>"San Francisco metro area", "latitude"=>"37.7983181", :asset_type_name=>"Active.com Event Registration", "searchWeight"=>"1", "country"=>"United States", "participationCriteria"=>"Adult,Family,Kids,Men,Women", "dma"=>"San Francisco - Oakland - San Jose", :asset_name=>"URBAN HUNT: San Francisco", :asset_type_id=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "isSearchable"=>"true", :xmlns=>"http://api.asset.services.active.com", :url=>"http://www.active.com/page/Event_Details.htm?event_id=1875345", "row"=>"1", "image1"=>nil, "startDate"=>"2010-10-16", "contactPhone"=>"607-222-9845", "onlineDonationAvailable"=>"0", "avgUserRating"=>nil, "market"=>"San Francisco - Oakland - San Jose", :substitution_url=>"1875345", "assetTypeId"=>"EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65", "assetName"=>"URBAN HUNT: San Francisco", "channel"=>["More Sports\\Adventure Racing", "Running"], "seourl"=>"http://www.active.com/running/san-francisco-ca/urban-hunt-san-francisco-2010", "mediaType"=>["Event", "Event\\5 mile", "=difficulty:Beginner", "=difficulty:Intermediate"], "startTime"=>"11:00:00", "endTime"=>"11:00:00", "contactEmail"=>"info@realityrush.com", "eventResults"=>nil, "longitude"=>"-122.4000032", "endDate"=>"2010-10-16", "onlineRegistrationAvailable"=>"false", "onlineMembershipAvailable"=>"0", "state"=>"California", "estParticipants"=>"100", "eventURL"=>"http://www.realityrush.com/events/urban-hunt-san-francisco-oct-16th-2010/"}))
     end
     it "should have asset ids" do
       @a.asset_id.should_not be_nil
@@ -275,5 +276,134 @@ describe Activity do
       @a._url.should eql("http://www.active.com/not-specified-recware-activities/antioch-ca/young-rembrandts-drawing-612-yrs-2010")
       @a.ats_loaded?.should eql(true)
     end
+
+    it "should load url from ats and _title from primary" do
+      @ats_activity.url.should eql("http://www.active.com/running/san-francisco-ca/urban-hunt-san-francisco-2010")
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._title.should eql("URBAN HUNT: San Francisco")
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have an ats title" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.title.should eql( "URBAN HUNT: San Francisco")
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have a primary title" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._title.should eql( "URBAN HUNT: San Francisco")
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have an ats categories" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.categories.should eql(["Adventure Racing", "Running"])
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have a primary categories" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._categories.should eql( ["Running", "Adventure Racing"])
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have an ats address" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.address["city"].should eql("San Francisco")
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have a primary address" do
+      @ats_activity.primary_loaded?.should eql(false)
+ #     puts @ats_activity._address.inspect
+#      puts @ats_activity.primary_source.data.inspect
+      @ats_activity._address["address"].should eql( "1 Embarcadero Center, San Francisco, CA 94111")
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+
+    it "should have a ats start_date" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.start_date.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source start_date" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._start_date.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+    it "should have a ats start_time" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.start_time.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source start_time" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._start_time.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have a ats end_date" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.end_date.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source end_date" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._end_date.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have a ats end_time" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.end_time.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source end_time" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._end_time.should be_an_instance_of(DateTime)
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have a ats category" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.category.should eql("Adventure Racing")
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+
+    it "should have a primay category" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._category.should eql("Running")
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    # SHOULD DESC be null or empty
+    it "should have a ats desc" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.desc.should eql("")
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source desc" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._desc.should_not eql("")
+#      puts @ats_activity._desc
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have a ats asset_id" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.asset_id.should eql("EEBC04D9-EA80-46C6-B9DD-6EBF49F8678F")
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+    it "should have an primary source asset_id" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity._asset_id.should eql("eebc04d9-ea80-46c6-b9dd-6ebf49f8678f")
+      @ats_activity.primary_loaded?.should eql(true)
+    end
+
+    it "should have a ats asset_type_id" do
+      @ats_activity.primary_loaded?.should eql(false)
+      @ats_activity.asset_type_id.should eql("EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65")
+      @ats_activity.primary_loaded?.should eql(false)
+    end
+        
   end
 end
