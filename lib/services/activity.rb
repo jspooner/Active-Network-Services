@@ -438,7 +438,7 @@ module Active
       # reg-not-open    – Online registration is available, but is not currently open
       # reg-closed      – The registration deadline has passed
       # reg-open        – Registration is currently open
-      def regristration_available?
+      def regristration_status
         if @gsa.asset_type_id == "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65" 
           Net::HTTP.get URI.parse("http://apij.active.com/regcenter/event/#{@gsa.substitutionUrl}/regstatus")
         elsif @gsa.asset_type_id == "DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
