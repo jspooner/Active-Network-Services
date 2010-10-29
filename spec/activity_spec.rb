@@ -406,4 +406,14 @@ describe Activity do
     end
         
   end
+  describe "regristration_available?" do
+    it "should have a valid response for regristration_available?" do      
+      results = Search.search( { :num_results => 50, :keywords => ["running"] } )
+      results.should have(50).results
+      # results.results.first.regristration_available?.should match(/reg-open|reg-unavailable|reg-not-open|reg-closed/)
+      results.results.each do |a|
+        a.regristration_available?.should match(/reg-open|reg-unavailable|reg-not-open|reg-closed/)
+      end
+    end
+  end
 end

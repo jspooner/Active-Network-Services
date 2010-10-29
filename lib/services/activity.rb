@@ -1,3 +1,5 @@
+require 'net/http'
+require 'uri'
 module Active
   module Services
 
@@ -74,17 +76,21 @@ module Active
           return @primary_source = ActiveWorks.find_by_id(substitutionUrl)  
         end
       end
-      
+      # activity.rb:80: warning: else without rescue is useless
+      # return true if @primary_source else false
       def primary_loaded?
-        return true if @primary_source else false
+        return true if @primary_source
+        false
       end
 
       def ats_loaded?
-        return true if @ats else false
+        return true if @ats
+        false
       end
 
       def gsa_loaded?
-        return true if @gsa else false
+        return true if @gsa
+        false
       end
       
       # def load_datasources
@@ -238,46 +244,46 @@ module Active
       end
 
       def desc
-          return @primary_source.desc if primary_loaded?
-          return @ats.desc     if ats_loaded?
-          return @gsa.desc     if gsa_loaded?
-          return nil
-        end      
+        return @primary_source.desc if primary_loaded?
+        return @ats.desc     if ats_loaded?
+        return @gsa.desc     if gsa_loaded?
+        return nil
+      end      
 
-        def _desc
-          return primary_source.desc unless primary_source.nil? || primary_source.desc.nil?
-          return ats.desc     unless ats.nil? || ats.desc.nil?
-          return gsa.desc     unless gsa.nil? || gsa.desc.nil?
-          return nil
-        end
+      def _desc
+        return primary_source.desc unless primary_source.nil? || primary_source.desc.nil?
+        return ats.desc     unless ats.nil? || ats.desc.nil?
+        return gsa.desc     unless gsa.nil? || gsa.desc.nil?
+        return nil
+      end
 
-        def asset_id
-          return @primary_source.asset_id if primary_loaded?
-          return @ats.asset_id     if ats_loaded?
-          return @gsa.asset_id     if gsa_loaded?
-          return nil
-        end
+      def asset_id
+        return @primary_source.asset_id if primary_loaded?
+        return @ats.asset_id     if ats_loaded?
+        return @gsa.asset_id     if gsa_loaded?
+        return nil
+      end
 
-        def _asset_id
-          return primary_source.asset_id unless primary_source.nil? || primary_source.asset_id.nil?
-          return ats.asset_id     unless ats.nil? || ats.asset_id.nil?
-          return gsa.asset_id     unless gsa.nil? || gsa.asset_id.nil?
-          return nil
-        end
+      def _asset_id
+        return primary_source.asset_id unless primary_source.nil? || primary_source.asset_id.nil?
+        return ats.asset_id     unless ats.nil? || ats.asset_id.nil?
+        return gsa.asset_id     unless gsa.nil? || gsa.asset_id.nil?
+        return nil
+      end
 
-        def asset_type_id
-          return @primary_source.asset_type_id if primary_loaded?
-          return @ats.asset_type_id     if ats_loaded?
-          return @gsa.asset_type_id     if gsa_loaded?
-          return nil
-        end
+      def asset_type_id
+        return @primary_source.asset_type_id if primary_loaded?
+        return @ats.asset_type_id     if ats_loaded?
+        return @gsa.asset_type_id     if gsa_loaded?
+        return nil
+      end
 
-        def _asset_type_id
-          return primary_source.asset_type_id unless primary_source.nil? || primary_source.asset_type_id.nil?
-          return ats.asset_type_id     unless ats.nil? || ats.asset_type_id.nil?
-          return gsa.asset_type_id     unless gsa.nil? || gsa.asset_type_id.nil?
-          return nil
-        end
+      def _asset_type_id
+        return primary_source.asset_type_id unless primary_source.nil? || primary_source.asset_type_id.nil?
+        return ats.asset_type_id     unless ats.nil? || ats.asset_type_id.nil?
+        return gsa.asset_type_id     unless gsa.nil? || gsa.asset_type_id.nil?
+        return nil
+      end
         
       # id within a system
       def asset_id=(value)        
@@ -426,6 +432,20 @@ module Active
         return @primary.substitutionUrl if !@primary.nil?
         
         return nil
+      end
+
+      # reg-unavailable – No online registration
+      # reg-not-open    – Online registration is available, but is not currently open
+      # reg-closed      – The registration deadline has passed
+      # reg-open        – Registration is currently open
+      def regristration_available?
+        if @gsa.asset_type_id == "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65" 
+          Net::HTTP.get URI.parse("http://apij.active.com/regcenter/event/#{@gsa.substitutionUrl}/regstatus")
+        elsif @gsa.asset_type_id == "DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
+          Net::HTTP.get URI.parse("http://apij.active.com/activeworks/event/#{@gsa.asset_id}/regstatus")
+        else
+          'reg-open'
+        end
       end
 
       
