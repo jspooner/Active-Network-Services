@@ -42,8 +42,12 @@ module Active
         elsif @data.has_key?("event") && @data["event"].has_key?("registrationUrl")
           @data["event"]["registrationUrl"]
         elsif @data.has_key?("event") && @data["event"].has_key?("eventContactUrl")
-          @data["event"]["eventContactUrl"]          
+          @data["event"]["eventContactUrl"]
         end
+      end
+      
+      def event_url
+        @data[:event][:eventUrl]
       end
       
       def categories
@@ -108,6 +112,10 @@ module Active
       def end_date
         nil
       end
+      # The date and time that registration closes
+      def registration_close_date
+        DateTime.parse(@data["event"]["eventCloseDate"])
+      end
 
       def category
         primary_category
@@ -122,12 +130,12 @@ module Active
         u
       end
 
-      def desc
+      def desc_old
         if @data.has_key?("event") && @data["event"].has_key?("briefDescription")
-          ret=@data["event"]["briefDescription"]
-          if @data["event"].has_key?("eventDetails")  && @data["event"]["eventDetails"]!=nil && @data["event"]["eventDetails"].has_key?("eventDetail")
+          ret = @data["event"]["briefDescription"]
+          if @data["event"].has_key?("eventDetails")  && @data["event"]["eventDetails"] != nil && @data["event"]["eventDetails"].has_key?("eventDetail")
             eventDetail = @data["event"]["eventDetails"]["eventDetail"]
-            if eventDetail.class==Array
+            if eventDetail.class == Array
               @data["event"]["eventDetails"]["eventDetail"].each do |detail|
                 ret +="<div><b>" + detail["eventDetailsName"] + ":</b> " + cleanup_reg_string(detail["eventDetailsValue"]) + "</div>"
               end
@@ -139,6 +147,36 @@ module Active
           return ret
         elsif @data.has_key?("event") && @data["event"].has_key?("eventDescription")
           return @data["event"]["eventDescription"]
+        end
+      end
+      
+      def desc(length = :full)
+        if length == :full
+          @data["event"]["eventDescription"]
+        else
+          @data["event"]["briefDescription"]
+        end
+      end
+      
+      # Content should be a array of hashes.
+      # [ {:title => "briefDescription", :type => "html", :content => "..." }]
+      #
+      # It should contain everything in briefDescription description and eventDetails.
+      # It should just be one big happy 
+      # 
+      # TODO: Need to order this by detail[:eventDetailsOrder]
+      # TODO: Add the other description blocks to this 
+      def content
+        if @data["event"] and @data["event"]["eventDetails"] 
+
+          if @data["event"]["eventDetails"]["eventDetail"].class == Array
+            return @data["event"]["eventDetails"]["eventDetail"].collect { |obj| {:title => obj[:eventDetailsName], :content => obj[:eventDetailsValue]} } 
+          else
+            return [{:title => @data["event"]["eventDetails"]["eventDetail"]["eventDetailsName"],:content => @data["event"]["eventDetails"]["eventDetail"]["eventDetailsValue"]}]
+          end
+          
+        else
+          return []
         end
       end
       

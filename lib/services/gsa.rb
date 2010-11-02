@@ -38,6 +38,10 @@ module Active
           @data["url"]
         end
       end
+      
+      # def event_url
+      #   @data["meta"]["organizationWebsite"] rescue
+      # end
 
       def categories
         if @data["meta"]["channel"].class==String

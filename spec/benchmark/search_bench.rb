@@ -25,4 +25,4 @@ include Active::Services
 # puts " "
 # puts arr
 
-puts Search.search(:asset_id => "FBF1EF76-B8BF-427A-85DD-D310DB9E075D")
+puts Search.search(:asset_ids => ["DD8F427F-6188-465B-8C26-71BBA22D2DB7"]).results.inspect
