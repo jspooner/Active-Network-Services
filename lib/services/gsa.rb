@@ -125,8 +125,15 @@ module Active
       
       def last_modified
         @data["meta"]["lastModifiedDateTime"] if @data["meta"].has_key?("lastModifiedDateTime") 
-      end
 
+      end
+      
+      def online_registration
+        if @data["meta"].has_key?("onlineRegistrationAvailable") 
+          (@data["meta"]["onlineRegistrationAvailable"].downcase == "true") ? true : false
+        end
+      end
+      
       # def contact_email
       #   if @data["meta"].has_key?("contactEmail") && !@data["meta"]["contactEmail"].blank?
       #     @data["meta"]["contactEmail"]

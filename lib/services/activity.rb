@@ -292,7 +292,13 @@ module Active
       end
       # The asset type id lets us know what system is came from
 
-
+      def online_registration
+        if @gsa
+          return @gsa.online_registration 
+        else
+          return false
+        end
+      end
 
       def primary_category
         return @primary.primary_category unless @primary.nil?
