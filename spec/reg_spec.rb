@@ -79,7 +79,11 @@ describe RegCenter do
     r.user.email.should eql("rnrsj@eliteracing.com")
   end
 
-
+  # it "should get asset metadata" do
+  #   a = RegCenter.get_asset_metadata(@valid_id)
+  #   a.should be_valid
+  # end
+  
   it "should set find by id" do
     a = RegCenter.find_by_id(@valid_id)
     a.data.should_not be_nil
@@ -159,7 +163,10 @@ describe RegCenter do
     r.content[0][:content].should eql("<a href=http://www.eteamz.com/activeactive1/files/0913halloweenentryv5-new.pdf> Click Here to View Event Flyer</a>")    
   end
 
-  
+  it "should have an event_image_url" do
+    r = RegCenter.find_by_id("1917437")
+    r.event_image_url.should eql("http://www.active.com/images/upimages/2642.gif")
+  end
   
   
   

@@ -26,4 +26,3 @@ describe Active do
   end
   
 end
-
