@@ -309,6 +309,9 @@ module Active
         return categories.first
       end
       
+      def event_image_url
+        
+      end
       # def load_master
       #   # @ats = ATS.find_by_id(@gsa.asset_id)
       #   # throw StandardError.new "ATS type=#{@gsa.asset_type_id} id=#{@gsa.substitutionUrl}"

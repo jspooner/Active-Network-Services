@@ -46,6 +46,14 @@ module Active
         end
       end
       
+      def registration_url
+        if @data.has_key?("event") && @data["event"].has_key?("registrationUrl")
+          @data["event"]["registrationUrl"]
+        else
+          ""
+        end
+      end
+      
       def event_url
         @data[:event][:eventUrl]
       end
@@ -212,19 +220,21 @@ module Active
         reg
       end
 
+
+      def self.get_asset_metadata(id)
+        c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService?wsdl")
+        c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
+        r = c.get_asset_metadata do |soap|
+          soap.namespace = "http://api.asset.services.active.com"
+          soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
+        end
+        puts "==========="
+        puts r.to_hash[:get_asset_metadata_response][:out].inspect
+        return r
+      end
+
+
       private
-      # def self.get_asset_metadata(id)
-      #   c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService?wsdl")
-      #   c.request.headers["Api-Key"] = "6npky9t57235vps5cetm3s7k"
-      #   r = c.get_asset_metadata do |soap|
-      #     soap.namespace = "http://api.asset.services.active.com"
-      #     soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
-      #   end
-      #   puts "==========="
-      #   puts r.to_hash[:get_asset_metadata_response][:out].inspect
-      #   return r
-      # end
-      # 
       # def self.get_asset_by_id(id)
       #   puts "loading ATS"
       #   c = Savon::Client.new("http://api.amp.active.com/asset-service/services/AssetService")

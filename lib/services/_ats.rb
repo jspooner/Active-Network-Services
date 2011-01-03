@@ -129,21 +129,9 @@ module Active
         # load_metadata unless @metadata_loaded
         @data["contactEmail"] if @data.has_key?("contactEmail")
       end
-      def contact_phone
-        @data["contactPhone"]  if @data.has_key?("contactPhone")
-      end
 
       def substitutionUrl
         @data[:substitution_url]
-      end
-
-      def user
-        email        = contact_email
-        u            = User.new
-        u.email      = email if Validators.email(email)
-        u.first_name = contact_name
-        u.phone      = contact_phone
-        u
       end
 
 
@@ -164,9 +152,9 @@ module Active
           end
           ats = ATS.new(r.to_hash[:get_asset_by_id_response][:out])
           ats.load_metadata
-
+        
           return ats
-
+        
         rescue Savon::SOAPFault => e
           raise ATSError, "Couldn't find activity with the id of #{id} error #{e.inspect}"
           return
@@ -188,8 +176,6 @@ module Active
           soap.namespace = "http://api.asset.services.active.com"
           soap.body = "<context><userId></userId><applicationId></applicationId></context><assetId>#{id}</assetId>"
         end
-        # puts "==========="
-        # puts r.to_hash[:get_asset_metadata_response][:out].inspect
         return r
       end
 

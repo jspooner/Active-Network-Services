@@ -1,9 +1,9 @@
 require 'net/http'
 require 'json'
 require 'cgi'
+require 'rubygems'
 require 'mysql' 
 require 'active_record'
-require 'digest/md5'
 
 module Active
   module Services
@@ -29,8 +29,8 @@ module Active
     end
 
     class Search
-      attr_accessor :api_key, :start_date, :end_date, :location, :channels, :split_media_type, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
-                    :view, :facet, :sort, :num_results, :asset_ids, :dma, :city, :state, :country, :bounding_box
+      attr_accessor :api_key, :start_date, :end_date, :location, :channels, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
+                    :view, :facet, :sort, :num_results, :asset_ids, :dma, :city, :state, :country
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
        
@@ -39,10 +39,9 @@ module Active
       
       def initialize(data={})
         self.api_key     = data[:api_key] || ""
-        self.location    = data[:location]
+        self.location    = data[:location] || ""
         self.zips        = data[:zips] || []
         self.channels    = data[:channels] || []
-        self.split_media_type= data[:split_media_type] || []
         self.keywords    = data[:keywords] || []
         self.radius      = data[:radius] || nil
         self.limit       = data[:limit] || "10"
@@ -63,7 +62,6 @@ module Active
         self.city        = data[:city]
         self.state       = data[:state]
         self.country     = data[:country]
-        self.bounding_box = data[:bounding_box]
       end
       
       # Example
@@ -83,7 +81,6 @@ module Active
       end
       
       def location=(value)
-        return if value.nil?
         @location = CGI.escape(value)
       end
       
@@ -106,16 +103,6 @@ module Active
       def asset_ids=(value)
         @asset_ids = value
       end
-      
-      def bounding_box=(value)
-        return if value==nil
-        value = HashWithIndifferentAccess.new(value)
-        if value.has_key?("sw") && value.has_key?("ne")
-          @bounding_box=value
-        else
-          raise "bounding_box must be hash with keys sw and ne"
-        end
-      end
 
       def asset_id=(value)
         return if value.empty?
@@ -134,8 +121,6 @@ module Active
           end
         end
         meta_data = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }.join("+OR+")
-        # SPLIT MEDIA TYPE
-        meta_data += split_media_type.collect { |type| "+meta:splitMediaType=#{Search.double_encode_channel(type)}" }.join("+OR+") unless split_media_type.nil?
         # ASSET IDS
         unless asset_ids.empty?
           meta_data += "+AND+" unless meta_data == ""
@@ -151,6 +136,7 @@ module Active
         # 3 Look for lat lng
         # 4 Look for a formatted string "San Diego, CA, US"
         # 5 Look for a dma
+        
         if @city or @state or @country
           if @city
             meta_data += "+AND+" unless meta_data == ""
@@ -184,34 +170,11 @@ module Active
         end
         meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
         
-        # BOUNDING BOX
-        if @bounding_box!=nil
-          #The values in the GSA metadata are shifted to  prevent negative values.  This was done b/c lat/long
-          # are searched as a number range and the GSA doesn't allow negative values in number ranges.  
-          # We shift latitude values by 90 and longitude values by 180.
-          
-          if @bounding_box[:sw].class==String
-            #String :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.832371,-122.356979"}
-            latitude1 = @bounding_box[:sw].split(",").first.to_f+90
-            latitude2 = @bounding_box[:ne].split(",").first.to_f+90
-            longitude1 = @bounding_box[:sw].split(",").last.to_f+180
-            longitude2 = @bounding_box[:ne].split(",").last.to_f+180
-          else 
-            #hash query[:bounding_box] = { :sw => [123, 10], :ne => [222,10] }
-            latitude1 = @bounding_box[:sw].first.to_f+90
-            latitude2 = @bounding_box[:ne].first.to_f+90
-            longitude1 = @bounding_box[:sw].last.to_f+180
-            longitude2 = @bounding_box[:ne].last.to_f+180
-          end
-          meta_data += "+AND+" unless meta_data == ""
-          meta_data += "meta:latitudeShifted:#{latitude1}..#{latitude2}+AND+meta:longitudeShifted:#{longitude1}..#{longitude2}"
-        end
-        
         # url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
         urla = ["#{SEARCH_URL}/search?api_key=#{@api_key}"]
         urla << "num=#{@num_results}" if @num_results
         urla << "page=#{@page}" if @page
-        urla << "l=#{loc_str}" unless loc_str.nil? or loc_str.empty?
+        urla << "l=#{loc_str}" unless loc_str.empty?
         urla << "f=#{@facet}" if @facet 
         urla << "v=#{@view}" if @view
         urla << "r=#{@radius}" if @radius
@@ -222,14 +185,14 @@ module Active
         return urla.join("&")
       end
       
-      # TODO the seach method should not raise an error.
       def search
         searchurl         = URI.parse(end_point)
         req               = Net::HTTP::Get.new(searchurl.path)
         http              = Net::HTTP.new(searchurl.host, searchurl.port)
         http.read_timeout = DEFAULT_TIMEOUT
         
-        puts "Active Search [GET] #{"#{searchurl.path}?#{searchurl.query}"}"
+        puts "#{searchurl.path}?#{searchurl.query}"
+        
         res = http.start { |http|
           http.get("#{searchurl.path}?#{searchurl.query}")
         }
@@ -241,13 +204,7 @@ module Active
             @pageSize        = parsed_json["pageSize"]
             @searchTime      = parsed_json["searchTime"]
             @numberOfResults = parsed_json["numberOfResults"]
-            @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
-
-            begin
-              Active.CACHE.set( Digest::MD5.hexdigest(end_point), self) if Active.CACHE
-            rescue Exception => e              
-            end
-
+            @results         = parsed_json['_results'].collect { |a| GSA.new(a) }  
           rescue JSON::ParserError => e
             raise RuntimeError, "JSON::ParserError json=#{res.body}"
             @endIndex        = 0
@@ -270,10 +227,6 @@ module Active
       # Search.new({:keywords => "Dog,Cat,Cow"})
       # Search.new({:keywords => %w(Dog Cat Cow)})
       # Search.new({:keywords => ["Dog","Cat","Cow"]})
-      #
-      # = Channels and MediaType =
-      # Search.new({:channels => [:running], :split_media_type => ["5k"]})
-      # for a list of channels and splitMediaTypes please see http://developer.active.com/docs/Activecom_Search_API_Reference
       #
       # = Location =
       # The location will be set in this order and will override other values.  For example is you set a zip code and a location only the zip will be used. 
@@ -298,36 +251,10 @@ module Active
       # http://developer.active.com/docs/Activecom_Search_API_Reference
       # returns an array of results and query info
       def self.search(data=nil)
-        search      = Search.new(data)
-        search_hash = Digest::MD5.hexdigest(search.end_point)
-        puts "search_hash #{search_hash}"
-        cache = Search.return_cached(search_hash)
-        if cache != nil
-          return cache
-        else
-          search.search
-          return search  
-        end
+        search = Search.new(data)
+        search.search
+        return search
       end
-
-      def self.return_cached key
-        if Active.CACHE
-          begin
-            cached_version = Active.CACHE.get(key)
-          rescue Exception => e
-            return nil
-          end
-          
-          
-          
-          if cached_version
-            puts "Active Search [CACHE] #{key}"
-            return cached_version 
-          end
-        end
-        nil
-      end
-
       
       def []
         @results
@@ -340,6 +267,7 @@ module Active
           str.gsub!(/\-/,"%252D")
           str
         end
+      
     end
     
     # TODO move to a reflection service
