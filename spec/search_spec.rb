@@ -67,6 +67,9 @@ describe Search do
       s = Search.new()
       s.should have(0).channels
       s = Search.new({:channels => "running,swimming,yoga"})
+      puts s.end_point
+      s.end_point.include?("m=meta:channel=Running+OR+meta:channel=Swimming+OR+meta:channel=Mind%2520%2526%2520Body%255CYoga").should be_true
+      
       s.should have(3).channels
       s = Search.new({:channels => %w(running swimming yoga)})
       s.should have(3).channels
@@ -127,6 +130,17 @@ describe Search do
       uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true
     end
 
+    it "should send valid channel info and a bounding_box" do
+      s = Search.new({:bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"}, :channels => [:running,:triathlon] })
+      s.bounding_box.should_not be_nil
+      # uri = URI.parse( Search.new({:channels => [:running,:triathlon], :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"} }).end_point )
+      uri = URI.parse( s.end_point )
+      puts "????????????????????? "
+      puts uri
+      uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true
+      uri.query.include?("meta:latitudeShifted:127.695141..127.695141+AND+meta:longitudeShifted:56.986343..56.986343").should be_true
+    end
+
     it "should send the correct channel value for everything in Search.CHANNELS" do
       Categories.CHANNELS.each do |key,value|
         uri   = URI.parse( Search.new({:channels => [key]}).end_point )
@@ -145,6 +159,20 @@ describe Search do
       uri.query.should have_param("meta:splitMediaType=5k")
       # SHOULD NOT SEE "++"
       pending
+    end
+    
+    it "should pass the assetTypeId" do
+      local_asset_type_id = "EC6E96A5-6900-4A0E-8B83-9AA935F45A73"
+      encoded = "EC6E96A5%252D6900%252D4A0E%252D8B83%252D9AA935F45A73"
+      uri   = URI.parse( Search.new({:asset_type_id => local_asset_type_id}).end_point )
+      uri.query.should have_param("meta:assetTypeId=#{encoded}")
+    end
+    
+    it "should pass a url" do
+      url = "www.active.com/running/pleasant-hill-ca/dont-wine-just-run-5k-fun-runwalk-east-bay-edition-2011"
+      encoded = "site:www.active.com%2Frunning%2Flong-branch-nj%2Fnew-jersey-marathon-and-long-branch-half-marathon-2011"
+      uri   = URI.parse( Search.new({:url => url}).end_point )
+      uri.query.should have_param(encoded)
     end
 
     it "should send a valid start and end date" do
@@ -210,6 +238,7 @@ describe Search do
       Search.search({:dma=>"San Francisco - Oakland - San Jose", :num_results => 2}).should have(2).results        
     end
   end
+  
   describe "Handle http server codes" do 
     after(:each) do 
       FakeWeb.clean_registry

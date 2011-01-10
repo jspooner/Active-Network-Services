@@ -30,6 +30,7 @@ module Active
 
     class Search
       attr_accessor :api_key, :start_date, :end_date, :location, :channels, :split_media_type, :keywords, :search, :radius, :limit, :sort, :page, :offset, :latitude, :longitude,
+                    :asset_type_id, :url,
                     :view, :facet, :sort, :num_results, :asset_ids, :dma, :city, :state, :country, :bounding_box
                     
       attr_reader :results, :endIndex, :pageSize, :searchTime, :numberOfResults, :end_point, :meta
@@ -38,32 +39,34 @@ module Active
       DEFAULT_TIMEOUT = 60
       
       def initialize(data={})
-        self.api_key     = data[:api_key] || ""
-        self.location    = data[:location]
-        self.zips        = data[:zips] || []
-        self.channels    = data[:channels] || []
-        self.split_media_type= data[:split_media_type] || []
-        self.keywords    = data[:keywords] || []
-        self.radius      = data[:radius] || nil
-        self.limit       = data[:limit] || "10"
-        self.sort        = data[:sort] || Sort.DATE_ASC
-        self.page        = data[:page] || "1"
-        self.offset      = data[:offset] || "0"
-        self.view        = data[:view] || "json"
-        self.facet       = data[:facet] || Facet.ACTIVITIES       
-        self.num_results = data[:num_results] || "10"
-        self.search      = data[:search] || ""
-        self.start_date  = data[:start_date] || "today"
-        self.end_date    = data[:end_date] || "+"        
-        self.asset_ids   = data[:asset_ids] || []
-        self.asset_id    = data[:asset_id] || ""
-        self.latitude    = data[:latitude]
-        self.longitude   = data[:longitude]
-        self.dma         = data[:dma]
-        self.city        = data[:city]
-        self.state       = data[:state]
-        self.country     = data[:country]
-        self.bounding_box = data[:bounding_box]
+        self.asset_type_id    = data[:asset_type_id]
+        self.url              = data[:url]
+        self.api_key          = data[:api_key] || ""
+        self.location         = data[:location]
+        self.zips             = data[:zips] || []
+        self.channels         = data[:channels] || []
+        self.split_media_type = data[:split_media_type] || []
+        self.keywords         = data[:keywords] || []
+        self.radius           = data[:radius] || nil
+        self.limit            = data[:limit] || "10"
+        self.sort             = data[:sort] || Sort.DATE_ASC
+        self.page             = data[:page] || "1"
+        self.offset           = data[:offset] || "0"
+        self.view             = data[:view] || "json"
+        self.facet            = data[:facet] || Facet.ACTIVITIES       
+        self.num_results      = data[:num_results] || "10"
+        self.search           = data[:search] || ""
+        self.start_date       = data[:start_date] || "today"
+        self.end_date         = data[:end_date] || "+"        
+        self.asset_ids        = data[:asset_ids] || []
+        self.asset_id         = data[:asset_id] || ""
+        self.latitude         = data[:latitude]
+        self.longitude        = data[:longitude]
+        self.dma              = data[:dma]
+        self.city             = data[:city]
+        self.state            = data[:state]
+        self.country          = data[:country]
+        self.bounding_box     = data[:bounding_box]
       end
       
       # Example
@@ -128,14 +131,33 @@ module Active
         # CHANNELS
         channel_keys = []
         @channels.each do |c|
-          c.to_sym
+          c = c.to_sym
           if Categories.CHANNELS.include?(c)
             channel_keys << Categories.CHANNELS[c]
+          else
+            puts "///////////  Channel key not found [#{c}]"
           end
         end
-        meta_data = channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }.join("+OR+")
+        meta_data += channel_keys.collect { |channel| "meta:channel=#{Search.double_encode_channel(channel)}" }.join("+OR+")
         # SPLIT MEDIA TYPE
-        meta_data += split_media_type.collect { |type| "+meta:splitMediaType=#{Search.double_encode_channel(type)}" }.join("+OR+") unless split_media_type.nil?
+        if split_media_type
+          meta_data += "+AND+" unless meta_data == ""
+          meta_data += split_media_type.collect { |type| "meta:splitMediaType=#{Search.double_encode_channel(type)}" }.join("+OR+")           
+        end
+        # ASSET TYPE ID
+        if asset_type_id
+          meta_data += "+AND+" unless meta_data == ""
+          meta_data += "meta:assetTypeId=#{Search.double_encode_channel(asset_type_id)}" 
+        end
+        # url
+        if url
+          meta_data += "+AND+" unless meta_data == ""
+          # url.gsub!(/\-/,"%252D")
+          url.gsub!(/\//,"%2F")
+          # URI.escape(url, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+          meta_data += "site:#{url}"
+          # meta_data += "site:#{Search.double_encode_channel(url)}"
+        end
         # ASSET IDS
         unless asset_ids.empty?
           meta_data += "+AND+" unless meta_data == ""
@@ -154,42 +176,28 @@ module Active
         if @city or @state or @country
           if @city
             meta_data += "+AND+" unless meta_data == ""
-            meta_data += "meta:city=#{Search.double_encode_channel(@city)}" 
+            meta_data += "meta:city=#{Search.double_encode_channel(@city)}"
           end
           if @state
             meta_data += "+AND+" unless meta_data == ""
-            meta_data += "meta:state=#{Search.double_encode_channel(@state)}"             
+            meta_data += "meta:state=#{Search.double_encode_channel(@state)}"         
           end
         elsif !@zips.empty?
-        # if not @zips.empty?
           loc_str = @zips.join(",")          
         elsif @latitude and @longitude
           loc_str = "#{@latitude};#{@longitude}"
         elsif @dma
-          
           meta_data += "+AND+" unless meta_data == ""
           meta_data += "meta:dma=#{Search.double_encode_channel(@dma)}"
         else
           loc_str = @location
         end
         
-        
-        # AND DATE
-        meta_data += "+AND+" unless meta_data == ""
-        if @start_date.class == Date
-          @start_date = URI.escape(@start_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
-        end
-        if @end_date.class == Date
-          @end_date = URI.escape(@end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
-        end
-        meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
-        
         # BOUNDING BOX
-        if @bounding_box!=nil
+        unless @bounding_box.nil?
           #The values in the GSA metadata are shifted to  prevent negative values.  This was done b/c lat/long
           # are searched as a number range and the GSA doesn't allow negative values in number ranges.  
           # We shift latitude values by 90 and longitude values by 180.
-          
           if @bounding_box[:sw].class==String
             #String :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.832371,-122.356979"}
             latitude1 = @bounding_box[:sw].split(",").first.to_f+90
@@ -205,8 +213,18 @@ module Active
           end
           meta_data += "+AND+" unless meta_data == ""
           meta_data += "meta:latitudeShifted:#{latitude1}..#{latitude2}+AND+meta:longitudeShifted:#{longitude1}..#{longitude2}"
-        end
+        end        
         
+        # AND DATE
+        if @start_date.class == Date
+          @start_date = URI.escape(@start_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
+        end
+        if @end_date.class == Date
+          @end_date = URI.escape(@end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
+        end
+        meta_data += "+AND+" unless meta_data == ""
+        meta_data += "meta:startDate:daterange:#{@start_date}..#{@end_date}"
+                
         # url = "#{SEARCH_URL}/search?api_key=#{@api_key}&num=#{@num_results}&page=#{@page}&l=#{loc_str}&f=#{@facet}&v=#{@view}&r=#{@radius}&s=#{@sort}&k=#{@keywords.join("+")}&m=#{meta_data}"
         urla = ["#{SEARCH_URL}/search?api_key=#{@api_key}"]
         urla << "num=#{@num_results}" if @num_results
