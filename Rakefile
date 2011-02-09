@@ -18,7 +18,7 @@ Bones {
   Welcome to Active Network
   --------------------------
   MSG
-  depend_on  'savon'
+  depend_on  'savon', '0.7.9'
   depend_on  'dalli', '0.9.8'
 }
 

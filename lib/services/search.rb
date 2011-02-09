@@ -258,7 +258,8 @@ module Active
             @endIndex        = parsed_json["endIndex"]
             @pageSize        = parsed_json["pageSize"]
             @searchTime      = parsed_json["searchTime"]
-            @numberOfResults = parsed_json["numberOfResults"]
+            # GSA will only return 1000 events but will give us a number larger then 1000.
+            @numberOfResults = (parsed_json["numberOfResults"] <= 1000) ? parsed_json["numberOfResults"] : 1000
             @results         = parsed_json['_results'].collect { |a| Activity.new(GSA.new(a)) }  
 
             begin

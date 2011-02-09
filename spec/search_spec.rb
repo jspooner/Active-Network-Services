@@ -135,7 +135,7 @@ describe Search do
       s.bounding_box.should_not be_nil
       # uri = URI.parse( Search.new({:channels => [:running,:triathlon], :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"} }).end_point )
       uri = URI.parse( s.end_point )
-      puts "????????????????????? "
+      puts "?????????????????????"
       puts uri
       uri.query.include?("meta:channel=Running+OR+meta:channel=Triathlon").should be_true
       uri.query.include?("meta:latitudeShifted:127.695141..127.695141+AND+meta:longitudeShifted:56.986343..56.986343").should be_true

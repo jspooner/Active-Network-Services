@@ -6,6 +6,8 @@ module Active
     class GSA < IActivity
       require 'nokogiri'
       require 'open-uri'
+      # require 'active_support/core_ext/hash/'
+
       attr_accessor :asset_type_id
 
       # EXAMPLE Data hash
@@ -76,7 +78,11 @@ module Active
             end
           end
         end
-        return categories.first
+        if categories.nil?# && categories.empty?
+          return "unknown"
+        else
+          return categories.first
+        end
       end
 
       def address

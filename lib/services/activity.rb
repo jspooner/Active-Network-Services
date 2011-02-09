@@ -9,6 +9,7 @@ module Active
       REG_CENTER_ASSET_TYPE_ID   = "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
       REG_CENTER_ASSET_TYPE_ID2  = "3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6"
       ACTIVE_WORKS_ASSET_TYPE_ID = "DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
+      LOCAL_ASSET_TYPE_ID        = "EC6E96A5-6900-4A0E-8B83-9AA935F45A73"
 
       attr_accessor :primary, :gsa, :ats
       attr_reader :datasources_loaded
@@ -47,6 +48,8 @@ module Active
           return "RegCenter id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
         elsif @gsa.asset_type_id == ACTIVE_WORKS_ASSET_TYPE_ID
           return "ActiveWorks id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
+        elsif @gsa.asset_type_id == LOCAL_ASSET_TYPE_ID
+          return "Local id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
         else
           return "Undefined id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"
         end 
