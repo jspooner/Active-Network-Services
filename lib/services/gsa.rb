@@ -46,16 +46,17 @@ module Active
       # end
 
       def categories
+        arr = []
         if @data["meta"]["channel"].class==String
           if @data["meta"]["channel"].index(",")
-            return @data["meta"]["channel"].split(",")
+            arr << @data["meta"]["channel"].split(",")
           else
-            return [@data["meta"]["channel"]]
+            arr << [@data["meta"]["channel"]]
           end
         else
-          return @data["meta"]["channel"]
-        end
-        []
+          arr << @data["meta"]["channel"]
+        end  
+        arr
       end
 
       def asset_id
