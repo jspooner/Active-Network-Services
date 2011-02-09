@@ -48,13 +48,14 @@ module Active
       def categories
         if @data["meta"]["channel"].class==String
           if @data["meta"]["channel"].index(",")
-            @data["meta"]["channel"].split(",")
+            return @data["meta"]["channel"].split(",")
           else
-            [@data["meta"]["channel"]]
+            return [@data["meta"]["channel"]]
           end
         else
-          @data["meta"]["channel"]
+          return @data["meta"]["channel"]
         end
+        []
       end
 
       def asset_id
