@@ -51,12 +51,12 @@ module Active
           if @data["meta"]["channel"].index(",")
             arr << @data["meta"]["channel"].split(",")
           else
-            arr << [@data["meta"]["channel"]]
+            arr << @data["meta"]["channel"]
           end
         else
           arr << @data["meta"]["channel"]
         end  
-        arr
+        arr.flatten!
       end
 
       def asset_id
@@ -74,10 +74,12 @@ module Active
         # do we have it in the seo url?
         if @data["meta"].has_key?("seourl")
           seo_channel = @data["meta"]["seourl"].split("/")
-          if seo_channel.length >2
+          if seo_channel.length > 2 and categories
             categories.each do |cat|
               return cat if cat.downcase==seo_channel[3].downcase
             end
+          else
+            return "unknown"
           end
         end
         if categories.nil?# && categories.empty?
