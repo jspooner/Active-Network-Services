@@ -6,11 +6,28 @@ module Active
     class ActivityFindError < StandardError; end
 
     class Activity < IActivity
+      
+      # EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65  reg
+      # 3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6  reg2
+      # FB27C928-54DB-4ECD-B42F-482FC3C8681F  ActiveNet US or Canada
+      # 732A256E-2A25-4A02-81B3-769615CAA7A4  Active Net US or Canada
+      # EC6E96A5-6900-4A0E-8B83-9AA935F45A73  Local
+      # DFAA997A-D591-44CA-9FB7-BF4A4C8984F1  ActiveWorks
+      
+      # ecffc8b6-51ed-43af-82d3-540e607e5af5  Search Assets (This is a generic page (currently hosts Class Assets, Tournaments, and Swim Schools).  This data comes from ATS.)
+      # 71D917DE-FA90-448A-90DA-C8852F7E03E2  tennislink.usta.com Tournaments (Tennis Tournaments, don’t know much about this one.)
+      # 2b22b4e6-5aa4-44d7-bf06-f7a71f9fa8a6  AW Camps  (These are Foundations Camps pages.  They have a SOAP service.)
+      # 2ba50aba-080e-4e3d-a01c-1b4f56648a2e  Asset Quality DB - Thriva (These are Thriva Camps.  This data come from ATS.)
+      
       REG_CENTER_ASSET_TYPE_ID   = "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
       REG_CENTER_ASSET_TYPE_ID2  = "3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6"
       ACTIVE_WORKS_ASSET_TYPE_ID = "DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
       LOCAL_ASSET_TYPE_ID        = "EC6E96A5-6900-4A0E-8B83-9AA935F45A73"
-
+      THRIVA                     = "2ba50aba-080e-4e3d-a01c-1b4f56648a2e"
+      AW_CAMPS                   = "2b22b4e6-5aa4-44d7-bf06-f7a71f9fa8a6"
+      TENNIS_TOURNAMENTS         = "71D917DE-FA90-448A-90DA-C8852F7E03E2"
+      GENERIC_SEARCH             = "ecffc8b6-51ed-43af-82d3-540e607e5af5"
+      
       attr_accessor :primary, :gsa, :ats
       attr_reader :datasources_loaded
 
@@ -42,7 +59,7 @@ module Active
       def source
         :active
       end
-      
+      # todo remove
       def origin
         if @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID || @gsa.asset_type_id == REG_CENTER_ASSET_TYPE_ID2
           return "RegCenter id= #{@gsa.asset_id} type= #{@gsa.asset_type_id}"

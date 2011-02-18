@@ -14,8 +14,7 @@ module Active
         # need to hold on to original data
         @data = HashWithIndifferentAccess.new(data) || HashWithIndifferentAccess.new
         @api_data_loaded = false
-        @asset_type_id = "DFAA997A-D591-44CA-9FB7-BF4A4C8984F1"
-        get_app_api
+        @asset_type_id = Activity::ACTIVE_WORKS_ASSET_TYPE_ID
       end
 
       def source
@@ -93,28 +92,31 @@ module Active
         User.new
       end
 
-
       def category
         primary_category
       end
 
       def desc
         if @data.has_key?("eventDetailDto") && @data["eventDetailDto"].has_key?("description")
-#          @data["eventDetailDto"]["description"].gsub('\"','"')
-          sanitize @data["eventDetailDto"]["description"]
+          sanitize( @data["eventDetailDto"]["description"] )
         end
       end
       
-
-      # EXAMPLE
-      # lazy load the data for some_crazy_method
-      # def some_crazy
-      #   return @some_crazy unless @some_crazy.nil?
-      #   @some_crazy = @data[:some_crazy_method_from_ats].split replace twist bla bla bla
-      # end
-
-      def self.find_by_id(id) #local id
-          return ActiveWorks.new({:id=>id})
+      def registration_url
+        if @data.has_key?("eventDetailDto") && @data["eventDetailDto"].has_key?("registrationUrl")
+          @data["eventDetailDto"]["registrationUrl"]
+        end
+      end
+      
+      # Finds an active works event by substitution url or returns nil
+      def self.find_by_id(id)
+        begin
+          doc              = Nokogiri::XML(open("http://apij.active.com/activeworks/event/#{id}"))
+          ActiveWorks.new( Hash.from_xml(doc.to_s) )
+        rescue
+          # raise ActiveWorksError, "Couldn't find ActiveWorks activity with the id of #{id}"
+          return nil
+        end
       end
 
       private
@@ -148,17 +150,17 @@ module Active
       #   @metadata_loaded=true
       # end
       
-      def get_app_api
-#        puts "loading active works api"
-        begin
-          doc = Nokogiri::XML(open("http://apij.active.com/activeworks/event/#{@data[:id]}"))
-          @data.merge! Hash.from_xml doc.to_s
-          @api_data_loaded=true
-        rescue
-          raise ActiveWorksError, "Couldn't find ActiveWorks activity with the id of #{id}"
-          return
-        end
-      end
+#       def get_app_api
+# #        puts "loading active works api"
+#         begin
+#           doc = Nokogiri::XML(open("http://apij.active.com/activeworks/event/#{@data[:id]}"))
+#           @data.merge! Hash.from_xml doc.to_s
+#           @api_data_loaded=true
+#         rescue
+#           raise ActiveWorksError, "Couldn't find ActiveWorks activity with the id of #{id}"
+#           return
+#         end
+#       end
 
     end # end ats
   end
