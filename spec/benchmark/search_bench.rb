@@ -50,6 +50,6 @@ local_asset_type_id = "EC6E96A5-6900-4A0E-8B83-9AA935F45A73"
 # puts r.map(&:url)
 
 
-s = Search.search({:dma=>"San Francisco - Oakland - San Jose", :num_results => 5})
+s = Search.search({:bounding_box=>{:sw=>"36.893089,-123.533684", :ne=>"38.8643,-121.208199"}, :facet=>"", :end_date=>"+", :page=>1, :num_results=>10, :sort=>"date_asc", :start_date=>"today", :split_media_type=>nil})
 puts s.numberOfResults
 # puts r.map(&:url)

@@ -1,33 +1,12 @@
 Active
-    by Jonathan Spooner and Brian Levine
+    by Jonathan Spooner and Marc Leglise
     http://developer.active.com/docs/Activecom_Search_API_Reference
 
 == DESCRIPTION:
 
 Search api for Active Network
 
-== FEATURES/PROBLEMS:
 
-* Seach API
-
-== SYNOPSIS:
-
-	Search.search( {:location => "San Diego, CA, US"} )
-
-	List all categories
-	Active::Services::Search.CHANNELS.each do |key, value| 
-		puts key.to_s.humanize
-	end 
-	
-	
-
-== REQUIREMENTS:
-
-* none
-
-== INSTALL:
-
-* sudo gem install Active
 
 == LICENSE:
 
