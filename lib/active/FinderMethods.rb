@@ -4,7 +4,7 @@ module Active::FinderMethods
   module ClassMethods
     def find(asset_ids=nil)
       raise Active::RecordNotFound, "Couldn't find Asset without an ID" if asset_ids.nil?
-      finder = self.new
+      finder = Active::Query.new
       ids = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
       meta_data = []
       ids.each do |id|

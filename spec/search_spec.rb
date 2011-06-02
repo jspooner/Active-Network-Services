@@ -4,34 +4,23 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 
 describe "Search" do
   describe "Asset" do
-  
-    # before(:each) do
-    #   @asset = Active::Asset.new
-    # end
-  
-    it "should have a facet accessor" do
-      Active::Asset.new.facet.should be_nil
-      asset = Active::Asset.new
-      asset.facet = "foo"
-      asset.facet.should eql("foo")
-    end
     
     describe "Instance Methods - Query Builder" do
     
       it "should build a query" do
-        asset = Active::Asset.new
+        asset = Active::Query.new
         asset.to_query.should have_param("http://search.active.com/search?")
       end
       
       it "should have a facet in the query" do
-        asset = Active::Asset.new
+        asset = Active::Query.new
         asset.facet = "activities"
         asset.to_query.should have_param("f=activities")
       end
       
       it "should specify sort and return itself" do
         asset = Active::Asset.sort(:date_desc)
-        asset.should be_an_instance_of(Active::Asset)
+        asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("s=date_desc")
         asset.sort(:relevance).should === asset
         asset.to_query.should have_param("s=relevance")
@@ -39,7 +28,7 @@ describe "Search" do
       
       it "should specify order and return itself" do
         asset = Active::Asset.order(:date_asc)
-        asset.should be_an_instance_of(Active::Asset)
+        asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("s=date_asc")
         asset.order(:relevance).should === asset
         asset.to_query.should have_param("s=relevance")
@@ -47,7 +36,7 @@ describe "Search" do
 
       it "should specify limit and return itself" do
         asset = Active::Asset.limit(5)
-        asset.should be_an_instance_of(Active::Asset)
+        asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("num=5")
         asset.limit(16).should === asset
         asset.to_query.should have_param("num=16")
@@ -58,7 +47,7 @@ describe "Search" do
       
       it "should specify a per_page and return itself" do
         asset = Active::Asset.per_page(3)
-        asset.should be_an_instance_of(Active::Asset)
+        asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("num=3")
       end
       
@@ -69,7 +58,7 @@ describe "Search" do
       
       it "should specify page and return itself" do
         asset = Active::Asset.page()
-        asset.should be_an_instance_of(Active::Asset)
+        asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("page=1")
         asset.page(5).should === asset
         asset.to_query.should have_param("page=5")
@@ -90,7 +79,6 @@ describe "Search" do
       end
 
       it "should find record: Dean Karnazes Silicon Valley Marathon" do
-        # pending "Need to load the real object"
         result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
         result.should be_an_instance_of(Active::Asset)
       end

@@ -24,7 +24,7 @@ include Active::Services
 # puts " "
 # puts arr
 
-# puts Search.search(:asset_ids => ["DD8F427F-6188-465B-8C26-71BBA22D2DB7"]).results.inspect
+puts Search.search(:asset_ids => ["DD8F427F-6188-465B-8C26-71BBA22D2DB7"]).results.inspect
 
 REG_CENTER_ASSET_TYPE_ID   = "EA4E860A-9DCD-4DAA-A7CA-4A77AD194F65"
 REG_CENTER_ASSET_TYPE_ID2  = "3BF82BBE-CF88-4E8C-A56F-78F5CE87E4C6"
@@ -50,6 +50,6 @@ local_asset_type_id = "EC6E96A5-6900-4A0E-8B83-9AA935F45A73"
 # puts r.map(&:url)
 
 
-s = Search.search({:bounding_box=>{:sw=>"36.893089,-123.533684", :ne=>"38.8643,-121.208199"}, :facet=>"", :end_date=>"+", :page=>1, :num_results=>10, :sort=>"date_asc", :start_date=>"today", :split_media_type=>nil})
-puts s.numberOfResults
+# s = Search.search({:bounding_box=>{:sw=>"36.893089,-123.533684", :ne=>"38.8643,-121.208199"}, :facet=>"", :end_date=>"+", :page=>1, :num_results=>10, :sort=>"date_asc", :start_date=>"today", :split_media_type=>nil})
+# puts s.numberOfResults
 # puts r.map(&:url)
