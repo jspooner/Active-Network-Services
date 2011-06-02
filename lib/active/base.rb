@@ -17,7 +17,9 @@ module Active
     end
 
     def page(value)
-      @options[:page] = value || 1
+      v = value || 1
+      raise Active::InvalidOption if v <= 0
+      @options[:page] = v
       self
     end
 
@@ -35,7 +37,8 @@ module Active
     def sort(value)
       @options[:s] = value
       self
-    end    
+    end
+    alias order sort
 
     
     # We have several different types of data in the Search index.  To restrict a search to a particular type, use the facet parameter.  The available values are:
@@ -55,7 +58,7 @@ module Active
     end
           
     class << self
-      [:sort, :limit, :per_page, :page].each do |method_name|
+      [:sort, :order, :limit, :per_page, :page].each do |method_name|
         define_method(method_name) do |val|
           self.new.send(method_name, val)
         end

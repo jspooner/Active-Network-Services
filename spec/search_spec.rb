@@ -44,11 +44,19 @@ describe "Search" do
         base.to_query.should have_param("f=activities")
       end
       
-      it "should specify sort order and return itself" do
+      it "should specify sort and return itself" do
         base = Active::Base.sort(:date_desc)
         base.should be_an_instance_of(Active::Base)
         base.to_query.should have_param("s=date_desc")
         base.sort(:relevance).should === base
+        base.to_query.should have_param("s=relevance")
+      end
+      
+      it "should specify order and return itself" do
+        base = Active::Base.order(:date_asc)
+        base.should be_an_instance_of(Active::Base)
+        base.to_query.should have_param("s=date_asc")
+        base.order(:relevance).should === base
         base.to_query.should have_param("s=relevance")
       end
 
@@ -70,9 +78,8 @@ describe "Search" do
       end
       
       it "should raise an invalid option error" do
-        pending "rails and Invalid Param or option error"
-        # Active::Base.page(0)
-        # Active::Base.page(-1)
+        lambda { Active::Base.page(0) }.should raise_error(Active::InvalidOption)
+        lambda { Active::Base.page(-1) }.should raise_error(Active::InvalidOption)
       end
       
       it "should specify page and return itself" do
