@@ -21,22 +21,6 @@ describe "Search" do
         base = Active::Base.new
         base.to_query.should have_param("http://search.active.com/search?")
       end
-    
-      it "should raise error if no id is specified" do
-        lambda { Active::Base.find() }.should raise_error(Active::RecordNotFound)
-      end
-
-      it "should find record 666" do
-        pending "Need to load the real object"
-        result = Active::Base.find("666")
-        result.should be_an_instance_of(Object)
-      end
-
-      it "should have two asset_id's in the query" do
-        pending "Need to load the real object"        
-        results = Active::Base.find(["123456", "666"])
-        results.should be_an_instance_of(Array) 
-      end
       
       it "should have a facet in the query" do
         base = Active::Base.new
@@ -99,6 +83,22 @@ describe "Search" do
       
     end
     
-    
+    describe "Static Find Methods" do
+      it "should raise error if no id is specified" do
+        lambda { Active::Base.find() }.should raise_error(Active::RecordNotFound)
+      end
+
+      it "should find record: Dean Karnazes Silicon Valley Marathon" do
+        # pending "Need to load the real object"
+        result = Active::Base.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
+        result.should be_an_instance_of(Object)
+      end
+
+      it "should have two asset_id's in the query" do
+        pending "Need to load the real object"
+        results = Active::Base.find(["123456", "666"])
+        results.should be_an_instance_of(Array)
+      end
+    end
   end
 end
