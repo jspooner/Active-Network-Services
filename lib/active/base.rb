@@ -16,30 +16,26 @@ module Active
       Object.new
     end
 
-    def self.page(value=1)
-      self.new.page(value)
-    end
+    # def self.page(value=1)
+    #   self.new.page(value)
+    # end
     def page(value)
-      @options[:page] = value
+      @options[:page] = value || 1
       self
     end
 
-    def self.limit(value)
-      self.new.limit(value)
-    end
+    # def self.limit(value)
+    #   self.new.limit(value)
+    # end
     def limit(value)
       @options[:num] = value
       self
     end    
-
     alias per_page limit
-    class << self
-      alias per_page limit
-    end
     
-    def self.sort(value)
-      self.new.sort(value)
-    end
+    # def self.sort(value)
+    #  self.new.sort(value)
+    # end
     
     # s = sort
     # The default sort for results is by relevance.  The available values are:
@@ -50,6 +46,7 @@ module Active
       @options[:s] = value
       self
     end    
+
     
     # We have several different types of data in the Search index.  To restrict a search to a particular type, use the facet parameter.  The available values are:
     #     activities - things like running events or camps
@@ -66,8 +63,14 @@ module Active
     def to_query
       "http://search.active.com/search?" + URI.escape(@options.collect{|k,v| "#{k}=#{v}"}.join('&'))
     end
-    
-    
+          
+    class << self
+      [:sort, :limit, :per_page, :page].each do |method_name|
+        define_method(method_name) do |val|
+          self.new.send(method_name, val)
+        end
+      end
+    end
     
   end
 end
