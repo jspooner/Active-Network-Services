@@ -62,19 +62,8 @@ module Active
     Dir.glob(search_me).sort.each {|rb| require rb}
   end
   
-  # Active.memcache_host = "localhost:11211"
-  def self.memcache_host(url)
-    require 'dalli'
-    @CACHE = Dalli::Client.new(url)
-  end
-    
-  def self.CACHE
-    @CACHE
-  end
-
-  
 end  # module Active
 
 Active.require_all_libs_relative_to(__FILE__)
 Active.require_all_libs_relative_to(__FILE__, 'services')
-require 'savon'
+Active.require_all_libs_relative_to(__FILE__, 'active')
