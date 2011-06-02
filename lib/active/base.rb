@@ -16,27 +16,17 @@ module Active
       Object.new
     end
 
-    # def self.page(value=1)
-    #   self.new.page(value)
-    # end
     def page(value)
       @options[:page] = value || 1
       self
     end
 
-    # def self.limit(value)
-    #   self.new.limit(value)
-    # end
     def limit(value)
       @options[:num] = value
       self
     end    
     alias per_page limit
-    
-    # def self.sort(value)
-    #  self.new.sort(value)
-    # end
-    
+        
     # s = sort
     # The default sort for results is by relevance.  The available values are:
     #     date_asc
