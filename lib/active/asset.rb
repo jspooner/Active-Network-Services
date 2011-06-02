@@ -3,7 +3,7 @@ require 'json'
 
 module Active
   
-  class Base
+  class Asset
     
     attr_accessor :options
     
