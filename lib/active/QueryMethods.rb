@@ -66,7 +66,7 @@ module Active::QueryMethods
     end
     
     if (200..307).include?(res.code.to_i)
-      puts JSON.pretty_generate(JSON.parse(res.body))
+      return res.body
     else
       raise Active::ActiveError, "Active Search responded to your query with code: #{res.code}"
     end

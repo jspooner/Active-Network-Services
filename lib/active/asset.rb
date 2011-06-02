@@ -8,9 +8,9 @@ module Active
     include Active::FinderMethods
     extend Active::FinderMethods::ClassMethods
     
-    attr_accessor :options
+    attr_accessor :options, :data
     
-    def initialize(options={})
+    def initialize(data={}, options={})
       @options = {
         :s => "relevance",
         :v => "json"

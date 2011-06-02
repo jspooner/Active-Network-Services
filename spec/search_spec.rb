@@ -11,7 +11,8 @@ describe "Search" do
   
     it "should have a facet accessor" do
       Active::Asset.new.facet.should be_nil
-      asset = Active::Asset.new(:facet => "foo")
+      asset = Active::Asset.new
+      asset.facet = "foo"
       asset.facet.should eql("foo")
     end
     
@@ -91,12 +92,11 @@ describe "Search" do
       it "should find record: Dean Karnazes Silicon Valley Marathon" do
         # pending "Need to load the real object"
         result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
-        result.should be_an_instance_of(Object)
+        result.should be_an_instance_of(Active::Asset)
       end
 
       it "should have two asset_id's in the query" do
-        pending "Need to load the real object"
-        results = Active::Asset.find(["123456", "666"])
+        results = Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "2C384907-D683-4E83-BD97-63A46F38437A"])
         results.should be_an_instance_of(Array)
       end
     end

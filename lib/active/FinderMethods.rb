@@ -1,3 +1,5 @@
+require 'json'
+
 module Active::FinderMethods
   module ClassMethods
     def find(asset_ids=nil)
@@ -10,8 +12,10 @@ module Active::FinderMethods
       end
       
       finder.options[:m] = meta_data.join('+OR+')
-      finder.search
-      Object.new
+      
+      a = self.new
+      a.data = JSON.parse(finder.search)
+      a
     end
   end
 end
