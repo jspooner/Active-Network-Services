@@ -1,0 +1,17 @@
+module Active::FinderMethods
+  module ClassMethods
+    def find(asset_ids=nil)
+      raise Active::RecordNotFound, "Couldn't find Asset without an ID" if asset_ids.nil?
+      finder = self.new
+      ids = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
+      meta_data = []
+      ids.each do |id|
+        meta_data << "meta:assetId=#{id.gsub("-","%2d")}"
+      end
+      
+      finder.options[:m] = meta_data.join('+OR+')
+      finder.search
+      Object.new
+    end
+  end
+end
