@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["History.txt", "README.md"]
   s.rdoc_options = ["--main", "README.md"]
   
-  s.add_dependency "json", "~> 1.4"
+  s.add_dependency "json", "~> 1"
   # s.add_dependency "savon", "= 0.7.9"
   # s.add_dependency "dalli", "= 0.9.8"
   
