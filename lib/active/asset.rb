@@ -2,7 +2,7 @@ module Active
   
   class Asset
     
-    include Active::QueryMethods
+    # include Active::QueryMethods # instance
     extend Active::QueryMethods::ClassMethods
     
     include Active::FinderMethods
