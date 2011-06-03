@@ -75,7 +75,7 @@ describe "Search" do
     
     describe "Static Find Methods" do
       it "should raise error if no id is specified" do
-        lambda { Active::Asset.find() }.should raise_error(Active::RecordNotFound, "Couldn't find Asset without an ID")
+        lambda { Active::Asset.find() }.should raise_error(Active::InvalidOption, "Couldn't find Asset without an ID")
       end
 
       it "should find record: Dean Karnazes Silicon Valley Marathon" do
