@@ -75,7 +75,7 @@ describe "Search" do
     
     describe "Static Find Methods" do
       it "should raise error if no id is specified" do
-        lambda { Active::Asset.find() }.should raise_error(Active::RecordNotFound)
+        lambda { Active::Asset.find() }.should raise_error(Active::RecordNotFound, "Couldn't find Asset without an ID")
       end
 
       it "should find record: Dean Karnazes Silicon Valley Marathon" do
@@ -86,6 +86,12 @@ describe "Search" do
       it "should have two asset_id's in the query" do
         results = Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "2C384907-D683-4E83-BD97-63A46F38437A"])
         results.should be_an_instance_of(Array)
+      end
+      
+      it "should throw an error if one or more asset_ids weren't found" do
+        lambda { Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "123"])
+        # }.should raise_error(Active::RecordNotFound)
+        }.should raise_error(Active::RecordNotFound, "Couldn't find record with asset_id: 123")
       end
     end
   end
