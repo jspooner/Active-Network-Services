@@ -1,5 +1,5 @@
 require 'json'
-require 'active_support/core_ext/array/conversions'
+#require 'active_support/core_ext/array/conversions'
 
 module Active::FinderMethods
   module ClassMethods
@@ -24,12 +24,22 @@ module Active::FinderMethods
           found_id = r['meta']['assetId'] & missing_ids
           missing_ids -= found_id
         end
-        raise Active::RecordNotFound, "Couldn't find record with asset_id: #{missing_ids.to_sentence}"
+        raise Active::RecordNotFound, "Couldn't find record with asset_id: #{missing_ids.join(',')}"
       end
       
-      a = self.new
-      a.data = res
-      a
+
+      a = []
+      res['_results'].collect do |d| 
+        t = self.new
+        t.data = res        
+        a << t
+      end
+      
+      if a.length == 1
+        return a.first
+      else
+        return a
+      end
     end
   end
 end
