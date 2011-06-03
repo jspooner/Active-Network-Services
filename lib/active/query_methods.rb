@@ -59,7 +59,6 @@ module Active::QueryMethods
     end
 
     def search
-      puts to_query
       searchurl = URI.parse(to_query)
       http = Net::HTTP.new(searchurl.host, searchurl.port)
     
