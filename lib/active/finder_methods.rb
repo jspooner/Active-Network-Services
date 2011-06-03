@@ -3,18 +3,18 @@ require 'json'
 
 module Active::FinderMethods
   module ClassMethods
+    # this code smells
     def find(asset_ids=nil)
       raise Active::InvalidOption, "Couldn't find Asset without an ID" if asset_ids.nil?
-      finder = Active::Query.new
-      ids = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
+      finder    = Active::Query.new
+      ids       = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
       meta_data = []
       ids.each do |id|
         meta_data << "meta:assetId=#{id.gsub("-","%2d")}"
       end
       
-      finder.options[:m] = meta_data.join('+OR+')
-      
-      res = JSON.parse(finder.search)
+      finder.options[:m] = meta_data.join('+OR+')      
+      res                = JSON.parse(finder.search)
       
       # Ensure we have found all of the IDs requested, otherwise raise an error
       # that includes which ID(s) are missing.
@@ -30,7 +30,7 @@ module Active::FinderMethods
 
       a = []
       res['_results'].collect do |d| 
-        t = self.new
+        t      = self.new
         t.data = res        
         a << t
       end
