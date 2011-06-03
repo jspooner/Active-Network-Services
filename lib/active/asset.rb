@@ -3,7 +3,7 @@ module Active
     
     extend Active::QueryMethods::ClassMethods
     
-    include Active::FinderMethods
+    # include Active::FinderMethods
     extend Active::FinderMethods::ClassMethods
     
     attr_accessor :data ## should be an instance of our DataKlass
