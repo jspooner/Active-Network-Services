@@ -14,5 +14,15 @@ module Active
       }
     end
     
+    def results
+      @res ||= search
+      a   = []
+      @res['_results'].collect do |d|
+        t = Active::Asset.new(d)
+        a << t
+      end
+      a
+    end
+    
   end
 end

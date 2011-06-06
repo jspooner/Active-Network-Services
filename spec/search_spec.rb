@@ -1,7 +1,4 @@
-# Require the spec helper relative to this file
 require File.join(File.dirname(__FILE__), %w[spec_helper])
-# require File.join(File.dirname(__FILE__), %w[custom_matchers_spec])
-
 describe "Search" do
   describe "Asset" do
     
@@ -105,5 +102,23 @@ describe "Search" do
       
       
     end
+  
+    describe "Results Object" do
+      
+      it "should find only 4 results" do
+        asset = Active::Asset.order(:date_asc)
+        asset.page(1)
+        asset.limit(4)
+        asset.order(:relevance)
+        asset.should have_exactly(4).results
+        asset.results.first.should be_an_instance_of(Active::Asset)
+        asset.results.first.url.should_not be_nil
+        asset.results.first.meta.eventId.should_not be_nil
+        asset.results.first.meta.eventId.should eql("1920020")
+      end
+      
+      
+    end
+  
   end
 end

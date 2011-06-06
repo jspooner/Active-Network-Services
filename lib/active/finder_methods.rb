@@ -14,7 +14,8 @@ module Active::FinderMethods
       end
       
       finder.options[:m] = meta_data.join('+OR+')      
-      res                = JSON.parse(finder.search)
+      
+      res = finder.search
       
       # Ensure we have found all of the IDs requested, otherwise raise an error
       # that includes which ID(s) are missing.

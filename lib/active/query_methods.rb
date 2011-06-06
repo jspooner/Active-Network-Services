@@ -2,6 +2,7 @@ require 'net/http'
 require 'json'
 
 module Active::QueryMethods
+  
   module ClassMethods
     [:sort, :order, :limit, :per_page, :page].each do |method_name|
       define_method(method_name) do |val|
@@ -67,7 +68,8 @@ module Active::QueryMethods
       end
     
       if (200..307).include?(res.code.to_i)
-        return res.body
+# TODO HANDLE JSON PARSE ERROR        
+        return JSON.parse(res.body)
       else
         raise Active::ActiveError, "Active Search responded to your query with code: #{res.code}"
       end
