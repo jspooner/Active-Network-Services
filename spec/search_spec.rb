@@ -93,6 +93,17 @@ describe "Search" do
         # }.should raise_error(Active::RecordNotFound)
         }.should raise_error(Active::RecordNotFound, "Couldn't find record with asset_id: 123")
       end
+      
+      describe "Result Object" do
+
+        it "should have a title via dot notation" do
+          result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
+          result.title.should eql("Dean Karnazes Silicon Valley Marathon | San Jose, California <b>...</b>")
+        end
+        
+      end
+      
+      
     end
   end
 end

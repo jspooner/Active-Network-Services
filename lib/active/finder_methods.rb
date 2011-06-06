@@ -29,9 +29,8 @@ module Active::FinderMethods
       
 
       a = []
-      res['_results'].collect do |d| 
-        t      = self.new
-        t.data = res        
+      res['_results'].collect do |d|        
+        t      = self.new(d)
         a << t
       end
       
