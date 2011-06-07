@@ -10,8 +10,7 @@ describe "Search" do
       end
       
       it "should have a facet in the query" do
-        asset = Active::Query.new
-        asset.facet = "activities"
+        asset = Active::Query.new(:facet => 'activities')
         asset.to_query.should have_param("f=activities")
       end
       

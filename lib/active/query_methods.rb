@@ -28,13 +28,6 @@ module Active::QueryMethods
       self
     end
     alias order sort
-  
-    def facet=(v)
-      @options[:f] = v
-    end
-    def facet
-      @options[:f]
-    end
 
     def to_query
       # TODO: Figure out why URI.espace works but CGI.escape does not
