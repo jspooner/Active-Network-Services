@@ -1,4 +1,5 @@
 require 'active/version'
+require 'ext/hash_extensions.rb'
 
 module Active
   # require files in order!
