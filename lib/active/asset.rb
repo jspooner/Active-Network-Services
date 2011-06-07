@@ -31,6 +31,12 @@ module Active
         end
       end
       
+      # We have several different types of data in the Search index.  To restrict a search to a particular type, use the facet parameter.  The available values are:
+      #     activities - things like running events or camps
+      #     results - race results from results.active.com
+      #     training - training plans
+      #     articles - articles on active.com and ihoops.com
+      # This method should be overridden in child classes to return the appropriate type string.
       def facet
         ''
       end

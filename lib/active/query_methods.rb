@@ -29,11 +29,6 @@ module Active::QueryMethods
     end
     alias order sort
   
-    # We have several different types of data in the Search index.  To restrict a search to a particular type, use the facet parameter.  The available values are:
-    #     activities - things like running events or camps
-    #     results - race results from results.active.com
-    #     training - training plans
-    #     articles - articles on active.com and ihoops.com
     def facet=(v)
       @options[:f] = v
     end
