@@ -15,13 +15,14 @@ module Active
     end
     
     def results
+      return @a if @a
       @res ||= search
-      a   = []
+      @a   ||= []
       @res['_results'].collect do |d|
         t = Active::Asset.new(d)
-        a << t
+        @a << t
       end
-      a
+      @a
     end
     
   end
