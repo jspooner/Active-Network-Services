@@ -8,13 +8,9 @@ module Active::FinderMethods
       raise Active::InvalidOption, "Couldn't find Asset without an ID" if asset_ids.nil?
       finder    = Active::Query.new
       ids       = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
-      meta_data = []
-      ids.each do |id|
-        meta_data << "meta:assetId=#{id.gsub("-","%2d")}"
-      end
+      finder.options[:meta][:assetId] = ids.collect{ |id| id.gsub("-","%2d") }
       
-      finder.options[:m] = meta_data.join('+OR+')      
-      
+      # Executes the actual search API call
       res = finder.search
       
       # Ensure we have found all of the IDs requested, otherwise raise an error

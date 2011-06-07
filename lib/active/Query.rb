@@ -10,6 +10,7 @@ module Active
       @options = {
         :s => "relevance",
         :f => options[:facet],
+        :meta => {},
         :v => 'json'
       }
     end
