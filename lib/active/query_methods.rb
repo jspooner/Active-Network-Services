@@ -3,14 +3,6 @@ require 'json'
 
 module Active::QueryMethods
   
-  module ClassMethods
-    [:sort, :order, :limit, :per_page, :page].each do |method_name|
-      define_method(method_name) do |val|
-        Active::Query.new.send(method_name, val)
-      end
-    end
-  end
-  
   module InstanceMethods
     
     def page(value)

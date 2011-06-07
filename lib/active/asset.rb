@@ -2,7 +2,6 @@ require 'hashie'
 module Active
   class Asset
     
-    extend Active::QueryMethods::ClassMethods
     extend Active::FinderMethods::ClassMethods
     
     attr_reader :data
@@ -23,6 +22,18 @@ module Active
     
     def to_json
       @data.to_json
+    end
+    
+    class << self
+      [:sort, :order, :limit, :per_page, :page].each do |method_name|
+        define_method(method_name) do |val|
+          Active::Query.new(:facet => self.facet).send(method_name, val)
+        end
+      end
+      
+      def facet
+        ''
+      end
     end
     
   end
