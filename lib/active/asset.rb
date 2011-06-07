@@ -24,7 +24,10 @@ module Active
     end
     
     class << self
-      [:sort, :order, :limit, :per_page, :page].each do |method_name|
+      [
+        :sort, :order, :limit, :per_page, :page,
+        :category, :channel, :splitMediaType
+      ].each do |method_name|
         define_method(method_name) do |val|
           Active::Query.new(:facet => self.facet).send(method_name, val)
         end

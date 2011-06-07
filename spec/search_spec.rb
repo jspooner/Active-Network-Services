@@ -116,6 +116,17 @@ describe "Search" do
         asset.results.first.meta.eventId.should eql("1735298")
       end
       
+      it "should find Running events" do
+        asset = Active::Asset.order(:date_asc)
+        asset.page(1).limit(1)
+        asset.channel('Running')
+        asset.to_query.should have_param('Running')
+        asset.results.first.should be_an_instance_of(Active::Asset)
+        asset.results.first.url.should_not be_nil
+        asset.results.first.meta.eventId.should_not be_nil
+        asset.results.first.meta.eventId.should eql("1520568")
+      end
+      
       
     end
   

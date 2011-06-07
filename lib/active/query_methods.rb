@@ -28,6 +28,17 @@ module Active::QueryMethods
       self
     end
     alias order sort
+    
+    [:category, :channel, :splitMediaType].each do |method_name|
+      define_method(method_name) do |val|
+        options[:meta][method_name] ||= []
+        if val.kind_of?(Array)
+          options[:meta][method_name] += val
+        else
+          options[:meta][method_name] << val
+        end
+      end
+    end
 
     def to_query
       # TODO: Figure out why URI.espace works but CGI.escape does not
