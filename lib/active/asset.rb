@@ -24,6 +24,24 @@ module Active
     end
     
     class << self
+      def factory(data)
+        category = data['meta']['category']
+        rescue NoMethodError
+          category = nil
+        
+        type = case category
+        when 'Activities'
+          Active::Activity
+        when 'Articles'
+          Active::Article
+        when 'Training plans'
+          Active::Training
+        else
+          Active::Asset
+        end
+        type.new(data)
+      end
+      
       [
         :sort, :order, :limit, :per_page, :page,
         :category, :channel, :splitMediaType

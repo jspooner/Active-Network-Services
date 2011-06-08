@@ -1,4 +1,3 @@
-
 module Active
   class Query
     
@@ -20,7 +19,7 @@ module Active
       @res ||= search
       @a   ||= []
       @res['_results'].collect do |d|
-        t = Active::Asset.new(d)
+        t = Active::Asset.factory(d)
         @a << t
       end
       @a
