@@ -37,6 +37,7 @@ module Active::QueryMethods
         else
           options[:meta][method_name] << val
         end
+        return self
       end
     end
 
