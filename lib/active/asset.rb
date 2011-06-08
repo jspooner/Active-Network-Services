@@ -1,8 +1,8 @@
 require 'hashie'
+require 'json'
+
 module Active
   class Asset
-    
-    extend Active::FinderMethods::ClassMethods
     
     attr_reader :data
     
@@ -42,6 +42,41 @@ module Active
           Active::Asset
         end
         type.new(data)
+      end
+      
+      # this code smells
+      def find(asset_ids=nil)
+        raise Active::InvalidOption, "Couldn't find Asset without an ID" if asset_ids.nil?
+        finder    = Active::Query.new
+        ids       = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
+        finder.options[:meta][:assetId] = ids.collect{ |id| id.gsub("-","%2d") }
+
+        # Executes the actual search API call
+        res = finder.search
+
+        # Ensure we have found all of the IDs requested, otherwise raise an error
+        # that includes which ID(s) are missing.
+        if res['numberOfResults'] != ids.length
+          missing_ids = Array.new(ids)
+          res['_results'].each do |r|
+            found_id = r['meta']['assetId'] & missing_ids
+            missing_ids -= found_id
+          end
+          raise Active::RecordNotFound, "Couldn't find record with asset_id: #{missing_ids.join(',')}"
+        end
+
+
+        a = []
+        res['_results'].collect do |d|
+          t      = self.new(d)
+          a << t
+        end
+
+        if a.length == 1
+          return a.first
+        else
+          return a
+        end
       end
       
       [
