@@ -14,5 +14,7 @@
 # When irb is started within this project folder (read: during gem development)
 # this file will add lib/ to the load_path and require the gem.
 
-$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), 'lib'))
-require 'Active'
+# Doesn't work if you have the Active Gem also installed
+
+#$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), 'lib'))
+#require 'Active'

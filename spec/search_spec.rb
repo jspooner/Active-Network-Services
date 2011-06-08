@@ -2,13 +2,11 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 describe "Search" do
   describe "Asset" do
     
-    describe "Instance Methods - Query Builder" do
-    
+    describe "Instance Methods - Query Builder - Default Options" do
       it "should build a query" do
         asset = Active::Query.new
         asset.to_query.should have_param("http://search.active.com/search?")
       end
-      
       it "should have a facet in the query" do
         asset = Active::Query.new(:facet => 'activities')
         asset.to_query.should have_param("f=activities")
@@ -46,12 +44,10 @@ describe "Search" do
         asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("num=3")
       end
-      
       it "should raise an invalid option error" do
         lambda { Active::Asset.page(0) }.should raise_error(Active::InvalidOption)
         lambda { Active::Asset.page(-1) }.should raise_error(Active::InvalidOption)
       end
-      
       it "should specify page and return itself" do
         asset = Active::Asset.page()
         asset.should be_an_instance_of(Active::Query)
@@ -59,14 +55,76 @@ describe "Search" do
         asset.page(5).should === asset
         asset.to_query.should have_param("page=5")
       end
-      
       it "does something" do
         asset = Active::Asset.page(2).limit(5).sort(:date_asc)
         asset.to_query.should have_param("page=2")
         asset.to_query.should have_param("s=date_asc")
         asset.to_query.should have_param("num=5")
       end
-      
+    end
+    
+    describe "Instance Methods - Query Builder - Location" do
+      it "should search by city" do
+        asset = Active::Asset.location(:city=>"Oceanside")
+        asset.to_query.should have_param("meta:city=Oceanside")
+      end
+      it "should double encode the city" do
+        asset = Active::Asset.location(:city=>"San Marcos")
+        asset.to_query.should have_param("meta:city=San%2520Marcos")
+      end
+      it "should pass California as the meta state" do
+        asset = Active::Asset.location(:state=>"California")
+        asset.to_query.should have_param("meta:state=California")
+      end
+      it "should search by the SF DMA" do
+        asset = Active::Asset.location(:dma=>"San Francisco - Oakland - San Jose")
+        asset.to_query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
+      end
+      it "should place lat and lng in the l param" do
+        asset = Active::Asset.near({:latitude=>"37.785895", :longitude=>"-122.40638", :radius => 25})
+        asset.to_query.should have_param("l=37.785895;-122.40638")
+        asset.to_query.should have_param("r=25")
+      end
+      it "should send an array of zips" do
+        asset = Active::Asset.location(:zips => [92121, 92078, 92114])
+        asset.to_query.should have_param("l=92121,92078,92114")
+      end
+      it "should construct a valid url with location" do
+        asset = Active::Asset.location(:location => "San Diego, CA, US")
+        asset.to_query.should have_param("l=#{CGI.escape("San Diego, CA, US")}")
+      end
+      it "should send valid channel info and a bounding_box" do
+        asset = Active::Asset.location( :bounding_box => { :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"} )
+        asset.to_query.should have_param("meta:latitudeShifted:127.695141..127.695141+AND+meta:longitudeShifted:56.986343..56.986343")
+      end
+    end
+    
+    describe "Instance Methods - Query Builder - Meta" do
+      # Keywords
+      # channels
+      # split media types
+    end
+    
+    describe "Instance Methods - Query Builder - Dates" do
+      it "should send a valid start and end date" do
+        asset = Active::Asset.date({ :start_date => Date.new(2010, 11, 1), :end_date => Date.new(2010, 11, 15) })
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+      end
+      it "should search past" do
+        pending
+        asset = Active::Asset.date
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+      end
+      it "should search future" do
+        pending
+        asset = Active::Asset.date
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+      end
+      it "should search today" do
+        pending
+        asset = Active::Asset.date
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+      end
     end
     
     describe "Static Find Methods" do
@@ -139,4 +197,6 @@ describe "Search" do
     end
   
   end
+  
+  
 end
