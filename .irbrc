@@ -16,5 +16,6 @@
 
 # Doesn't work if you have the Active Gem also installed
 
-#$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), 'lib'))
-#require 'Active'
+$LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), 'lib'))
+require 'lib/Active'
+puts "Using Active v#{Active::VERSION}"
