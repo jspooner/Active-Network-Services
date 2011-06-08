@@ -98,19 +98,16 @@ describe "Search" do
         end
         
       end
-      
-      
     end
   
     describe "Results Object" do
-      
       it "should find only 4 results" do
         asset = Active::Asset.order(:relevance)
         asset.page(1)
         asset.limit(4)
         asset.order(:date_asc)
         asset.should have_exactly(4).results
-        asset.results.first.should be_an_instance_of(Active::Asset)
+        asset.results.first.should be_an_instance_of(Active::Activity)
         asset.results.first.url.should_not be_nil
         asset.results.first.meta.eventId.should_not be_nil
         asset.results.first.meta.eventId.should eql("1735298")
@@ -121,13 +118,24 @@ describe "Search" do
         asset.page(1).limit(1)
         asset.channel('Running')
         asset.to_query.should have_param('Running')
-        asset.results.first.should be_an_instance_of(Active::Asset)
+        asset.results.first.should be_an_instance_of(Active::Activity)
         asset.results.first.url.should_not be_nil
         asset.results.first.meta.eventId.should_not be_nil
-        asset.results.first.meta.eventId.should eql("1520568")
+        # asset.results.first.meta.eventId.should eql("1520568")
       end
-      
-      
+    end
+    
+    describe "Factory" do
+      it "should type cast results" do
+        asset = Active::Asset.factory({})
+        asset.should be_an_instance_of(Active::Asset)
+        asset2 = Active::Asset.factory({'meta'=>{'category'=>'Activities'}})
+        asset2.should be_an_instance_of(Active::Activity)
+        asset3 = Active::Asset.factory({'meta'=>{'category'=>'Articles'}})
+        asset3.should be_an_instance_of(Active::Article)
+        asset4 = Active::Asset.factory({'meta'=>{'category'=>'Training plans'}})
+        asset4.should be_an_instance_of(Active::Training)
+      end
     end
   
   end

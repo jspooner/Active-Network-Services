@@ -25,9 +25,11 @@ module Active
     
     class << self
       def factory(data)
+        begin
         category = data['meta']['category']
         rescue NoMethodError
           category = nil
+        end
         
         type = case category
         when 'Activities'
