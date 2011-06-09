@@ -47,12 +47,12 @@ module Active
       # this code smells
       def find(asset_ids=nil)
         raise Active::InvalidOption, "Couldn't find Asset without an ID" if asset_ids.nil?
-        finder    = Active::Query.new
+        query    = Active::Query.new
         ids       = asset_ids.kind_of?(Array) ? asset_ids : [asset_ids]
-        finder.options[:meta][:assetId] = ids.collect{ |id| id.gsub("-","%2d") }
+        query.options[:meta][:assetId] = ids.collect{ |id| id.gsub("-","%2d") }
 
         # Executes the actual search API call
-        res = finder.search
+        res = query.search
 
         # Ensure we have found all of the IDs requested, otherwise raise an error
         # that includes which ID(s) are missing.
