@@ -48,7 +48,14 @@ module Active
       options[:meta][:longitudeShifted] = "#{longitude1}..#{longitude2}"
       self
     end
-        
+    
+    def near(value)
+      raise Active::InvalidOption unless value[:latitude] and value[:longitude] and value[:radius]
+      @options[:l] = "#{value[:latitude]},#{value[:longitude]}"
+      @options[:r] = value[:radius]
+      self
+    end
+    
     [:location, :state, :city, :category, :channel, :splitMediaType, :zip, :dma].each do |method_name|
       define_method(method_name) do |val|
         options[:meta][method_name] ||= []

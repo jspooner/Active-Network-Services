@@ -91,10 +91,9 @@ describe "Search" do
         asset.to_query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
       end
       it "should place lat and lng in the l param" do
-        pending
-        # asset = Active::Asset.near({:latitude=>"37.785895", :longitude=>"-122.40638", :radius => 25})
-        # asset.to_query.should have_param("l=37.785895;-122.40638")
-        # asset.to_query.should have_param("r=25")
+        asset = Active::Asset.near({:latitude=>"37.785895", :longitude=>"-122.40638", :radius => 25})
+        asset.to_query.should have_param("l=37.785895,-122.40638")
+        asset.to_query.should have_param("r=25")
       end
       it "should send an array of zips" do
         asset = Active::Asset.zip(92121)
@@ -110,7 +109,8 @@ describe "Search" do
       end
       it "should send bounding_box" do
         asset = Active::Asset.bounding_box({ :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"} )
-        asset.to_query.should have_param("meta%253AlatitudeShifted%253A127.695141..127.695141+AND+meta%253AlongitudeShifted%253A56.986343..56.986343")
+        asset.to_query.should have_param("meta%253AlongitudeShifted%253A56.986343..56.986343")
+        asset.to_query.should have_param("meta%253AlatitudeShifted%253A127.695141..127.695141")
       end
     end
     
