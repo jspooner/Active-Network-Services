@@ -14,18 +14,7 @@ module Active
         :v => 'json'
       }
     end
-    
-    def results
-      return @a if @a
-      @res ||= search
-      @a   ||= []
-      @res['_results'].collect do |d|
-        t = Active::Asset.factory(d)
-        @a << t
-      end
-      @a
-    end
-    
+        
     def page(value)
       v = value || 1
       raise Active::InvalidOption if v <= 0
@@ -50,11 +39,13 @@ module Active
     end
     alias order sort
     
-    [:category, :channel, :splitMediaType].each do |method_name|
+    [:location, :state, :city, :category, :channel, :splitMediaType].each do |method_name|
       define_method(method_name) do |val|
         options[:meta][method_name] ||= []
         if val.kind_of?(Array)
           options[:meta][method_name] += val
+        elsif val.kind_of?(Hash)
+          options[:meta].merge!(val)
         else
           options[:meta][method_name] << val
         end
@@ -75,9 +66,9 @@ module Active
       opts[:m] = opts[:meta].collect{ |k,v|
         if v.kind_of?(Array)
           # Second-level options get joined with OR
-          v.collect{ |v2| "meta:#{k}=#{v2}" }.join('+OR+')
+          v.collect{ |v2| "meta:#{k}=#{encode(v2)}" }.join('+OR+')
         else
-          "meta:#{k}:#{v}"
+          "meta:#{k}=#{encode(v)}"
         end
       }.join('+AND+')
       opts.delete(:meta)
@@ -100,6 +91,26 @@ module Active
         raise Active::ActiveError, "Active Search responded to your query with code: #{res.code}"
       end
     end
+    
+    def results
+      return @a if @a
+      @res ||= search
+      @a   ||= []
+      @res['_results'].collect do |d|
+        t = Active::Asset.factory(d)
+        @a << t
+      end
+      @a
+    end
+    
+    private
+      # The GSA needs some values encoded
+      def encode(str)
+        return "" if str.nil?
+        str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+        str.gsub!(/\-/,"%252D")
+        str
+      end
     
   end
 end

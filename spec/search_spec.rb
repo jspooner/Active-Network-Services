@@ -69,10 +69,19 @@ describe "Search" do
         asset.to_query.should have_param("meta:city=Oceanside")
       end
       it "should double encode the city" do
+        asset = Active::Asset.city("San Marcos")
+        asset.to_query.should have_param("meta:city=San%2520Marcos")
+        
         asset = Active::Asset.location(:city=>"San Marcos")
         asset.to_query.should have_param("meta:city=San%2520Marcos")
       end
       it "should pass California as the meta state" do
+        asset = Active::Asset.state("California")
+        asset.to_query.should have_param("meta:state=California")
+
+        asset = Active::Asset.state(["California", "Oregon"])
+        asset.to_query.should have_param("meta:state=California+OR+meta:state=Oregon")
+        
         asset = Active::Asset.location(:state=>"California")
         asset.to_query.should have_param("meta:state=California")
       end
