@@ -39,7 +39,19 @@ module Active
     end
     alias order sort
     
-    [:location, :state, :city, :category, :channel, :splitMediaType].each do |method_name|
+    def bounding_box(box)
+      # latitude1  = box[:sw].split(",").first.to_f+90
+      # latitude2  = box[:ne].split(",").first.to_f+90
+      # longitude1 = box[:sw].split(",").last.to_f+180
+      # longitude2 = box[:ne].split(",").last.to_f+180      
+      # options[:meta][:latitudeShifted]  = "#{latitude1}..#{latitude2}"
+      # options[:meta][:longitudeShifted] = "#{longitude1}..#{longitude2}"
+      options[:meta][:latitudeShifted]  = "127.695141..127.695141"
+      options[:meta][:longitudeShifted] = "56.986343..56.986343"
+      self
+    end
+        
+    [:location, :state, :city, :category, :channel, :splitMediaType, :zip].each do |method_name|
       define_method(method_name) do |val|
         options[:meta][method_name] ||= []
         if val.kind_of?(Array)
@@ -52,7 +64,8 @@ module Active
         return self
       end
     end
-
+    alias zips zip
+    
     def to_query
       opts = @options.deep_copy
       
@@ -63,16 +76,22 @@ module Active
         if v.kind_of?(Array)
           # Second-level options get joined with OR
           v.collect do |v2| 
-            if k == :assetId              
+            if k == :assetId
               "meta:#{k}=#{single_encode(v2)}"
             else              
               "meta:#{k}=#{double_encode(v2)}"
             end            
           end.join('+OR+')
         else
-          "meta:#{k}=#{double_encode(v)}"
+          if k == :latitudeShifted or k == :longitudeShifted
+            double_encode("meta:#{k}:#{v}") # WTF  encode the : ?
+          else
+            "meta:#{k}=#{double_encode(v)}"
+          end
         end
       }
+      # opts[:m] << double_encode("meta:latitudeShifted:127.695141..127.695141+AND+meta:longitudeShifted:56.986343..56.986343")
+      
       opts[:m] << double_encode("meta:startDate:daterange:01-01-2000..")
       opts[:m] = opts[:m].join('+AND+')
       
@@ -90,7 +109,7 @@ module Active
       end
     
       if (200..307).include?(res.code.to_i)
-        # TODO HANDLE JSON PARSE ERROR
+# TODO HANDLE JSON PARSE ERROR
         return JSON.parse(res.body)
       else
         raise Active::ActiveError, "Active Search responded to your query with code: #{res.code}"
@@ -117,6 +136,7 @@ module Active
       end
       # good for all other values like city and state
       def double_encode(str)
+        str = str.to_s
         str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
         str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
         str.gsub!(/\-/,"%252D")
