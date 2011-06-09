@@ -89,14 +89,12 @@ describe "Search" do
       it "should search by the SF DMA" do
         asset = Active::Asset.dma("San Francisco - Oakland - San Jose")
         asset.to_query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
-        asset = Active::Asset.location(:dma=>"San Francisco - Oakland - San Jose")
-        asset.to_query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
       end
       it "should place lat and lng in the l param" do
         pending
-        asset = Active::Asset.near({:latitude=>"37.785895", :longitude=>"-122.40638", :radius => 25})
-        asset.to_query.should have_param("l=37.785895;-122.40638")
-        asset.to_query.should have_param("r=25")
+        # asset = Active::Asset.near({:latitude=>"37.785895", :longitude=>"-122.40638", :radius => 25})
+        # asset.to_query.should have_param("l=37.785895;-122.40638")
+        # asset.to_query.should have_param("r=25")
       end
       it "should send an array of zips" do
         asset = Active::Asset.zip(92121)
