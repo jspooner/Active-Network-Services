@@ -54,11 +54,7 @@ module Active
     end
 
     def to_query
-      # TODO: Figure out why URI.espace works but CGI.escape does not
-      
-      # Add in the date range.
       opts = @options.deep_copy
-      opts[:meta][:startDate] = "daterange:01-01-2000.."
       
       # Extract :meta and turn it into a single string for :m
       # Nested options inside meta get joined as OR
@@ -66,14 +62,23 @@ module Active
       opts[:m] = opts[:meta].collect{ |k,v|
         if v.kind_of?(Array)
           # Second-level options get joined with OR
-          v.collect{ |v2| "meta:#{k}=#{encode(v2)}" }.join('+OR+')
+          v.collect do |v2| 
+            if k == :assetId              
+              "meta:#{k}=#{single_encode(v2)}"
+            else              
+              "meta:#{k}=#{double_encode(v2)}"
+            end            
+          end.join('+OR+')
         else
-          "meta:#{k}=#{encode(v)}"
+          "meta:#{k}=#{double_encode(v)}"
         end
-      }.join('+AND+')
+      }
+      opts[:m] << double_encode("meta:startDate:daterange:01-01-2000..")
+      opts[:m] = opts[:m].join('+AND+')
+      
       opts.delete(:meta)
       opts.delete_if { |k, v| v.nil? || v.to_s.empty? } # Remove all blank keys
-      "http://search.active.com/search?" + URI.escape(opts.collect{|k,v| "#{k}=#{v}"}.join('&'))
+      "http://search.active.com/search?" + opts.collect{|k,v| "#{k}=#{v}"}.join('&')
     end
 
     def search
@@ -104,9 +109,15 @@ module Active
     end
     
     private
-      # The GSA needs some values encoded
-      def encode(str)
-        return "" if str.nil?
+      # good for assetId only.. maybe
+      def single_encode(str)
+        str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+        str.gsub!(/\-/,"%252D")
+        str        
+      end
+      # good for all other values like city and state
+      def double_encode(str)
+        str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
         str = URI.escape(str, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
         str.gsub!(/\-/,"%252D")
         str
