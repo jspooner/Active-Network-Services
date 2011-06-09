@@ -40,14 +40,12 @@ module Active
     alias order sort
     
     def bounding_box(box)
-      # latitude1  = box[:sw].split(",").first.to_f+90
-      # latitude2  = box[:ne].split(",").first.to_f+90
-      # longitude1 = box[:sw].split(",").last.to_f+180
-      # longitude2 = box[:ne].split(",").last.to_f+180      
-      # options[:meta][:latitudeShifted]  = "#{latitude1}..#{latitude2}"
-      # options[:meta][:longitudeShifted] = "#{longitude1}..#{longitude2}"
-      options[:meta][:latitudeShifted]  = "127.695141..127.695141"
-      options[:meta][:longitudeShifted] = "56.986343..56.986343"
+      latitude1  = box[:sw].split(",").first.to_f+90
+      latitude2  = box[:ne].split(",").first.to_f+90
+      longitude1 = box[:sw].split(",").last.to_f+180
+      longitude2 = box[:ne].split(",").last.to_f+180      
+      options[:meta][:latitudeShifted]  = "#{latitude1}..#{latitude2}"
+      options[:meta][:longitudeShifted] = "#{longitude1}..#{longitude2}"
       self
     end
         
@@ -84,7 +82,7 @@ module Active
           end.join('+OR+')
         else
           if k == :latitudeShifted or k == :longitudeShifted
-            double_encode("meta:#{k}:#{v}") # WTF  encode the : ?
+            double_encode("meta:#{k}:#{v}") # WTF  encode the : ? and we don't have to encode it for assetId?
           else
             "meta:#{k}=#{double_encode(v)}"
           end

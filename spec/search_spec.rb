@@ -87,7 +87,6 @@ describe "Search" do
         asset.to_query.should have_param("meta:state=California")
       end
       it "should search by the SF DMA" do
-        pending
         asset = Active::Asset.dma("San Francisco - Oakland - San Jose")
         asset.to_query.should have_param("meta:dma=San%2520Francisco%2520%252D%2520Oakland%2520%252D%2520San%2520Jose")
         asset = Active::Asset.location(:dma=>"San Francisco - Oakland - San Jose")
