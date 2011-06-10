@@ -2,6 +2,7 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 describe "Search" do
   describe "Asset" do
     # describe HTTP and JSON Parse Errors
+    # describe pagination methods
     describe "Instance Methods - Query Builder - Default Options" do
       it "should build a query" do
         asset = Active::Query.new
@@ -95,22 +96,66 @@ describe "Search" do
         asset.to_query.should have_param("l=37.785895,-122.40638")
         asset.to_query.should have_param("r=25")
       end
-      it "should send an array of zips" do
-        asset = Active::Asset.zip(92121)
+      it "should find by zip" do
+        asset = Active::Activity.zip("92121")
         asset.to_query.should have_param("zip=92121")
-
-        asset = Active::Asset.zips([92121, 92114])
+        # WTF?  result.data.meta.zip returns an array
+        asset.results.each do |result|
+          result.data.meta.eventZip.should satisfy do |zip|
+            true if zip == "92121"
+          end
+        end
+        
+      end
+      it "should find many zips" do
+        asset = Active::Activity.zips([92121, 92114])
         asset.to_query.should have_param("meta:zip=92121+OR+meta:zip=92114")
+        # WTF?  result.data.meta.zip returns an array
+        asset.results.each do |result|
+          result.data.meta.eventZip.should satisfy do |zip|
+            true if zip == "92121" or zip == "92114"
+          end
+        end
+
       end
       it "should construct a valid url with location" do
         asset = Active::Asset.location(:l => "San Diego, CA, US")
         asset.to_query.should have_param("l=San%2520Diego%252C%2520CA%252C%2520US")
       end
       it "should send bounding_box" do
-        asset = Active::Asset.bounding_box({ :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"} )
-        asset.to_query.should have_param("meta%253AlongitudeShifted%253A56.986343..56.986343")
-        asset.to_query.should have_param("meta%253AlatitudeShifted%253A127.695141..127.695141")
+        asset = Active::Activity.bounding_box({ :sw => "33.007407,-117.332985", :ne => "33.179984,-117.003395"} )
+        asset.to_query.should have_param("meta%253AlongitudeShifted%253A62.667015..62.996605")
+        asset.to_query.should have_param("meta%253AlatitudeShifted%253A123.007407..123.179984")
+        # asset.results.each do |result|
+        #   puts "#{result.meta.latitude}, #{result.meta.longitude}<br/>"
+        #   # result.meta.latitude.should satisfy do |lat|
+        #   #   puts "<br/> latitude #{lat}"
+        #   #   lat.to_f >= 33.007407 and lat.to_f <= 33.179984
+        #   # end
+        #   result.meta.longitude.should satisfy do |lng|
+        #     puts "<br/> longitude #{lng.to_f}"
+        #     lng.to_f <= -117.003395# and lng.to_f <= -117.332985
+        #   end
+        # end
       end
+      it "should send bounding_box" do
+        asset = Active::Activity.bounding_box({:ne=>"38.8643,-121.208199", :sw=>"36.893089,-123.533684"})
+#puts asset.to_query
+        asset.to_query.should have_param("meta%253AlatitudeShifted%253A126.893089..128.8643")
+        asset.to_query.should have_param("meta%253AlongitudeShifted%253A56.466316..58.791801")
+        # asset.results.each do |result|
+        #   puts "#{result.meta.latitude}, #{result.meta.longitude}<br/>"
+        #   # result.meta.latitude.should satisfy do |lat|
+        #   #   puts "<br/> latitude #{lat}"
+        #   #   lat.to_f >= 33.007407 and lat.to_f <= 33.179984
+        #   # end
+        #   result.meta.longitude.should satisfy do |lng|
+        #     puts "<br/> longitude #{lng.to_f}"
+        #     # lng.to_f <= -117.003395# and lng.to_f <= -117.332985
+        #   end
+        # end
+      end
+      
     end
     
     describe "Instance Methods - Query Builder - Meta" do
@@ -179,30 +224,24 @@ describe "Search" do
       it "should raise error if no id is specified" do
         lambda { Active::Asset.find() }.should raise_error(Active::InvalidOption, "Couldn't find Asset without an ID")
       end
-
       it "should find record: Dean Karnazes Silicon Valley Marathon" do
         result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
         result.should be_an_instance_of(Active::Asset)
       end
-
       it "should have two asset_id's in the query" do
         results = Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "2C384907-D683-4E83-BD97-63A46F38437A"])
         results.should be_an_instance_of(Array)
       end
-      
       it "should throw an error if one or more asset_ids weren't found" do
         lambda { Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "123"])
-        # }.should raise_error(Active::RecordNotFound)
         }.should raise_error(Active::RecordNotFound, "Couldn't find record with asset_id: 123")
       end
       
       describe "Result Object" do
-
         it "should have a title via dot notation" do
           result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
           result.title.should eql("Dean Karnazes Silicon Valley Marathon | San Jose, California <b>...</b>")
         end
-        
       end
     end
   

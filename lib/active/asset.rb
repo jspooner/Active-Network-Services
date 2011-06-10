@@ -9,7 +9,7 @@ module Active
     def initialize(data)
       @data = Hashie::Mash.new(data)
     end
-    
+    # BUG only works for one level  ex:  asset.meta.zip doesn't work
     def method_missing(m, *args, &block)
       return @data.send(m.to_s, args, &block)
     end

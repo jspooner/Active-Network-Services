@@ -38,6 +38,8 @@ module Active
     end
     alias order sort
     
+    # LatLngBounds(sw?:LatLng, ne?:LatLng)
+    # Constructs a rectangle from the points at its south-west and north-east corners.
     def bounding_box(box)
       latitude1  = box[:sw].split(",").first.to_f+90
       latitude2  = box[:ne].split(",").first.to_f+90
