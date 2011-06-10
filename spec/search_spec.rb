@@ -164,9 +164,14 @@ describe "Search" do
         end
       end
       it "should search today" do
-        pending
-        asset = Active::Asset.date
-        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+        asset = Active::Asset.today
+        asset.should be_an_instance_of(Active::Query)        
+        asset.to_query.should have_param("meta:startDate:#{Date.today}")
+        asset.results.each do |result|
+          result.meta.startDate.should satisfy { |date| 
+            Date.parse(date) == Date.today
+          }
+        end
       end
     end
     

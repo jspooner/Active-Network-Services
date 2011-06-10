@@ -84,6 +84,11 @@ module Active
       options[:meta][:startDate] = "daterange:..#{Date.today}"
       self
     end
+    
+    def today
+      options[:meta][:startDate] = Date.today
+      self
+    end
         
     [:state, :city, :category, :keywords, :channel, :splitMediaType, :zip, :dma].each do |method_name|
       define_method(method_name) do |val|
