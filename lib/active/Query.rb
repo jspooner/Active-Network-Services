@@ -122,13 +122,16 @@ module Active
             end            
           end.join('+OR+')
         else
+          # these keys need meta :
           if k == :latitudeShifted or k == :longitudeShifted or k == :startDate
-            # encoding works for longitudeShifted            
-            # double_encode("meta:#{k}:#{v}") # WTF  encode the : ? and we don't have to encode it for assetId?
-            
-            # encoding doesn't work for asset_id, daterange
-            "meta:#{k}:#{v}"
-          else
+            # encoding works for longitudeShifted
+            if k == :latitudeShifted or k == :longitudeShifted
+              double_encode("meta:#{k}:#{v}") # WTF  encode the : ? and we don't have to encode it for assetId?
+            else
+              # encoding doesn't work for asset_id, daterange
+              "meta:#{k}:#{v}"              
+            end
+          else# these keys need meta=
             "meta:#{k}=#{double_encode(v)}"
           end
         end
