@@ -15,10 +15,9 @@ module Active
       }
     end
         
-    def page(value)
-      v = value || 1
-      raise Active::InvalidOption if v <= 0
-      @options[:page] = v
+    def page(value=1)
+      raise Active::InvalidOption if value <= 0
+      @options[:page] = value
       self
     end
 
@@ -55,8 +54,38 @@ module Active
       @options[:r] = value[:radius]
       self
     end
+
+    def location(value)
+      if value.kind_of?(Hash)        
+        options[:meta].merge!(value)
+      elsif value.kind_of?(String)
+        @options[:l] = value
+      end
+      self
+    end
     
-    [:location, :state, :city, :category, :keywords, :channel, :splitMediaType, :zip, :dma].each do |method_name|
+    def date_range(start_date,end_date)
+      if start_date.class == Date
+        start_date = URI.escape(start_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
+      end
+      if end_date.class == Date
+        end_date = URI.escape(end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
+      end
+      options[:meta][:startDate] = "daterange:#{start_date}..#{end_date}"
+      self
+    end
+    
+    def future
+      options[:meta][:startDate] = "daterange:today..+"
+      self
+    end
+
+    def past
+      options[:meta][:startDate] = "daterange:..#{Date.today}"
+      self
+    end
+        
+    [:state, :city, :category, :keywords, :channel, :splitMediaType, :zip, :dma].each do |method_name|
       define_method(method_name) do |val|
         options[:meta][method_name] ||= []
         if val.kind_of?(Array)
@@ -66,7 +95,7 @@ module Active
         else
           options[:meta][method_name] << val
         end
-        return self
+         self
       end
     end
     alias zips zip
@@ -88,8 +117,12 @@ module Active
             end            
           end.join('+OR+')
         else
-          if k == :latitudeShifted or k == :longitudeShifted
-            double_encode("meta:#{k}:#{v}") # WTF  encode the : ? and we don't have to encode it for assetId?
+          if k == :latitudeShifted or k == :longitudeShifted or k == :startDate
+            # encoding works for longitudeShifted            
+            # double_encode("meta:#{k}:#{v}") # WTF  encode the : ? and we don't have to encode it for assetId?
+            
+            # encoding doesn't work for asset_id, daterange
+            "meta:#{k}:#{v}"
           else
             "meta:#{k}=#{double_encode(v)}"
           end
@@ -97,7 +130,7 @@ module Active
       }
       # opts[:m] << double_encode("meta:latitudeShifted:127.695141..127.695141+AND+meta:longitudeShifted:56.986343..56.986343")
       
-      opts[:m] << double_encode("meta:startDate:daterange:01-01-2000..")
+      opts[:m] << double_encode("meta:startDate:daterange:01-01-2000..") if opts[:meta][:startDate].nil?
       opts[:m] = opts[:m].join('+AND+')
       
       opts.delete(:meta)

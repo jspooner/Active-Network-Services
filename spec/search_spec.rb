@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), %w[spec_helper])
 describe "Search" do
   describe "Asset" do
-    
+    # describe HTTP and JSON Parse Errors
     describe "Instance Methods - Query Builder - Default Options" do
       it "should build a query" do
         asset = Active::Query.new
@@ -103,9 +103,8 @@ describe "Search" do
         asset.to_query.should have_param("meta:zip=92121+OR+meta:zip=92114")
       end
       it "should construct a valid url with location" do
-        pending
-        # asset = Active::Asset.location(:l => "San Diego, CA, US")
-        # asset.to_query.should have_param("l=San Diego, CA, US")
+        asset = Active::Asset.location(:l => "San Diego, CA, US")
+        asset.to_query.should have_param("l=San%2520Diego%252C%2520CA%252C%2520US")
       end
       it "should send bounding_box" do
         asset = Active::Asset.bounding_box({ :sw => "37.695141,-123.013657", :ne => "37.695141,-123.013657"} )
@@ -132,19 +131,37 @@ describe "Search" do
     
     describe "Instance Methods - Query Builder - Dates" do
       it "should send a valid start and end date" do
-        pending
-        asset = Active::Asset.date({ :start_date => Date.new(2010, 11, 1), :end_date => Date.new(2010, 11, 15) })
-        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+        sd = Date.new(2011, 11, 1)
+        ed = Date.new(2011, 11, 3)
+        asset = Active::Asset.date_range( sd, ed ) 
+        asset.should be_an_instance_of(Active::Query)
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2011..11%2F03%2F2011")
+        asset.results.each do |result|
+          result.meta.startDate.should satisfy { |date| 
+            d = Date.parse(date)
+            d >= sd and d <= ed 
+          }
+        end
       end
       it "should search past" do
-        pending
-        asset = Active::Asset.date
-        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+        asset = Active::Asset.past
+        asset.should be_an_instance_of(Active::Query)
+        asset.to_query.should have_param("meta:startDate:daterange:..#{Date.today}")
+        asset.results.each do |result|
+          result.meta.startDate.should satisfy { |date| 
+            Date.parse(date) <= Date.today
+          }
+        end
       end
       it "should search future" do
-        pending
-        asset = Active::Asset.date
-        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2010..11%2F15%2F2010")
+        asset = Active::Asset.future
+        asset.should be_an_instance_of(Active::Query)
+        asset.to_query.should have_param("daterange:today..+")
+        asset.results.each do |result|
+          result.meta.startDate.should satisfy { |date| 
+            Date.parse(date) >= Date.today
+          }
+        end
       end
       it "should search today" do
         pending

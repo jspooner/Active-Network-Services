@@ -82,10 +82,11 @@ module Active
       [
         :sort, :order, :limit, :per_page, :page,
         :category, :keywords, :channel, :splitMediaType,
-        :location, :state, :city, :zip, :zips, :bounding_box, :dma, :near
+        :location, :state, :city, :zip, :zips, :bounding_box, :dma, :near, 
+        :date_range, :future, :past
       ].each do |method_name|
-        define_method(method_name) do |val|
-          Active::Query.new(:facet => self.facet).send(method_name, val)
+        define_method(method_name) do |*val|
+          Active::Query.new(:facet => self.facet).send(method_name, *val)
         end
       end
       
