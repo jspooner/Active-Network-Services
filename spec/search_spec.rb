@@ -115,9 +115,19 @@ describe "Search" do
     end
     
     describe "Instance Methods - Query Builder - Meta" do
-      # Keywords
-      # channels
-      # split media types
+      it "should search keywords" do
+        asset = Active::Asset.keywords('Running')
+        asset.to_query.should have_param("meta:keywords=Running")
+      end
+      it "should search channels" do
+        asset = Active::Asset.channel('Running')
+        asset.to_query.should have_param("meta:channel=Running")
+      end
+      it "should search splitMediaType" do
+        asset = Active::Asset.splitMediaType('5k')
+        asset.to_query.should have_param("meta:splitMediaType=5k")
+        # open_url(asset.to_query)
+      end
     end
     
     describe "Instance Methods - Query Builder - Dates" do

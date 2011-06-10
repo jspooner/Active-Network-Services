@@ -81,7 +81,8 @@ module Active
       
       [
         :sort, :order, :limit, :per_page, :page,
-        :category, :channel, :splitMediaType, :location, :state, :city, :zip, :zips, :bounding_box, :dma, :near
+        :category, :keywords, :channel, :splitMediaType,
+        :location, :state, :city, :zip, :zips, :bounding_box, :dma, :near
       ].each do |method_name|
         define_method(method_name) do |val|
           Active::Query.new(:facet => self.facet).send(method_name, val)

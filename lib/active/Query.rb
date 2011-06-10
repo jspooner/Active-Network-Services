@@ -56,7 +56,7 @@ module Active
       self
     end
     
-    [:location, :state, :city, :category, :channel, :splitMediaType, :zip, :dma].each do |method_name|
+    [:location, :state, :city, :category, :keywords, :channel, :splitMediaType, :zip, :dma].each do |method_name|
       define_method(method_name) do |val|
         options[:meta][method_name] ||= []
         if val.kind_of?(Array)
