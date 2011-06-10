@@ -28,3 +28,7 @@ RSpec::Matchers.define :have_param do |expected|
     "have param #{expected}"
   end
 end
+
+def open_url(str)
+  system("open \"#{str}\"")
+end
