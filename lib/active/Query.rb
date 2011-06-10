@@ -167,7 +167,12 @@ module Active
     def results
       return @a if @a
       @res ||= search
-      @a   ||= []
+      @a   ||= Active::Results.new()
+      @a.number_of_results = @res['numberOfResults']
+      @a.end_index         = @res['endIndex']
+      @a.page_size         = @res['pageSize']
+      @a.search_time       = @res['searchTime']
+
       @res['_results'].collect do |d|
         t = Active::Asset.factory(d)
         @a << t

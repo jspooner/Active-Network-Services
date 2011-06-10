@@ -2,7 +2,18 @@ require File.join(File.dirname(__FILE__), %w[spec_helper])
 describe "Search" do
   describe "Asset" do
     # describe HTTP and JSON Parse Errors
-    # describe pagination methods
+    
+    describe "pagination" do
+      it "should show the number of results" do
+        asset = Active::Asset.location(:city=>"Oceanside")
+        results = asset.results
+        results.number_of_results.should_not be_nil
+        results.end_index.should_not be_nil
+        results.page_size.should_not be_nil
+        results.search_time.should_not be_nil
+      end
+    end
+    
     describe "Instance Methods - Query Builder - Default Options" do
       it "should build a query" do
         asset = Active::Query.new
@@ -105,7 +116,6 @@ describe "Search" do
             true if zip == "92121"
           end
         end
-        
       end
       it "should find many zips" do
         asset = Active::Activity.zips([92121, 92114])
