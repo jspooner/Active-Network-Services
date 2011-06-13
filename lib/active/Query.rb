@@ -16,7 +16,7 @@ module Active
     end
         
     def page(value=1)
-      raise Active::InvalidOption if value <= 0
+      raise Active::InvalidOption if value.to_i <= 0
       @options[:page] = value
       self
     end

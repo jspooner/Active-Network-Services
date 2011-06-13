@@ -12,6 +12,11 @@ describe "Search" do
         results.page_size.should_not be_nil
         results.search_time.should_not be_nil
       end
+      it "does something" do
+        query = Active::Activity.page("2").limit(10).location(:city=>"Oceanside")
+        results = query.results
+        puts results.inspect
+      end
     end
     
     describe "Instance Methods - Query Builder - Default Options" do
