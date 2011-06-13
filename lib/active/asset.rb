@@ -78,6 +78,32 @@ module Active
           return a
         end
       end
+
+      # Active::Activity.find_by_url("http://www.active.com#{request.fullpath}")
+      # url = http://search.active.com/search?v=list&m=site:www.active.com/running/san-diego-ca/americas-finest-city-half-marathon-and-5k-2011
+      def find_by_url(url)
+        raise Active::InvalidOption, "Couldn't find Asset without a url" if url.nil?
+        query                = Active::Query.new
+        query.options[:m] << "site:#{url}"
+
+        # Executes the actual search API call
+        res = query.search
+        if res['numberOfResults'].to_i != 1
+          raise Active::RecordNotFound, "Couldn't find record with asset_id: #{url}"
+        end
+
+        a = []
+        res['_results'].collect do |d|
+          t      = self.new(d)
+          a << t
+        end
+
+        if a.length == 1
+          return a.first
+        else
+          return a
+        end
+      end
       
       [
         :sort, :order, :limit, :per_page, :page,

@@ -12,11 +12,6 @@ describe "Search" do
         results.page_size.should_not be_nil
         results.search_time.should_not be_nil
       end
-      it "does something" do
-        query = Active::Activity.page("2").limit(10).location(:city=>"Oceanside")
-        results = query.results
-        puts results.inspect
-      end
     end
     
     describe "Instance Methods - Query Builder - Default Options" do
@@ -251,7 +246,11 @@ describe "Search" do
         lambda { Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "123"])
         }.should raise_error(Active::RecordNotFound, "Couldn't find record with asset_id: 123")
       end
-      
+      it "should find a record by url" do
+        # event = Active::Activity.find_by_url("http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011")
+        event = Active::Activity.find_by_url("www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011")
+        event.title.should eql("2011 Rohto Ironman 70.3 California | Oceanside, California <b>...</b>")
+      end
       describe "Result Object" do
         it "should have a title via dot notation" do
           result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")

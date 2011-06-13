@@ -11,6 +11,7 @@ module Active
         :s => "relevance",
         :f => options[:facet],
         :meta => {},
+        :m => [],
         :v => 'json'
       }
     end
@@ -113,7 +114,7 @@ module Active
       # Extract :meta and turn it into a single string for :m
       # Nested options inside meta get joined as OR
       # Top-level options get joined with AND
-      opts[:m] = opts[:meta].collect{ |k,v|
+      opts[:m] += opts[:meta].collect { |k,v|
         if v.kind_of?(Array)
           # Second-level options get joined with OR
           v.collect do |v2| 
@@ -138,7 +139,6 @@ module Active
           end
         end
       }
-      # opts[:m] << double_encode("meta:latitudeShifted:127.695141..127.695141+AND+meta:longitudeShifted:56.986343..56.986343")
       
       opts[:m] << double_encode("meta:startDate:daterange:01-01-2000..") if opts[:meta][:startDate].nil?
       opts[:m] = opts[:m].join('+AND+')
