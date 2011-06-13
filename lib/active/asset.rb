@@ -88,7 +88,7 @@ module Active
 puts "query #{query.to_query}"
         # Executes the actual search API call
         res = query.search
-        if res['numberOfResults'].to_i != 1
+        if res['numberOfResults'].to_i < 1
           raise Active::RecordNotFound, "Couldn't find record with asset_id: #{url}"
         end
 
