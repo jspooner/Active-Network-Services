@@ -15,8 +15,8 @@ module Active
     end
     
     def title
-      if @data.title
-        @title = @data.title.split("|")[0].strip if @data.title.include?("|")
+      if @title = @data.title
+        @title = @title.split("|")[0].strip if @title.include?("|")
         @title = @title.gsub(/<\/?[^>]*>/, "")
         @title = @title.gsub("...", "")
       end
