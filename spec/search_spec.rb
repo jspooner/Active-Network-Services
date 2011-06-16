@@ -11,7 +11,6 @@ describe "Search" do
         results.end_index.should_not be_nil
         results.page_size.should_not be_nil
         results.search_time.should_not be_nil
-        fail
       end
     end
     
