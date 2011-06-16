@@ -15,9 +15,22 @@ module Active
     end
     
     def title
-      # data.title.gsub...
-      @data.title
+      if @data.title
+        @title = @data.title.split("|")[0].strip if @data.title.include?("|")
+        @title = @title.gsub(/<\/?[^>]*>/, "")
+        @title = @title.gsub("...", "")
+      end
+      @title
     end
+    # def title=(value)
+    #   @title = value
+    #   if @title 
+    #     @title = @title.split("|")[0].strip if @title.include?("|")          
+    #     @title = @title.gsub(/<\/?[^>]*>/, "")
+    #     @title = @title.gsub("...", "")
+    #   end
+    # end
+    
     
     def to_json
       @data.to_json

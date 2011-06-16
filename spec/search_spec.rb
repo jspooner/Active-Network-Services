@@ -253,12 +253,12 @@ describe "Search" do
       it "should find a record by url" do
         # event = Active::Activity.find_by_url("http://www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011")
         event = Active::Activity.find_by_url("www.active.com/triathlon/oceanside-ca/rohto-ironman-703-california-2011")
-        event.title.should eql("2011 Rohto Ironman 70.3 California | Oceanside, California <b>...</b>")
+        event.title.should eql("2011 Rohto Ironman 70.3 California")
       end
       describe "Result Object" do
         it "should have a title via dot notation" do
           result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
-          result.title.should eql("Dean Karnazes Silicon Valley Marathon | San Jose, California <b>...</b>")
+          result.title.should eql("Dean Karnazes Silicon Valley Marathon")
         end
       end
     end
