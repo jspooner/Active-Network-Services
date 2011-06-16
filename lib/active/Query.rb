@@ -66,6 +66,15 @@ module Active
       end
       self
     end
+
+    def keywords(value)
+      if value.kind_of?(Array)        
+        @options[:k] = value.join("+")
+      elsif value.kind_of?(String)
+        @options[:k] = value
+      end
+      self
+    end
     
     def date_range(start_date,end_date)
       if start_date.class == Date
@@ -93,7 +102,7 @@ module Active
       self
     end
         
-    [:state, :city, :category, :keywords, :channel, :splitMediaType, :zip, :dma].each do |method_name|
+    [:state, :city, :category, :channel, :splitMediaType, :zip, :dma].each do |method_name|
       define_method(method_name) do |val|
         options[:meta][method_name] ||= []
         if val.kind_of?(Array)

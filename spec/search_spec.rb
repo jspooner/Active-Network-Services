@@ -133,6 +133,7 @@ describe "Search" do
         asset.to_query.should have_param("l=San%2520Diego%252C%2520CA%252C%2520US")
       end
       it "should send bounding_box" do
+        pending
         asset = Active::Activity.bounding_box({ :sw => "33.007407,-117.332985", :ne => "33.179984,-117.003395"} )
         asset.to_query.should have_param("meta%253AlongitudeShifted%253A62.667015..62.996605")
         asset.to_query.should have_param("meta%253AlatitudeShifted%253A123.007407..123.179984")
@@ -149,6 +150,7 @@ describe "Search" do
         # end
       end
       it "should send bounding_box" do
+        pending
         asset = Active::Activity.bounding_box({:ne=>"38.8643,-121.208199", :sw=>"36.893089,-123.533684"})
 #puts asset.to_query
         asset.to_query.should have_param("meta%253AlatitudeShifted%253A126.893089..128.8643")
@@ -171,7 +173,9 @@ describe "Search" do
     describe "Instance Methods - Query Builder - Meta" do
       it "should search keywords" do
         asset = Active::Asset.keywords('Running')
-        asset.to_query.should have_param("meta:keywords=Running")
+        asset.to_query.should have_param("k=Running")
+        asset = Active::Asset.keywords(['Running', 'Hiking'])
+        asset.to_query.should have_param("k=Running+Hiking")
       end
       it "should search channels" do
         asset = Active::Asset.channel('Running')
