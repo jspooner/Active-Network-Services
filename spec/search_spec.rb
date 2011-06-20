@@ -234,6 +234,16 @@ describe "Search" do
       end
     end
     
+    describe "Instance Methods - Continuation Pattern" do
+      it "does something" do
+        asset = Active::Activity.page(1).limit(10)
+        asset.keywords("")
+        asset.state("")
+        asset.channel("Running")
+        asset.to_query.should_not have_param("meta:state=")
+      end
+    end
+    
     describe "Static Find Methods" do
       it "should raise error if no id is specified" do
         lambda { Active::Asset.find() }.should raise_error(Active::InvalidOption, "Couldn't find Asset without an ID")
