@@ -124,6 +124,7 @@ module Active
       # Nested options inside meta get joined as OR
       # Top-level options get joined with AND
       opts[:m] += opts[:meta].collect { |k,v|
+        next unless v # TODO Test that this line removes blank keys like city!!!!!!!!!!!!!!
         if v.kind_of?(Array)
           # Second-level options get joined with OR
           v.collect do |v2| 
@@ -153,6 +154,7 @@ module Active
       opts[:m] = opts[:m].join('+AND+')
       
       opts.delete(:meta)
+# bug meta:city= should be removed.  it should only be meta:city=foo
       opts.delete_if { |k, v| v.nil? || v.to_s.empty? } # Remove all blank keys
       "http://search.active.com/search?" + opts.collect{|k,v| "#{k}=#{v}"}.join('&')
     end
