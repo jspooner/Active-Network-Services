@@ -179,7 +179,8 @@ module Active
       return @a if @a
       @res ||= search
       @a   ||= Active::Results.new()
-      @a.number_of_results = @res['numberOfResults']
+      # GSA will only return 1000 events but will give us a number larger then 1000.      
+      @a.number_of_results = (@res['numberOfResults'] <= 1000) ? @res['numberOfResults'] : 1000
       @a.end_index         = @res['endIndex']
       @a.page_size         = @res['pageSize']
       @a.search_time       = @res['searchTime']

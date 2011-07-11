@@ -22,6 +22,7 @@ module Active
       end
       @title
     end
+    
     # def title=(value)
     #   @title = value
     #   if @title 

@@ -294,6 +294,13 @@ describe "Search" do
         asset.results.first.url.should_not be_nil
         asset.results.first.meta.eventId.should_not be_nil
       end
+      
+      it "should not return more then 1000 results" do
+        # GSA will only return 1000 events but will give us a number larger then 1000.
+        # This test depends on this query returning more than 1000 
+        asset = Active::Asset.order(:date_asc)
+        asset.results.number_of_results.should eql(1000)
+      end
     end
     
     describe "Factory" do
