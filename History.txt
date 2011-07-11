@@ -1,3 +1,6 @@
+== 0.1.1 / 2011-07-11
+* Fixed GSA number of results GSA bug to make pagination work as expected.
+
 == 0.1.0 / 2010-08-30
 
 * Improving organization and api
