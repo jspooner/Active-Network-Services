@@ -203,7 +203,7 @@ describe "Search" do
         end
       end
       it "should send a valid start and end date" do
-        asset = Active::Asset.date_range( "2011-11-1", "2011-11-3" ) 
+        asset = Active::Asset.date_range( "2011-11-1", "2011-11-3" )
         asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2011..11%2F03%2F2011")
         asset.results.each do |result|
@@ -246,16 +246,6 @@ describe "Search" do
           }
         end
       end
-      # it "should do search for a date span in strings" do
-      #   asset = Active::Asset.date_range("2011-07-12", "2011-06-12")
-      #   asset.should be_an_instance_of(Active::Query)        
-      #   asset.to_query.should have_param("meta:startDate:2011-07-12")
-      #   # asset.results.each do |result|
-      #   #   result.meta.startDate.should satisfy { |date| 
-      #   #     Date.parse(date) == Date.today
-      #   #   }
-      #   # end
-      # end
       
     end
     
@@ -351,7 +341,25 @@ describe "Search" do
         asset4.should be_an_instance_of(Active::Training)
       end
     end
-  
+    
+    describe "Real world examples" do
+      it "should work in Search.rb" do
+        asset = Active::Activity.page(1).limit(10)
+        asset.date_range( "2000-11-1", "2011-11-3" )
+        asset.keywords("run")
+        asset.state("CA")                          
+        asset.channel("Running")                   
+        
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2000..11%2F03%2F2011")
+        asset.to_query.should have_param("k=run")
+        asset.to_query.should have_param("meta:state=CA")
+        asset.to_query.should have_param("meta:channel=Running")    
+        
+        # open_url asset.to_query
+        asset.should have_exactly(10).results    
+      end
+    end
+    
   end
   
   
