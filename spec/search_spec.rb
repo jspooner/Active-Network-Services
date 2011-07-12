@@ -202,6 +202,20 @@ describe "Search" do
           }
         end
       end
+      it "should send a valid start and end date" do
+        asset = Active::Asset.date_range( "2011-11-1", "2011-11-3" ) 
+        asset.should be_an_instance_of(Active::Query)
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2011..11%2F03%2F2011")
+        asset.results.each do |result|
+          result.meta.startDate.should satisfy { |date| 
+            d = Date.parse(date)
+            d >= Date.parse("2011-11-1") and d <= Date.parse("2011-11-3")
+          }
+        end
+      end
+      
+      
+      
       it "should search past" do
         asset = Active::Asset.past
         asset.should be_an_instance_of(Active::Query)
@@ -232,6 +246,17 @@ describe "Search" do
           }
         end
       end
+      # it "should do search for a date span in strings" do
+      #   asset = Active::Asset.date_range("2011-07-12", "2011-06-12")
+      #   asset.should be_an_instance_of(Active::Query)        
+      #   asset.to_query.should have_param("meta:startDate:2011-07-12")
+      #   # asset.results.each do |result|
+      #   #   result.meta.startDate.should satisfy { |date| 
+      #   #     Date.parse(date) == Date.today
+      #   #   }
+      #   # end
+      # end
+      
     end
     
     describe "Instance Methods - Catching empty and nill values" do
