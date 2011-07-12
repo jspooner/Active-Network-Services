@@ -2,36 +2,59 @@ require 'hashie'
 require 'json'
 
 module Active
-  class Asset
+  class Asset < Hashie::Mash
     
-    attr_reader :data
-    
-    def initialize(data)
-      @data = Hashie::Mash.new(data)
-    end
-    # BUG only works for one level  ex:  asset.meta.zip doesn't work
-    def method_missing(m, *args, &block)
-      return @data.send(m.to_s, args, &block)
-    end
-    
+    # * No punctuation: Returns the value of the hash for that key, or nil if none exists.
+    # * Assignment (<tt>=</tt>): Sets the attribute of the given method name.
+    # * Existence (<tt>?</tt>): Returns true or false depending on whether that key has been set.
+    # * Bang (<tt>!</tt>): Forces the existence of this key, used for deep Mashes. Think of it as "touch" for mashes.
+    #
+    # == Basic Example
+    #
+    #   mash = Mash.new
+    #   mash.name? # => false
+    #   mash.name = "Bob"
+    #   mash.name # => "Bob"
+    #   mash.name? # => true
+    #
+    # == Hash Conversion  Example
+    #
+    #   hash = {:a => {:b => 23, :d => {:e => "abc"}}, :f => [{:g => 44, :h => 29}, 12]}
+    #   mash = Mash.new(hash)
+    #   mash.a.b # => 23
+    #   mash.a.d.e # => "abc"
+    #   mash.f.first.g # => 44
+    #   mash.f.last # => 12
+    #
+    # == Bang Example
+    #
+    #   mash = Mash.new
+    #   mash.author # => nil
+    #   mash.author! # => <Mash>
+    #
+    #   mash = Mash.new
+    #   mash.author!.name = "Michael Bleigh"
+    #   mash.author # => <Mash name="Michael Bleigh">
+    #
     def title
-      if @title = @data.title
+      return @title if @title
+      if self.title?
+        # Notice we have to use self['hash'] to get the original value so we don't stackoverflow
+        @title = self['title']
         @title = @title.split("|")[0].strip if @title.include?("|")
         @title = @title.gsub(/<\/?[^>]*>/, "")
         @title = @title.gsub("...", "")
       end
-      @title
+      @title 
     end
-    
-    # def title=(value)
-    #   @title = value
-    #   if @title 
-    #     @title = @title.split("|")[0].strip if @title.include?("|")          
-    #     @title = @title.gsub(/<\/?[^>]*>/, "")
-    #     @title = @title.gsub("...", "")
-    #   end
-    # end
-    
+
+    def start_date
+      if self.meta!.startDate?
+        Date.parse(self.meta.startDate)
+      else
+        nil
+      end
+    end    
     
     def to_json
       @data.to_json
@@ -78,7 +101,6 @@ module Active
           end
           raise Active::RecordNotFound, "Couldn't find record with asset_id: #{missing_ids.join(',')}"
         end
-
 
         a = []
         res['_results'].collect do |d|

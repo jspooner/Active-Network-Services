@@ -112,7 +112,7 @@ describe "Search" do
         asset.to_query.should have_param("zip=92121")
         # WTF?  result.data.meta.zip returns an array
         asset.results.each do |result|
-          result.data.meta.eventZip.should satisfy do |zip|
+          result.meta!.eventZip.should satisfy do |zip|
             true if zip == "92121"
           end
         end
@@ -122,7 +122,7 @@ describe "Search" do
         asset.to_query.should have_param("meta:zip=92121+OR+meta:zip=92114")
         # WTF?  result.data.meta.zip returns an array
         asset.results.each do |result|
-          result.data.meta.eventZip.should satisfy do |zip|
+          result.meta!.eventZip.should satisfy do |zip|
             true if zip == "92121" or zip == "92114"
           end
         end
@@ -327,6 +327,27 @@ describe "Search" do
         asset = Active::Asset.order(:date_asc)
         asset.results.number_of_results.should eql(1000)
       end
+    end
+  
+    describe "Results Object" do
+      
+      it "should have a date object for each result" do
+        asset = Active::Asset.new({"meta" => {"startDate"=>"2011-07-16"}})
+        asset.start_date.should be_an_instance_of(Date)
+      end
+            
+      it "should return nil of there isn't a date" do
+        asset = Active::Asset.new()
+        asset.start_date.should be_nil
+        asset = Active::Asset.new({"meta" => { "foo"=>"bar" }})
+        asset.start_date.should be_nil
+      end
+      
+      it "should return nil if the title is missing" do
+        asset = Active::Asset.new({"meta" => {"startDate"=>"2011-07-16"}})
+        asset.title.should be_nil
+      end
+      
     end
     
     describe "Factory" do

@@ -79,15 +79,10 @@ module Active
     def date_range(start_date,end_date)
       if start_date.kind_of?(String)
         start_date = Date.parse(start_date)
-
-        # start_date = URI.escape(start_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
       end
       if end_date.kind_of?(String)
         end_date = Date.parse(end_date)
-        # end_date = URI.escape(end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
       end
-      
-      
       start_date = URI.escape(start_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
       end_date   = URI.escape(end_date.strftime("%m/%d/%Y")).gsub(/\//,"%2F")
       options[:meta][:startDate] = "daterange:#{start_date}..#{end_date}"
