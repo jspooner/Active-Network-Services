@@ -347,6 +347,11 @@ describe "Search" do
         asset = Active::Asset.new({"meta" => {"startDate"=>"2011-07-16"}})
         asset.title.should be_nil
       end
+
+      it "should return nil if the title is missing" do
+        asset = Active::Asset.new({"meta" => {"startDate"=>"2011-07-16"}})
+        asset.to_json.should eql("{\"meta\":{\"startDate\":\"2011-07-16\"}}")
+      end
       
     end
     

@@ -56,10 +56,6 @@ module Active
       end
     end    
     
-    def to_json
-      @data.to_json
-    end
-    
     class << self
       def factory(data)
         begin
