@@ -234,13 +234,24 @@ describe "Search" do
       end
     end
     
-    describe "Instance Methods - Continuation Pattern" do
-      it "does something" do
+    describe "Instance Methods - Catching empty and nill values" do
+      it "should not pass empty values" do
         asset = Active::Activity.page(1).limit(10)
         asset.keywords("")
         asset.state("")
         asset.channel("Running")
         asset.to_query.should_not have_param("meta:state=")
+        asset.to_query.should_not have_param("k=")
+        asset.to_query.should have_param("meta:channel=Running")
+        asset.to_query.should_not have_param("+OR++OR+")
+        asset.to_query.should_not have_param("+AND++AND+")
+      end
+      it "should not pass nil values" do
+        asset = Active::Activity.page(1).limit(10)
+        asset.keywords("")
+        asset.state(nil)
+        asset.channel("Running")
+        asset.to_query.should_not have_param("meta:state=")        
       end
     end
     

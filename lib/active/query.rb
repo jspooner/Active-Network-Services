@@ -104,6 +104,7 @@ module Active
         
     [:state, :city, :category, :channel, :splitMediaType, :zip, :dma].each do |method_name|
       define_method(method_name) do |val|
+        
         options[:meta][method_name] ||= []
         if val.kind_of?(Array)
           options[:meta][method_name] += val
@@ -124,15 +125,20 @@ module Active
       # Nested options inside meta get joined as OR
       # Top-level options get joined with AND
       opts[:m] += opts[:meta].collect { |k,v|
-        next unless v # TODO Test that this line removes blank keys like city!!!!!!!!!!!!!!
+        next unless v 
         if v.kind_of?(Array)
           # Second-level options get joined with OR
           v.collect do |v2| 
-            if k == :assetId
+            # clean out empty values
+            if v2.nil?
+              next
+            elsif v2.kind_of?(String) and v2.empty?
+              next
+            elsif k == :assetId
               "meta:#{k}=#{single_encode(v2)}"
-            else              
+            else
               "meta:#{k}=#{double_encode(v2)}"
-            end            
+            end
           end.join('+OR+')
         else
           # these keys need meta :
@@ -142,7 +148,7 @@ module Active
               double_encode("meta:#{k}:#{v}") # WTF  encode the : ? and we don't have to encode it for assetId?
             else
               # encoding doesn't work for asset_id, daterange
-              "meta:#{k}:#{v}"              
+              "meta:#{k}:#{v}"
             end
           else# these keys need meta=
             "meta:#{k}=#{double_encode(v)}"
@@ -151,10 +157,10 @@ module Active
       }
       
       opts[:m] << double_encode("meta:startDate:daterange:01-01-2000..") if opts[:meta][:startDate].nil?
-      opts[:m] = opts[:m].join('+AND+')
-      
+      # clean out empty values
+      opts[:m] = opts[:m].compact.reject { |s| s.nil? or s.empty? }
+      opts[:m] = opts[:m].join('+AND+')      
       opts.delete(:meta)
-# bug meta:city= should be removed.  it should only be meta:city=foo
       opts.delete_if { |k, v| v.nil? || v.to_s.empty? } # Remove all blank keys
       "http://search.active.com/search?" + opts.collect{|k,v| "#{k}=#{v}"}.join('&')
     end
