@@ -66,6 +66,12 @@ module Active
       end
       self
     end
+    
+    def radius(value)
+      raise Active::InvalidOption unless value
+      @options[:r] = value.to_i
+      self
+    end
 
     def keywords(value)
       if value.kind_of?(Array)        

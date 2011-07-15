@@ -132,6 +132,10 @@ describe "Search" do
         asset = Active::Asset.location(:l => "San Diego, CA, US")
         asset.to_query.should have_param("l=San%2520Diego%252C%2520CA%252C%2520US")
       end
+      it "should construct a valid url with radius" do
+        asset = Active::Asset.radius(50)
+        asset.to_query.should have_param("r=50")
+      end
       it "should send bounding_box" do
         pending
         asset = Active::Activity.bounding_box({ :sw => "33.007407,-117.332985", :ne => "33.179984,-117.003395"} )
