@@ -54,7 +54,15 @@ module Active
       else
         nil
       end
-    end    
+    end
+    
+    def asset_id
+      aid = self.meta!.assetId
+      if aid.kind_of?(Array)
+        aid = aid.first
+      end
+      aid.upcase
+    end
     
     class << self
       def factory(data)

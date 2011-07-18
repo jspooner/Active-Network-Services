@@ -281,6 +281,7 @@ describe "Search" do
       it "should find record: Dean Karnazes Silicon Valley Marathon" do
         result = Active::Asset.find("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
         result.should be_an_instance_of(Active::Asset)
+        result.asset_id.should eql("DD8F427F-6188-465B-8C26-71BBA22D2DB7")
       end
       it "should have two asset_id's in the query" do
         results = Active::Asset.find(["DD8F427F-6188-465B-8C26-71BBA22D2DB7", "2C384907-D683-4E83-BD97-63A46F38437A"])
