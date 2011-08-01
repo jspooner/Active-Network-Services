@@ -391,7 +391,13 @@ describe "Search" do
       end
     end
     
+    describe "invalid UTF-8 byte sequences" do
+      it "should gracefully handle invalid UTF-8 byte sequences in the title" do
+        asset = Active::Asset.new()
+        asset['title'] = "one | \xB7 two"
+        asset.title.should eql("one")
+      end
+    end
+    
   end
-  
-  
 end

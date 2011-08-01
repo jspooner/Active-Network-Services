@@ -1,5 +1,6 @@
 require 'hashie'
 require 'json'
+require 'active_support/multibyte/unicode'
 
 module Active
   class Asset < Hashie::Mash
@@ -40,7 +41,7 @@ module Active
       return @title if @title
       if self.title?
         # Notice we have to use self['hash'] to get the original value so we don't stackoverflow
-        @title = self['title']
+        @title = ActiveSupport::Multibyte::Unicode.tidy_bytes(self['title'])
         @title = @title.split("|")[0].strip if @title.include?("|")
         @title = @title.gsub(/<\/?[^>]*>/, "")
         @title = @title.gsub("...", "")
