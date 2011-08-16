@@ -65,6 +65,10 @@ module Active
       aid.upcase
     end
     
+    def zip
+      self.meta['zip'] # an inheritated object defines zip so we need to override it.
+    end
+        
     class << self
       def factory(data)
         begin
@@ -145,7 +149,9 @@ puts "query #{query.to_query}"
           return a
         end
       end
-      
+
+      # Example
+      # Asset.zip("92121")
       [
         :sort, :order, :limit, :per_page, :page,
         :category, :keywords, :channel, :splitMediaType,

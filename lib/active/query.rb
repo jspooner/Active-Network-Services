@@ -200,8 +200,7 @@ module Active
       @a.search_time       = @res['searchTime']
 
       @res['_results'].collect do |d|
-        t = Active::Asset.factory(d)
-        @a << t
+        @a << Active::Asset.factory(d)
       end
       @a
     end

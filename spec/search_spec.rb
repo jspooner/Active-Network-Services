@@ -110,19 +110,15 @@ describe "Search" do
       it "should find by zip" do
         asset = Active::Activity.zip("92121")
         asset.to_query.should have_param("zip=92121")
-        # WTF?  result.data.meta.zip returns an array
         asset.results.each do |result|
-          result.meta!.eventZip.should satisfy do |zip|
-            true if zip == "92121"
-          end
+          result.zip.should == "92121"
         end
       end
       it "should find many zips" do
         asset = Active::Activity.zips([92121, 92114])
         asset.to_query.should have_param("meta:zip=92121+OR+meta:zip=92114")
-        # WTF?  result.data.meta.zip returns an array
         asset.results.each do |result|
-          result.meta!.eventZip.should satisfy do |zip|
+          result.zip.should satisfy do |zip|
             true if zip == "92121" or zip == "92114"
           end
         end

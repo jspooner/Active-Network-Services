@@ -6,7 +6,9 @@ Active
 
 Search api for Active Network
 
-== Will Paginate
+== Development
+
+To use in irb do `rake install` then `irb` and `require 'Active'`
 
 
 == LICENSE:
