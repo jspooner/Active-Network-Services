@@ -385,6 +385,17 @@ describe "Search" do
         # open_url asset.to_query
         asset.should have_exactly(10).results    
       end
+      it "should work in Search.rb" do
+        asset = Active::Activity.page(1).limit(10)
+        asset.date_range( "2000-11-1", "2011-11-3" )
+        asset.keywords("run walk")
+        asset.state("CA")                          
+        asset.channel("Running")                   
+
+        # open_url asset.to_query        
+        asset.to_query.should have_param("k=run%20walk")
+        asset.should have_at_least(1).results    
+      end
     end
     
     describe "invalid UTF-8 byte sequences" do

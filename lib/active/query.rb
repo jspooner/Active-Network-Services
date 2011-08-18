@@ -77,7 +77,7 @@ module Active
       if value.kind_of?(Array)        
         @options[:k] = value.join("+")
       elsif value.kind_of?(String)
-        @options[:k] = value
+        @options[:k] = single_encode(value)
       end
       self
     end
