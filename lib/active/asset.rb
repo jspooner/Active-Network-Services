@@ -130,7 +130,7 @@ module Active
         raise Active::InvalidOption, "Couldn't find Asset without a url" if url.nil?
         query                = Active::Query.new
         query.options[:m] << "site:#{url}"
-puts "query #{query.to_query}"
+        
         # Executes the actual search API call
         res = query.search
         if res['numberOfResults'].to_i < 1

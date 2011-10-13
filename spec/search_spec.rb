@@ -125,8 +125,8 @@ describe "Search" do
 
       end
       it "should construct a valid url with location" do
-        asset = Active::Asset.location(:l => "San Diego, CA, US")
-        asset.to_query.should have_param("l=San%2520Diego%252C%2520CA%252C%2520US")
+        asset = Active::Asset.location("San Diego, CA, US")
+        asset.to_query.should have_param("l=San%20Diego%2C%20CA%2C%20US")
       end
       it "should construct a valid url with radius" do
         asset = Active::Asset.radius(50)
@@ -195,6 +195,7 @@ describe "Search" do
         asset = Active::Asset.date_range( sd, ed ) 
         asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2011..11%2F03%2F2011")
+        asset.results.size.should eq(10)
         asset.results.each do |result|
           result.meta.startDate.should satisfy { |date| 
             d = Date.parse(date)
@@ -206,6 +207,19 @@ describe "Search" do
         asset = Active::Asset.date_range( "2011-11-1", "2011-11-3" )
         asset.should be_an_instance_of(Active::Query)
         asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2011..11%2F03%2F2011")
+        asset.results.size.should eq(10)
+        asset.results.each do |result|
+          result.meta.startDate.should satisfy { |date| 
+            d = Date.parse(date)
+            d >= Date.parse("2011-11-1") and d <= Date.parse("2011-11-3")
+          }
+        end
+      end
+      it "should send a valid start and end date" do
+        asset = Active::Asset.date_range( "1/11/2011", "3/11/2011" )
+        asset.should be_an_instance_of(Active::Query)
+        asset.to_query.should have_param("meta:startDate:daterange:11%2F01%2F2011..11%2F03%2F2011")
+        asset.results.size.should eq(10)
         asset.results.each do |result|
           result.meta.startDate.should satisfy { |date| 
             d = Date.parse(date)

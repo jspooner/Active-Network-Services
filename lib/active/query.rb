@@ -62,7 +62,7 @@ module Active
       if value.kind_of?(Hash)        
         options[:meta].merge!(value)
       elsif value.kind_of?(String)
-        @options[:l] = value
+        @options[:l] = single_encode(value)
       end
       self
     end
