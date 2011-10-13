@@ -6,6 +6,8 @@ Active
 
 Search api for Active Network
 
+For use with Ruby 1.9
+
 == Development
 
 To use in irb do `rake install` then `irb` and `require 'Active'`

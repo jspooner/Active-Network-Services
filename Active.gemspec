@@ -5,7 +5,7 @@ require "active/version"
 Gem::Specification.new do |s|
   s.name        = "Active"
   s.version     = Active::VERSION
-  s.date        = "2011-06-03"
+  s.date        = "2011-10-13"
   s.authors     = ["Jonathan Spooner, Marc Leglise"]
   s.email       = ["jspooner@gmail.com"]
   s.homepage    = "http://developer.active.com/docs/Activecom_Search_API_Reference"
