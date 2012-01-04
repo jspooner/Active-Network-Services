@@ -3,6 +3,7 @@ describe "Search" do
   describe "Asset Accessors" do
     
     describe "invalid UTF-8 byte sequences" do
+      # TODO: Test pipe separately from UTF-8
       it "should gracefully handle invalid UTF-8 byte sequences in the title" do
         asset = Active::Asset.new()
         asset['title'] = "one | \xB7 two"
