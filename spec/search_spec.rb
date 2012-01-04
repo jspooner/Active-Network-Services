@@ -412,30 +412,5 @@ describe "Search" do
       end
     end
     
-    describe "invalid UTF-8 byte sequences" do
-      it "should gracefully handle invalid UTF-8 byte sequences in the title" do
-        asset = Active::Asset.new()
-        asset['title'] = "one | \xB7 two"
-        asset.title.should eql("one")
-      end
-    end
-    
-    describe "HTML and special character sanitizing" do
-      it "should convert HTML special characters in the title" do
-        asset = Active::Asset.new()
-        asset['title'] = "one &amp; two"
-        asset.title.should eql("one & two")
-      end
-      it "should remove HTML tags from the title" do
-        asset = Active::Asset.new()
-        asset['title'] = "one <b>two</b>"
-        asset.title.should eql("one two")
-      end
-      it "should remove HTML tags from the description" do
-        asset = Active::Asset.new({"meta" => { "summary"=>"one <b>two</b>" }})
-        asset.description.should eql("one two")
-      end
-    end
-    
   end
 end

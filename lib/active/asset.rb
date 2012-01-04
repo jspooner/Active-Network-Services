@@ -82,6 +82,16 @@ module Active
       aid.upcase
     end
     
+    def address
+      if self.meta['address']
+        return self.meta['address']
+      elsif self.meta['location']
+        return self.meta['location']
+      else
+        return "#{self.meta.city}, #{self.meta.state}"
+      end
+    end
+    
     def zip
       self.meta['zip'] # an inheritated object defines zip so we need to override it.
     end
