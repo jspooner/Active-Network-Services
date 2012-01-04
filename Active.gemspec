@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency "json", "~> 1"
   s.add_dependency "hashie", "~> 1"
   s.add_dependency "activesupport", "> 3"
+  s.add_dependency "htmlentities", "> 4"
   # s.add_dependency "savon", "= 0.7.9"
   # s.add_dependency "dalli", "= 0.9.8"
   

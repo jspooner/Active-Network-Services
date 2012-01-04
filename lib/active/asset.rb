@@ -1,5 +1,6 @@
 require 'hashie'
 require 'json'
+require 'htmlentities'
 require 'active_support/multibyte/unicode'
 
 module Active
@@ -45,13 +46,29 @@ module Active
         @title = @title.split("|")[0].strip if @title.include?("|")
         @title = @title.gsub(/<\/?[^>]*>/, "")
         @title = @title.gsub("...", "")
+        @title = ::HTMLEntities.new.decode( @title )
       end
-      @title 
+      @title
+    end
+    
+    def description
+      return @description if @description
+      if self.meta!.summary?
+        # Notice we have to use self['hash'] to get the original value so we don't stackoverflow
+        @description = ActiveSupport::Multibyte::Unicode.tidy_bytes( self.meta.summary )
+        @description = @description.gsub(/<\/?[^>]*>/, "")
+        @description = ::HTMLEntities.new.decode( @description )
+      end
+      @description
     end
 
     def start_date
       if self.meta!.startDate?
-        Date.parse(self.meta.startDate)
+        if self.meta!.startTime?
+          Time.parse("#{self.meta.startDate} #{self.meta.startTime}")
+        else
+          Date.parse(self.meta.startDate)
+        end
       else
         nil
       end
